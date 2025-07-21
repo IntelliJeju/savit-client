@@ -29,12 +29,13 @@ const handleClick = (event: MouseEvent) => {
 }
 
 const buttonClasses = computed(() => {
+  // 어두운 기본 버튼
   if (props.variant === 'dark') {
-    return 'cursor-pointer border-none rounded-[8px] bg-[#545045] font-[Pretendard] text-[16px] text-center text-[#FFFFFF] mx-[32px] my-[32px] px-[32px] py-[16px] h-[56px] w-[100%]'
+    return 'cursor-pointer border-none rounded-lg bg-[#545045] font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] mx-8 my-8 px-8 py-4 h-14 w-[100%]'
   }
 
-  // 기본
-  return 'cursor-pointer border-none rounded-[8px] bg-[#0ab68b] font-[Pretendard] text-[16px] text-center text-[#FFFFFF] mx-[32px] my-[32px] px-[32px] py-[16px] h-[56px] w-[100%]'
+  // 기본 버튼
+  return 'cursor-pointer border-none rounded-lg bg-[#0ab68b] font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] mx-8 my-8 px-8 py-4 h-14 w-[100%]'
 })
 </script>
 
