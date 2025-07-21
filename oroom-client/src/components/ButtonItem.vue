@@ -30,11 +30,13 @@ const handleClick = (event: MouseEvent) => {
 
 const buttonClasses = computed(() => {
   if (props.variant === 'dark') {
+
     return 'cursor-pointer border-none rounded-lg bg-[#545045] font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] mx-8 my-8 px-8 py-4 h-14 w-[100%]'
   }
 
   // 기본
   return 'cursor-pointer border-none rounded-lg bg-[#0ab68b] font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] mx-8 my-8 px-8 py-4 h-14 w-[100%]'
+
 })
 </script>
 
