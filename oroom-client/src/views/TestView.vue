@@ -1,13 +1,11 @@
 <template>
   <ButtonItem />
+  <DoughnutChart />
 </template>
 
 <script setup>
+import DoughnutChart from '@/components/DoughnutChart.vue'
 import ButtonItem from '../components/ButtonItem.vue'
-
-const handleClick = (event) => {
-  console.log('버튼 클릭됨!')
-}
 </script>
 
 <style scoped></style>

@@ -1,20 +1,5 @@
 <template>
-  <div>
-    <!-- 기본 버튼 -->
-    <Button @click="handleClick1" text="기본 버튼1" />
-  </div>
-
-  <div>
-    <!-- 기본 버튼 어두운 버전 -->
-    <Button variant="dark" @click="handleClick2" text="기본 버튼2" />
-  </div>
+  <div></div>
 </template>
-
-<script setup lang="ts">
-import Button from './components/ButtonItem.vue'
-
-const handleClick1 = () => console.log('기본 버튼')
-const handleClick2 = () => console.log('기본 버튼 다크 버전')
-</script>
-636.
+<script setup lang="ts"></script>
 <style scoped></style>
