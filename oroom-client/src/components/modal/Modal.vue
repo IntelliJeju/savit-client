@@ -1,3 +1,29 @@
+<!-- import Modal from './components/modal/Modal.vue'
+import { useModal } from './composable/useModal.ts'
+
+const basicModal = useModal()
+
+닫기 후 함수
+const afterModalClose = () => {
+  console.log('modal close')
+}
+
+확인 후 함수
+const afterConfirmClose = () => {
+  console.log('modal confirm')
+}
+
+열기 전 함수
+const handleBasicModal = () => {
+  basicModal.open()
+}
+
+<Modal
+  v-model:show="basicModal.isOpen.value"
+  @close="afterModalClose"
+  @confirm="afterConfirmClose"
+  >테스트 모달</Modal
+>-->
 <template>
   <div
     v-if="show"
