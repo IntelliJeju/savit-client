@@ -67,7 +67,6 @@
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
-    border: none;
     outline: none;
   }
 
@@ -90,23 +89,6 @@
   }
 
   /* 10. 접근성 개선 */
-  /* 포커스 아웃라인 개선 */
-  :focus-visible {
-    outline: 2px solid #4f46e5;
-    outline-offset: 2px;
-  }
-
-  /* 움직임 감소 설정을 선호하는 사용자를 위한 설정 */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
 
   /* 11. 다크 모드 지원을 위한 색상 스킴 */
   /* :root {
