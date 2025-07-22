@@ -1,5 +1,9 @@
 <template>
-  <button :class="buttonClasses" @click="handleClick">
+  <button
+    class="cursor-pointer border-none rounded-lg font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] h-12 w-[100%]"
+    :class="buttonClasses"
+    @click="handleClick"
+  >
     <slot>{{ text }}</slot>
   </button>
 </template>
@@ -9,7 +13,7 @@ import { computed } from 'vue'
 
 // Props 정의
 interface Props {
-  variant?: 'primary' | 'dark'
+  variant?: 'primary' | 'dark' | 'warn'
   text?: string
 }
 
@@ -31,11 +35,12 @@ const handleClick = (event: MouseEvent) => {
 const buttonClasses = computed(() => {
   // 어두운 기본 버튼
   if (props.variant === 'dark') {
-    return 'cursor-pointer border-none rounded-lg bg-[#545045] font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] mx-8 my-8 px-8 py-4 h-14 w-[100%]'
+    return 'bg-[#545045]'
+  } else if (props.variant === 'warn') {
+    return 'bg-[#FE4444]'
   }
-
   // 기본 버튼
-  return 'cursor-pointer border-none rounded-lg bg-[#0ab68b] font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] mx-8 my-8 px-8 py-4 h-14 w-[100%]'
+  return 'bg-[#0ab68b]'
 })
 </script>
 
