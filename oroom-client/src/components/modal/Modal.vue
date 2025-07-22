@@ -5,7 +5,7 @@
     @click="handleClose"
   >
     <div
-      class="modal-container bg-white w-[70%] min-h-[20vh] rounded-lg flex flex-col p-4 gap-4"
+      class="modal-container bg-white w-[70%] min-h-[20vh] rounded-lg flex flex-col p-4 pt-6 gap-4"
       @click.stop
     >
       <div class="modal-contet flex-1">
