@@ -24,95 +24,80 @@ const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
 
 const routes: Array<RouteRecordRaw> = [
+  //auth
   {
-    path: '/auth',
-    component: MainLayout,
-    meta: { showNavigation: false, requiresAuth: false },
-    children: [
-      {
-        path: 'login',
-        name: 'Login',
-        component: Login,
-      },
-    ],
+    path: '/auth/login',
+    name: 'Login',
+    component: Login,
+    meta: { showNavigation: false, requiresAuth: false, showBackButton: false },
   },
+
+  //index
   {
     path: '/',
-    component: MainLayout,
-    meta: { showNavigation: true, requiresAuth: true },
-    children: [
-      {
-        path: '',
-        name: 'Dashboard',
-        component: DashBoard,
-      },
-    ],
+    name: 'Dashboard',
+    component: DashBoard,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+  },
+
+  //card
+  {
+    path: '/card/current',
+    name: 'CardCurrent',
+    component: CardCurrent,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
   },
   {
-    path: '/card',
-    component: MainLayout,
-    meta: { showNavigation: true, requiresAuth: true },
-    children: [
-      {
-        path: 'current',
-        name: 'CardCurrent',
-        component: CardCurrent,
-      },
-      {
-        path: 'register',
-        name: 'CardRegister',
-        component: CardRegister,
-      },
-    ],
+    path: '/card/register',
+    name: 'CardRegister',
+    component: CardRegister,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+  },
+
+  //budget
+  {
+    path: '/budget/check',
+    name: 'BudgetCheck',
+    component: BudgetCheck,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
   },
   {
-    path: '/budget',
-    component: MainLayout,
-    meta: { showNavigation: true, requiresAuth: true },
-    children: [
-      {
-        path: 'check',
-        name: 'BudgetCheck',
-        component: BudgetCheck,
-      },
-      {
-        path: 'setting',
-        name: 'BudgetSetting',
-        component: BudgetSetting,
-      },
-    ],
+    path: '/budget/setting',
+    name: 'BudgetSetting',
+    component: BudgetSetting,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
   },
+
+  //challenge
   {
     path: '/challenge',
-    component: MainLayout,
-    meta: { showNavigation: true, requiresAuth: true },
-    children: [
-      {
-        path: '',
-        name: 'ChallengeMain',
-        component: ChallengeMain,
-      },
-      {
-        path: 'current',
-        name: 'ChallengeCurrent',
-        component: ChallengeCurrent,
-      },
-      {
-        path: 'detail',
-        name: 'ChallengeDetail',
-        component: ChallengeDetail,
-      },
-      {
-        path: 'statistics',
-        name: 'ChallengeStatistics',
-        component: ChallengeStatistics,
-      },
-      {
-        path: 'result',
-        name: 'ChallengeResult',
-        component: ChallengeResult,
-      },
-    ],
+    name: 'ChallengeMain',
+    component: ChallengeMain,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+  },
+  {
+    path: '/challenge/current',
+    name: 'ChallengeCurrent',
+    component: ChallengeCurrent,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+  },
+  {
+    path: '/challenge/detail',
+    name: 'ChallengeDetail',
+    component: ChallengeDetail,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+  },
+  {
+    path: '/challenge/statistics',
+    name: 'ChallengeStatistics',
+    component: ChallengeStatistics,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+  },
+  {
+    path: '/challenge/result',
+    name: 'ChallengeResult',
+    component: ChallengeResult,
+    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
   },
 ]
 

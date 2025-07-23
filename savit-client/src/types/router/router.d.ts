@@ -4,6 +4,7 @@ import 'vue-router'
 declare module 'vue-router' {
   interface RouteMeta {
     showNavigation: boolean
+    showBackButton: boolean
     requiresAuth: boolean
   }
 }
