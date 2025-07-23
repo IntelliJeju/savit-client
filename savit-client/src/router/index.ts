@@ -24,48 +24,88 @@ const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    redirect: '/home',
+  },
   //auth
   {
     path: '/auth/login',
     name: 'Login',
     component: Login,
-    meta: { showNavigation: false, requiresAuth: false, showBackButton: false },
+    meta: {
+      showNavigation: false,
+      requiresAuth: false,
+      showBackButton: false,
+      showTitle: false,
+      title: '',
+    },
   },
 
   //index
   {
-    path: '/',
+    path: '/home',
     name: 'Dashboard',
     component: DashBoard,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: false,
+      showTitle: true,
+      title: '',
+    },
   },
 
   //card
   {
-    path: '/card/current',
+    path: '/card',
     name: 'CardCurrent',
     component: CardCurrent,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: false,
+      showTitle: true,
+      title: '카드 사용 현황',
+    },
   },
   {
     path: '/card/register',
     name: 'CardRegister',
     component: CardRegister,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showTitle: true,
+      title: '카드 등록',
+    },
   },
 
   //budget
   {
-    path: '/budget/check',
+    path: '/budget',
     name: 'BudgetCheck',
     component: BudgetCheck,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: false,
+      showTitle: true,
+      title: '카테고리별 지출',
+    },
   },
   {
     path: '/budget/setting',
     name: 'BudgetSetting',
     component: BudgetSetting,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showTitle: true,
+      title: '카테고리 예산 설정',
+    },
   },
 
   //challenge
@@ -73,31 +113,61 @@ const routes: Array<RouteRecordRaw> = [
     path: '/challenge',
     name: 'ChallengeMain',
     component: ChallengeMain,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: false,
+      showTitle: true,
+      title: '챌린지',
+    },
   },
   {
     path: '/challenge/current',
     name: 'ChallengeCurrent',
     component: ChallengeCurrent,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showTitle: true,
+      title: '챌린지 현황',
+    },
   },
   {
     path: '/challenge/detail',
     name: 'ChallengeDetail',
     component: ChallengeDetail,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showTitle: true,
+      title: '챌린지 상세',
+    },
   },
   {
     path: '/challenge/statistics',
     name: 'ChallengeStatistics',
     component: ChallengeStatistics,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showTitle: true,
+      title: '챌린지 통계',
+    },
   },
   {
     path: '/challenge/result',
     name: 'ChallengeResult',
     component: ChallengeResult,
-    meta: { showNavigation: true, requiresAuth: true, showBackButton: false },
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: false,
+      showTitle: false,
+      title: '',
+    },
   },
 ]
 
