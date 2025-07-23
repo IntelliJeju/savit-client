@@ -1,14 +1,16 @@
-// api/axios.js
 import axios from 'axios'
-import { ElMessage, ElMessageBox } from 'element-plus' // Element Plus 사용 시
-// import { message } from 'ant-design-vue' // Ant Design Vue 사용 시
+import { ElMessage, ElMessageBox } from 'element-plus'
 import router from '@/router'
-import store from '@/store' // Vuex 사용 시
-// import { useAuthStore } from '@/stores/auth' // Pinia 사용 시
+import { useAuthStore } from '@/stores/auth' // Pinia 사용 시
+
+interface RefreshTokenResponse {
+  accessToken: string
+  refreshToken?: string
+}
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: process.env.VUE_APP_API_BASE_URL || 'http://localhost:5173/api',
+  baseURL: import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5173/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -98,27 +100,22 @@ apiClient.interceptors.response.use(
 )
 
 // 400 에러 처리
-function handleBadRequest(data) {
+function handleBadRequest(data: { message?: string }) {
   const message = data?.message || '잘못된 요청입니다.'
   ElMessage.error(message)
 }
 
 // 401 에러 처리 (인증 실패)
-async function handleUnauthorized(data) {
+async function handleUnauthorized(data: { message?: string }) {
   const message = data?.message || '인증이 만료되었습니다.'
 
   // 토큰 정리
   localStorage.removeItem('accessToken')
   localStorage.removeItem('refreshToken')
 
-  // Vuex 스토어 정리
-  if (store.dispatch) {
-    await store.dispatch('auth/logout')
-  }
-
-  // Pinia 스토어 정리 (Pinia 사용 시)
-  // const authStore = useAuthStore()
-  // authStore.logout()
+  // Pinia 스토어 정리
+  const authStore = useAuthStore()
+  authStore.logout()
 
   ElMessage.error(message)
 
@@ -132,7 +129,7 @@ async function handleUnauthorized(data) {
 }
 
 // 403 에러 처리 (권한 없음)
-function handleForbidden(data) {
+function handleForbidden(data: { message?: string }) {
   const message = data?.message || '접근 권한이 없습니다.'
   ElMessage.error(message)
 
@@ -141,13 +138,13 @@ function handleForbidden(data) {
 }
 
 // 404 에러 처리
-function handleNotFound(data) {
+function handleNotFound(data: { message?: string }) {
   const message = data?.message || '요청한 리소스를 찾을 수 없습니다.'
   ElMessage.error(message)
 }
 
 // 422 에러 처리 (유효성 검사 실패)
-function handleValidationError(data) {
+function handleValidationError(data: { errors?: any[]; message?: string }) {
   if (data?.errors && Array.isArray(data.errors)) {
     // 여러 유효성 검사 에러를 하나씩 표시
     data.errors.forEach((error) => {
@@ -160,14 +157,14 @@ function handleValidationError(data) {
 }
 
 // 429 에러 처리 (요청 제한 초과)
-function handleTooManyRequests(data) {
+function handleTooManyRequests(data: { message?: string }) {
   const message = data?.message || '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.'
   ElMessage.warning(message)
 }
 
 // 500번대 서버 에러 처리
-function handleServerError(status, data) {
-  const defaultMessages = {
+function handleServerError(status: number, data: { message?: string }) {
+  const defaultMessages: { [key: number]: string } = {
     500: '서버 내부 오류가 발생했습니다.',
     502: '게이트웨이 오류가 발생했습니다.',
     503: '서비스를 사용할 수 없습니다.',
@@ -183,7 +180,7 @@ function handleServerError(status, data) {
 }
 
 // 알 수 없는 에러 처리
-function handleUnknownError(status, data) {
+function handleUnknownError(status: number, data: { message?: string }) {
   const message = data?.message || `알 수 없는 오류가 발생했습니다. (${status})`
   ElMessage.error(message)
 }
@@ -197,11 +194,11 @@ export async function refreshToken() {
       throw new Error('Refresh token not found')
     }
 
-    const response = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {
+    const response = await apiClient.post<RefreshTokenResponse>(`/auth/refresh`, {
       refreshToken,
     })
 
-    const { accessToken, refreshToken: newRefreshToken } = response.data
+    const { accessToken, refreshToken: newRefreshToken } = response.data as RefreshTokenResponse
 
     localStorage.setItem('accessToken', accessToken)
     if (newRefreshToken) {
