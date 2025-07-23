@@ -5,7 +5,7 @@
       :key="item.id"
       class="nav-item flex flex-col justify-center items-center"
       :class="{ active: activeTab === item.id }"
-      @click="setActiveTab(item.id)"
+      @click="handleTabChange(item.id)"
       :style="{ color: activeTab === item.id ? '#028174' : '#9CA3AF' }"
     >
       <div class="nav-icon">
@@ -17,7 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 interface NavItem {
   id: string
@@ -32,35 +33,34 @@ const navItems: NavItem[] = [
     icon: 'hi-solid-home',
   },
   {
-    id: 'shopping',
+    id: 'card',
     label: '소비',
     icon: 'hi-solid-chart-bar',
   },
   {
-    id: 'statistics',
+    id: 'challenge',
     label: '챌린지',
     icon: 'hi-solid-user-group',
   },
   {
-    id: 'estimate',
+    id: 'budget',
     label: '예산',
     icon: 'hi-solid-credit-card',
   },
 ]
 
-const activeTab = ref('home')
+const route = useRoute()
 
-const setActiveTab = (tabId: string) => {
-  activeTab.value = tabId
-}
+const activeTab = computed(() => {
+  return route.path.split('/')[1] || 'home'
+})
 
 const emit = defineEmits<{
   tabChange: [tab: string]
 }>()
 
-const handleTabChange = (tabId: string) => {
-  setActiveTab(tabId)
-  emit('tabChange', tabId)
+const handleTabChange = (page: string) => {
+  emit('tabChange', page)
 }
 </script>
 
