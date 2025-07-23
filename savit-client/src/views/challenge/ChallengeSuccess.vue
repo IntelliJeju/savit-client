@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>ChallengeSuccess.vue</div>
 </template>
 
 <script setup lang="ts"></script>

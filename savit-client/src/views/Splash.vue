@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>Splash.vue</div>
 </template>
 
 <script setup lang="ts"></script>

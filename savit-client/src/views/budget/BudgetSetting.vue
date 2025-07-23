@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>BudgetSetting.vue</div>
 </template>
 
 <script setup lang="ts"></script>

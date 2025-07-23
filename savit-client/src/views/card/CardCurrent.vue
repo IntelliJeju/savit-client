@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>CardCurrent.vue</div>
 </template>
 
 <script setup lang="ts"></script>

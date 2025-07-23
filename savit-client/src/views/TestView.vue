@@ -1,4 +1,5 @@
 <template>
+  <div>TestView.vue</div>
   <ButtonItem />
   <DoughnutChart />
   <LabelItem />

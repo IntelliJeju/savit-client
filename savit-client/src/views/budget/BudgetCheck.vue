@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>BudgetCheck.vue</div>
 </template>
 
 <script setup lang="ts"></script>
