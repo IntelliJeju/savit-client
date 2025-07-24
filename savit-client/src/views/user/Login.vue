@@ -32,7 +32,7 @@ const router = useRouter()
 const handleKakaoLogin = async () => {
   try {
     await authStore.kakaoLogin()
-    router.push('/dashboard')
+    router.push('/home')
   } catch (error) {
     console.error('카카오 로그인 실패:', error)
   }

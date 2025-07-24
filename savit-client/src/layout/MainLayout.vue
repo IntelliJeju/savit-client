@@ -2,7 +2,7 @@
   <div class="main-layout h-screen flex flex-col">
     <div class="header">{{ pageTitle }}</div>
     <div class="main-content flex-1"><router-view /></div>
-    <div class="footer">
+    <div class="footer" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
   </div>

@@ -26,19 +26,19 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function kakaoLogin() {
     try {
-      const response = await request({
-        method: 'POST',
-        url: '/auth/kakao/login',
-        data: {
-          accessToken: 'temp-kakao-token',
-        },
-      })
+      // const response = await request({
+      //   method: 'POST',
+      //   url: '/auth/kakao/login',
+      //   data: {
+      //     accessToken: 'temp-kakao-token',
+      //   },
+      // })
 
       const tempToken = 'temp-kakao-token'
       const tempUser: User = {
-        memberId: 'kakao-user-123',
-        name: '카카오 사용자',
-        email: 'kakao@example.com',
+        memberId: 'temp-user-123',
+        name: '테스트 사용자',
+        email: 'temp@example.com',
       }
 
       token.value = tempToken
@@ -52,7 +52,6 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       console.error('카카오 로그인 실패:', error)
 
-      logout()
       throw error
     }
   }
