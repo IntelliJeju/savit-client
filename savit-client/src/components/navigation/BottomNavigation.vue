@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom-navigation h-12 flex flex-row justify-around border-t pt-3">
+  <div class="bottom-navigation h-12 flex flex-row justify-around border-t py-9">
     <div
       v-for="item in navItems"
       :key="item.id"

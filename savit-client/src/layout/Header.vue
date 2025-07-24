@@ -1,5 +1,5 @@
 <template>
-  <div class="py-4 flex items-center gap-2 px-2">
+  <div class="py-4 flex items-center gap-2 px-3">
     <button v-if="showBackButton" @click="goBack" class="flex items-center justify-center">
       <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
     </button>
