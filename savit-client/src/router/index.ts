@@ -11,6 +11,7 @@ const Login = () => import('@/views/user/Login.vue')
 // Card
 const CardCurrent = () => import('@/views/card/CardCurrent.vue')
 const CardRegister = () => import('@/views/card/CardRegister.vue')
+const CardUsage = () => import('@/views/card/CardUsage.vue')
 
 // Budget
 const BudgetCheck = () => import('@/views/budget/BudgetCheck.vue')
@@ -81,7 +82,18 @@ const routes: Array<RouteRecordRaw> = [
       title: '카드 등록',
     },
   },
-
+  {
+    path: '/card/usage',
+    name: 'CardUsage',
+    component: CardUsage,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showTitle: true,
+      title: '카드 이용내역',
+    },
+  },
   //budget
   {
     path: '/budget',
