@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout h-screen flex flex-col" style="height: 100vh">
     <Header :show-back-button="route.meta.showBackButton">{{ pageTitle }}</Header>
-    <div class="main-content flex-1"><router-view /></div>
+    <div class="main-content flex-1 bg-[#f5f5f5]"><router-view /></div>
     <div class="footer fixed bottom-0 left-0 right-0 z-50" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
