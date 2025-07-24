@@ -1,14 +1,15 @@
 <template>
-  <div class="main-layout h-screen flex flex-col">
-    <div class="header">{{ pageTitle }}</div>
+  <div class="main-layout h-screen flex flex-col" style="height: 100dvh">
+    <Header :show-back-button="route.meta.showBackButton">{{ pageTitle }}</Header>
     <div class="main-content flex-1"><router-view /></div>
-    <div class="footer" v-if="route.meta.showNavigation">
+    <div class="footer fixed bottom-0 left-0 right-0 z-50" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Header from './Header.vue'
 import BottomNavigation from '@/components/navigation/BottomNavigation.vue'
 import router from '@/router/index.ts'
 import { computed } from 'vue'
