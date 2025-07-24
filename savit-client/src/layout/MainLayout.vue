@@ -1,5 +1,5 @@
 <template>
-  <div class="main-layout h-screen flex flex-col" style="height: 100dvh">
+  <div class="main-layout h-screen flex flex-col" style="height: 100vh">
     <Header :show-back-button="route.meta.showBackButton">{{ pageTitle }}</Header>
     <div class="main-content flex-1"><router-view /></div>
     <div class="footer fixed bottom-0 left-0 right-0 z-50" v-if="route.meta.showNavigation">
@@ -31,7 +31,7 @@ const pageTitle = computed(() => {
 })
 
 const handleChangeTab = (page: string) => {
-  router.push(page)
+  router.replace(`/${page}`)
 }
 </script>
 

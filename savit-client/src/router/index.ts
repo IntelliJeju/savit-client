@@ -38,7 +38,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: false,
       requiresAuth: false,
       showBackButton: false,
-      showTitle: false,
+      showHeader: false,
       title: '',
     },
   },
@@ -52,7 +52,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: false,
-      showTitle: true,
+      showHeader: true,
       title: '',
     },
   },
@@ -66,7 +66,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: false,
-      showTitle: true,
+      showHeader: true,
       title: '카드 사용 현황',
     },
   },
@@ -78,7 +78,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: true,
-      showTitle: true,
+      showHeader: true,
       title: '카드 등록',
     },
   },
@@ -90,7 +90,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: true,
-      showTitle: true,
+      showHeader: true,
       title: '카드 이용내역',
     },
   },
@@ -103,7 +103,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: false,
-      showTitle: true,
+      showHeader: true,
       title: '카테고리별 지출',
     },
   },
@@ -115,7 +115,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: true,
-      showTitle: true,
+      showHeader: true,
       title: '카테고리 예산 설정',
     },
   },
@@ -129,7 +129,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: false,
-      showTitle: true,
+      showHeader: true,
       title: '챌린지',
     },
   },
@@ -141,7 +141,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: true,
-      showTitle: true,
+      showHeader: true,
       title: '챌린지 현황',
     },
   },
@@ -153,7 +153,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: true,
-      showTitle: true,
+      showHeader: true,
       title: '챌린지 상세',
     },
   },
@@ -165,7 +165,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: true,
-      showTitle: true,
+      showHeader: true,
       title: '챌린지 통계',
     },
   },
@@ -177,7 +177,7 @@ const routes: Array<RouteRecordRaw> = [
       showNavigation: true,
       requiresAuth: true,
       showBackButton: false,
-      showTitle: false,
+      showHeader: false,
       title: '',
     },
   },
@@ -186,6 +186,26 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+})
+
+// 기본값 설정
+router.beforeEach((to, from, next) => {
+  if (!to.meta.hasOwnProperty('showNavigation')) {
+    to.meta.showNavigation = true
+  }
+  if (!to.meta.hasOwnProperty('showBackButton')) {
+    to.meta.showBackButton = false
+  }
+  if (!to.meta.hasOwnProperty('requiresAuth')) {
+    to.meta.requiresAuth = true
+  }
+  if (!to.meta.hasOwnProperty('showHeader')) {
+    to.meta.showHeader = true
+  }
+  if (!to.meta.hasOwnProperty('title')) {
+    to.meta.title = ''
+  }
+  next()
 })
 
 export default router
