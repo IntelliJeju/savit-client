@@ -5,6 +5,8 @@ declare module 'vue-router' {
   interface RouteMeta {
     showNavigation: boolean
     showBackButton: boolean
+    showHeader: boolean
     requiresAuth: boolean
+    title: string
   }
 }
