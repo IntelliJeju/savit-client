@@ -1,15 +1,15 @@
 <template>
   <div class="min-h-screen bg-gradient-to-t from-[#333333] to-[#0AB68B] flex flex-col">
     <div class="flex-1"></div>
-    <div class="flex-1 flex items-center justify-center">
+    <div class="flex-1 flex items-center justify-center max-w-xs mx-auto">
       <img
         src="@/assets/img/savit_logo.png"
         alt="Savit Logo"
-        class="w-[70%] drop-shadow-[10px_10px_10px_rgba(0,0,0,0.5)]"
+        class="w-full drop-shadow-[10px_10px_10px_rgba(0,0,0,0.5)]"
       />
     </div>
     <div class="flex-1 flex items-end justify-center pb-16">
-      <div class="flex flex-col items-center w-[70%]">
+      <div class="flex flex-col items-center max-w-xs w-full mx-auto">
         <div class="w-full border-t border-[#61A292] mb-8" />
         <img
           src="@/assets/img/kakao_login_medium_wide.png"
