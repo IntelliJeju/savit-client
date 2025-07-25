@@ -1,17 +1,17 @@
 <template>
-  <div class="bottom-navigation flex flex-row justify-around border-t py-4 bg-white">
+  <div class="bottom-navigation flex flex-row justify-around border-t bg-white">
     <div
       v-for="item in navItems"
       :key="item.id"
-      class="nav-item flex flex-col justify-center items-center"
+      class="nav-item flex-1 flex flex-col justify-center items-center py-3"
       :class="{ active: activeTab === item.id }"
-      @click="handleTabChange(item.id)"
       :style="{ color: activeTab === item.id ? '#028174' : '#9CA3AF' }"
+      @click="handleTabChange(item.id)"
     >
       <div class="nav-icon">
         <v-icon :name="item.icon" :scale="1.2" />
       </div>
-      <span class="nav-label text-[0.75rem]">{{ item.label }}</span>
+      <span class="nav-label text-[0.75rem] pointer-events-none">{{ item.label }}</span>
     </div>
   </div>
 </template>
