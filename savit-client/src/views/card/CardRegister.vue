@@ -108,10 +108,6 @@ const cardData = ref({
 
 const handleRegisterCard = async () => {
   try {
-    // cardId는 백엔드에서 생성될 것이므로, 여기서는 Omit<Card, 'id'>에 맞게 cardId를 제외하고 전송합니다.
-    // 하지만 현재 cards.ts의 registerCard는 Omit<Card, 'id'>가 아닌 Omit<Card, 'cardId'>를 기대하는 것으로 보입니다.
-    // cards.ts의 Card 인터페이스에 id 필드가 없으므로, Omit<Card, 'id'>는 의미가 없습니다.
-    // 여기서는 cardId를 제외하고 나머지 필드를 전송하도록 합니다.
     const { cardId, ...dataToSend } = cardData.value
     await cardsStore.registerCard(dataToSend)
     alert('카드가 성공적으로 등록되었습니다!')
@@ -123,6 +119,4 @@ const handleRegisterCard = async () => {
 }
 </script>
 
-<style scoped>
-/* Tailwind CSS를 사용하므로 추가적인 스타일은 필요하지 않을 수 있습니다. */
-</style>
+<style scoped></style>

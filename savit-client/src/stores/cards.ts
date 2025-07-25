@@ -3,28 +3,29 @@ import { defineStore } from 'pinia'
 // import { useApi } from '@/api/useApi'
 
 interface Card {
-  organization: string
+  organization: string //카드사
   cardId: number
   cardName: string
   cardNumber: string
   cardPassword: string
-  userId: string
-  userPw: string
-  userBdate: string
+  userId: string // 카드사 사용자 아이디
+  userPw: string // 카드사 사용자 비밀번호
+  userBdate: string // 사용자 생년월일
 }
 
 interface BillingInfo {
+  cardId: number
   amount: number
   month: string
 }
 
 interface UsageDetail {
-  id: string;
-  cardId: number;
-  date: string;
-  merchant: string;
-  amount: number;
-  category: string;
+  id: string
+  cardId: number
+  date: string
+  merchant: string
+  amount: number
+  category: string
 }
 
 export const useCardsStore = defineStore('cards', () => {
@@ -52,14 +53,14 @@ export const useCardsStore = defineStore('cards', () => {
       userBdate: '900101',
     },
   ])
-  const currentMonthBilling = ref<BillingInfo | null>({
-    amount: 150000,
-    month: '2025-07',
-  })
-  const lastMonthBilling = ref<BillingInfo | null>({
-    amount: 120000,
-    month: '2025-06',
-  })
+  const currentMonthBilling = ref<BillingInfo[]>([
+    { cardId: 1, amount: 150000, month: '2025-07' },
+    { cardId: 2, amount: 250000, month: '2025-07' },
+  ])
+  const lastMonthBilling = ref<BillingInfo[]>([
+    { cardId: 1, amount: 120000, month: '2025-06' },
+    { cardId: 2, amount: 220000, month: '2025-06' },
+  ])
   const currentMonthUsage = ref<UsageDetail[]>([
     {
       id: 'usage1',
@@ -79,6 +80,14 @@ export const useCardsStore = defineStore('cards', () => {
     },
     {
       id: 'usage3',
+      cardId: 1,
+      date: '2025-07-19',
+      merchant: '맥도날드',
+      amount: 6900,
+      category: '식비',
+    },
+    {
+      id: 'usage4',
       cardId: 2,
       date: '2025-07-18',
       merchant: '쿠팡',
@@ -88,125 +97,59 @@ export const useCardsStore = defineStore('cards', () => {
   ])
 
   const registeredCards = computed(() => cards.value)
-  const currentBilling = computed(() => currentMonthBilling.value)
-  const lastBilling = computed(() => lastMonthBilling.value)
 
-  // async function registerCard(cardData: Omit<Card, 'cardId'>) {
-  //   try {
-  //     const response = await request({
-  //       method: 'POST',
-  //       url: '/cards/register',
-  //       data: cardData,
-  //     })
-  //     const newCard: Card = response.data
-  //     cards.value.push(newCard)
-  //     console.log('카드 등록 성공:', newCard)
-  //     return newCard
-  //   } catch (error) {
-  //     console.error('카드 등록 실패:', error)
-  //     throw error
-  //   }
-  // }
+  const getBillingByCardId = (cardId: number) => {
+    const current = currentMonthBilling.value.find((b) => b.cardId === cardId)
+    const last = lastMonthBilling.value.find((b) => b.cardId === cardId)
+    return {
+      current: current || null,
+      last: last || null,
+    }
+  }
+
+  const getUsageByCardId = (cardId: number) => {
+    return currentMonthUsage.value.filter((u) => u.cardId === cardId)
+  }
 
   async function registerCard(cardData: Omit<Card, 'cardId'>) {
-    console.log('Dummy registerCard:', cardData);
-    const newCard: Card = { ...cardData, cardId: Math.floor(Math.random() * 1000) + 1 };
-    cards.value.push(newCard);
-    return newCard;
+    console.log('Dummy registerCard:', cardData)
+    const newCard: Card = { ...cardData, cardId: Math.floor(Math.random() * 1000) + 1 }
+    cards.value.push(newCard)
+    // Add dummy billing info for the new card
+    currentMonthBilling.value.push({ cardId: newCard.cardId, amount: 0, month: '2025-07' })
+    lastMonthBilling.value.push({ cardId: newCard.cardId, amount: 0, month: '2025-06' })
+    return newCard
   }
-
-  // async function fetchCards() {
-  //   try {
-  //     const response = await request({
-  //       method: 'GET',
-  //       url: '/cards',
-  //     })
-  //     cards.value = response.data
-  //     console.log('등록된 카드 조회 성공:', cards.value)
-  //     return cards.value
-  //   } catch (error) {
-  //     console.error('등록된 카드 조회 실패:', error)
-  //     throw error
-  //   }
-  // }
 
   async function fetchCards() {
-    console.log('Dummy fetchCards');
-    return cards.value;
+    console.log('Dummy fetchCards')
+    // In a real app, you'd fetch cards and then their billing info
+    return cards.value
   }
 
-  // async function fetchCurrentMonthBilling() {
-  //   try {
-  //     const response = await request({
-  //       method: 'GET',
-  //       url: '/cards/billing/current-month',
-  //     })
-  //     currentMonthBilling.value = response.data
-  //     console.log('이번 달 청구금액 조회 성공:', currentMonthBilling.value)
-  //     return currentMonthBilling.value
-  //   } catch (error) {
-  //     console.error('이번 달 청구금액 조회 실패:', error)
-  //     throw error
-  //   }
-  // }
-
-  async function fetchCurrentMonthBilling() {
-    console.log('Dummy fetchCurrentMonthBilling');
-    return currentMonthBilling.value;
+  async function fetchBillingInfo(cardId: number) {
+    console.log(`Dummy fetchBillingInfo for cardId: ${cardId}`)
+    // This would fetch billing info for a specific card
+    return getBillingByCardId(cardId)
   }
 
-  // async function fetchLastMonthBilling() {
-  //   try {
-  //     const response = await request({
-  //       method: 'GET',
-  //       url: '/cards/billing/last-month',
-  //     })
-  //     lastMonthBilling.value = response.data
-  //     console.log('저번 달 청구금액 조회 성공:', lastMonthBilling.value)
-  //     return lastMonthBilling.value
-  //   } catch (error) {
-  //     console.error('저번 달 청구금액 조회 실패:', error)
-  //     throw error
-  //   }
-  // }
-
-  async function fetchLastMonthBilling() {
-    console.log('Dummy fetchLastMonthBilling');
-    return lastMonthBilling.value;
-  }
-
-  // async function fetchCurrentMonthUsage() {
-  //   try {
-  //     const response = await request({
-  //       method: 'GET',
-  //       url: '/cards/usage/current-month', // 예시 API 엔드포인트
-  //     });
-  //     currentMonthUsage.value = response.data;
-  //     console.log('이번 달 카드 이용 내역 조회 성공:', currentMonthUsage.value);
-  //     return currentMonthUsage.value;
-  //   } catch (error) {
-  //     console.error('이번 달 카드 이용 내역 조회 실패:', error);
-  //     throw error;
-  //   }
-  // }
-
-  async function fetchCurrentMonthUsage() {
-    console.log('Dummy fetchCurrentMonthUsage');
-    return currentMonthUsage.value;
+  async function fetchUsageForCard(cardId: number) {
+    console.log(`Dummy fetchUsageForCard for cardId: ${cardId}`)
+    // This would fetch usage details for a specific card
+    return getUsageByCardId(cardId)
   }
 
   return {
     cards,
-    currentMonthBilling,
-    lastMonthBilling,
-    currentMonthUsage,
     registeredCards,
-    currentBilling,
-    lastBilling,
+    getBillingByCardId,
+    getUsageByCardId,
     registerCard,
     fetchCards,
-    fetchCurrentMonthBilling,
-    fetchLastMonthBilling,
-    fetchCurrentMonthUsage,
+    fetchBillingInfo,
+    fetchUsageForCard,
+    // For CardUsage.vue to still have access to the full list for now
+    currentMonthBilling,
+    currentMonthUsage,
   }
 })
