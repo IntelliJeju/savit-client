@@ -1,8 +1,8 @@
 <template>
-  <div class="main-layout h-screen flex flex-col" style="height: 100vh">
+  <div class="main-layout h-dvh grid grid-rows-[auto_1fr_auto]">
     <Header :show-back-button="route.meta.showBackButton">{{ pageTitle }}</Header>
-    <div class="main-content flex-1 bg-[#f5f5f5]"><router-view /></div>
-    <div class="footer fixed bottom-0 left-0 right-0 z-50" v-if="route.meta.showNavigation">
+    <div class="main-content bg-[#f5f5f5] overflow-auto"><router-view /></div>
+    <div class="footer" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
   </div>
