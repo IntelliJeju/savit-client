@@ -5,9 +5,11 @@
         <div class="my-challenge-header">
           <span class="text-base font-bold">나의 챌린지</span>
         </div>
-        <div class="my-challenge-item mt-4">
+        <div class="my-challenge-item mt-4" @click="router.push(`/challenge/detail/${1}`)">
           <card-component>
-            <div class="my-challenge-label"><label-item>진행중</label-item></div>
+            <div class="my-challenge-label">
+              <label-item>진행중</label-item>
+            </div>
             <div class="my-challenge-title mt-4 text-2xl font-bold">배달음식 10회 이하 주문</div>
             <div class="my-challenge-progress mt-4">
               <div class="text-xs font-bold">4일째 진행중</div>
@@ -81,14 +83,4 @@ const test = () => {
 }
 </script>
 
-<style scoped>
-.content-area {
-  /* 스크롤바 숨기기 - 모든 브라우저 지원 */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
-
-.content-area::-webkit-scrollbar {
-  display: none;            /* Chrome, Safari, Opera */
-}
-</style>
+<style scoped></style>
