@@ -1,7 +1,7 @@
 <template>
   <div class="progress-back w-full h-2 bg-[#E0E0E0] rounded-full">
     <div
-      class="progress-front h-2"
+      class="progress-front h-2 rounded-full"
       :class="progress <= 50 ? 'bg-[#0AB68B]' : progress <= 80 ? 'bg-[#FFBC00]' : 'bg-[#FF4242]'"
       :style="{ width: Math.min(100, progress) + '%' }"
     />
