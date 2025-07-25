@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 max-w-2xl mx-auto font-[Pretendard]">
+  <div class="p-5 max-w-2xl mx-auto">
     <h2 class="text-center text-gray-500">카드 사용 현황</h2>
 
     <div class="flex justify-center items-center h-96 my-5 border-none rounded-lg p-5 bg-gray-50">

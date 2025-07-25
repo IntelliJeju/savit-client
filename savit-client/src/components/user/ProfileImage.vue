@@ -1,7 +1,7 @@
 <template>
   <div>
     <button
-      class="pointer-events-none border-none font-[Pretendard] font-bold text-[1rem] text-center h-9 w-9 rounded-3xl"
+      class="pointer-events-none border-none font-bold text-[1rem] text-center h-9 w-9 rounded-3xl"
       :class="buttonClasses"
     >
       <slot>{{ text.charAt(0) }}</slot>
@@ -30,10 +30,10 @@ const emit = defineEmits<{
 
 const buttonClasses = computed(() => {
   if (props.variant === 'others') {
-    return 'gradation bg-gradient-to-l from-[#0AB68B]'
+    return 'gradation bg-gradient-to-l from-app-green'
   }
   // 기본 버튼
-  return 'gradation bg-gradient-to-r from-[#6C5CE7]'
+  return 'gradation bg-gradient-to-r from-app-purple'
 })
 </script>
 

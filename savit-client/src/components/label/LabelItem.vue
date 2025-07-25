@@ -1,7 +1,7 @@
 <template>
   <div>
     <button
-      class="pointer-events-none border-none font-[Pretendard] font-bold text-[1rem] text-center"
+      class="pointer-events-none border-none text-[0.75rem] text-center"
       :class="buttonClasses"
     >
       <slot>{{ text }}</slot>
@@ -30,14 +30,14 @@ const emit = defineEmits<{
 
 const buttonClasses = computed(() => {
   if (props.variant === 'green') {
-    return 'bg-[#F0FDF9] text-[#1DD1A1] h-6 w-12 rounded-lg'
+    return 'bg-[#F0FDF9] text-app-green font-bold rounded-lg py-0.4 px-1'
   } else if (props.variant === 'red') {
-    return 'bg-[#FECACA] text-[#FE4444] h-6 w-12 rounded-lg'
+    return 'bg-[#FECACA] text-app-red font-bold rounded-lg py-0.4 px-1'
   } else if (props.variant === 'grey') {
-    return 'bg-[#EFEFF0] text-[#888888] h-6 w-12 rounded-lg'
+    return 'bg-[#EFEFF0] text-[#888888] font-bold rounded-lg py-0.4 px-1'
   }
   // 기본 버튼
-  return 'bg-[#0ab68b] text-[#FFFFFF] h-9 w-20 rounded-3xl'
+  return 'bg-app-green text-[#FFFFFF] rounded-3xl py-1 px-3'
 })
 </script>
 

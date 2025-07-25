@@ -1,6 +1,6 @@
 <template>
   <button
-    class="cursor-pointer border-none rounded-lg font-[Pretendard] text-[1rem] text-center text-[#FFFFFF] h-12 w-[100%]"
+    class="cursor-pointer border-none rounded-lg text-[1rem] text-center text-[#FFFFFF] h-12 w-[100%]"
     :class="buttonClasses"
     @click="handleClick"
   >
@@ -35,12 +35,12 @@ const handleClick = (event: MouseEvent) => {
 const buttonClasses = computed(() => {
   // 어두운 기본 버튼
   if (props.variant === 'dark') {
-    return 'bg-[#545045]'
+    return 'bg-app-dark-gray'
   } else if (props.variant === 'warn') {
-    return 'bg-[#FE4444]'
+    return 'bg-app-red'
   }
   // 기본 버튼
-  return 'bg-[#0ab68b]'
+  return 'bg-app-green'
 })
 </script>
 
