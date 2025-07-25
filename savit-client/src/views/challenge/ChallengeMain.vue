@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="challenge-button-container flex gap-2 pb-3 px-3">
+    <div class="challenge-button-container flex gap-2 p-4">
       <button-item text="챌린지 통계" variant="dark"></button-item>
       <button-item text="새 챌린지 개설" variant="primary"></button-item>
     </div>
