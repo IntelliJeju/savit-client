@@ -13,7 +13,7 @@ import { computed } from 'vue'
 
 // Props 정의
 interface Props {
-  variant?: 'primary' | 'dark' | 'warn'
+  variant?: 'primary' | 'dark' | 'warn' | 'purple'
   text?: string
 }
 
@@ -34,13 +34,19 @@ const handleClick = (event: MouseEvent) => {
 
 const buttonClasses = computed(() => {
   // 어두운 기본 버튼
-  if (props.variant === 'dark') {
-    return 'bg-app-dark-gray'
-  } else if (props.variant === 'warn') {
-    return 'bg-app-red'
+  switch (props.variant) {
+    case 'dark':
+      return 'bg-app-dark-gray active:bg-[#1B2631]'
+
+    case 'warn':
+      return 'bg-app-red active:bg-[#C0392B]'
+
+    case 'purple':
+      return 'bg-app-purple active:bg-[#6B5B95]'
+
+    default:
+      return 'bg-app-green active:bg-[#16A085]'
   }
-  // 기본 버튼
-  return 'bg-app-green'
 })
 </script>
 
