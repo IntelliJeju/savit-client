@@ -3,9 +3,9 @@
     <div class="content-area pt-6 overflow-auto pb-3 px-4">
       <div class="my-challenge-container">
         <div class="my-challenge-header">
-          <span class="text-base font-bold">나의 챌린지</span>
+          <span class="font-bold">나의 챌린지</span>
         </div>
-        <div class="my-challenge-item mt-4" @click="router.push(`/challenge/detail/${1}`)">
+        <div class="my-challenge-item mt-4" @click="routeDetail(1)">
           <card-component>
             <div class="my-challenge-label">
               <label-item>진행중</label-item>
@@ -28,7 +28,7 @@
         <div class="avail-challenge-header">
           <span class="text-base font-bold">이번 주 참여 가능 챌린지</span>
         </div>
-        <div v-for="item in dummy" class="avail-challenge-item mt-4">
+        <div v-for="item in dummy" class="avail-challenge-item mt-4" @click="routeDetail(1)">
           <card-component>
             <div class="avail-challenge-label">
               <label-item>{{ item.category }}</label-item>
@@ -77,6 +77,10 @@ const dummy = [
     due: '2025/07/16~2025/07/23',
   },
 ]
+
+const routeDetail = (id: number) => {
+  router.push(`/challenge/detail/${id}`)
+}
 
 const test = () => {
   router.push('/challenge/detail')
