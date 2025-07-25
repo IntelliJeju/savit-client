@@ -27,7 +27,7 @@ const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/auth/login',
   },
   //auth
   {
