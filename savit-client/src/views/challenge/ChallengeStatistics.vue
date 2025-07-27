@@ -1,11 +1,11 @@
 <template>
-  <div class="info-page">
+  <div class="info-page py-6">
     <CardComponent
       class="info-success bg-gradient-to-tr from-[#2BDDAE] to-[#10B981] text-white p-6"
     >
       <div class="info-success-header">챌린지 성공률</div>
       <div class="info-success-rate mt-4 text-[3rem] font-bold">73%</div>
-      <div class="info-success-count mt-8 flex ml-[-1rem] mr-[-1rem]">
+      <div class="info-success-count mt-4 flex ml-[-1rem] mr-[-1rem]">
         <div class="success flex flex-col items-center flex-1">
           <span class="text-[2rem] font-bold">6</span><span>성공</span>
         </div>
@@ -34,7 +34,7 @@
       ></div>
     </CardComponent>
     <CardComponent class="info-record mt-6">
-      <div class="info-record-header flex">
+      <div class="info-record-header flex p-2">
         <div class="title flex-1 text-[1.25rem] font-bold"><span>챌린지 기록</span></div>
         <div class="info-filter flex gap-3">
           <button
@@ -50,7 +50,10 @@
         </div>
       </div>
       <div class="info-record-container mt-8">
-        <div v-for="item in filteredRecords" class="info-record-item flex gap-2 items-center py-4">
+        <div
+          v-for="item in filteredRecords"
+          class="info-record-item flex gap-2 items-center py-4 border-b border-[#F1F3F4] last:border-0 last:pb-0"
+        >
           <div class="info-item-logo">
             <div class="w-[2rem] h-[2rem] bg-black rounded-full"></div>
           </div>
