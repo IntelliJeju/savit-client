@@ -1,6 +1,6 @@
 <template>
   <div class="challenge-main-page h-full grid grid-rows-[1fr_auto]">
-    <div class="content-area pt-6 overflow-auto pb-3 px-4">
+    <div class="content-area pt-6 overflow-auto pb-3">
       <div class="my-challenge-container">
         <div class="my-challenge-header">
           <span class="font-bold">나의 챌린지</span>
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="challenge-button-container flex gap-2 p-4">
+    <div class="challenge-button-container flex gap-2 py-4">
       <button-item
         @click="() => router.push('/challenge/statistics')"
         text="챌린지 통계"
