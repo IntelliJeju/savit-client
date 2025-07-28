@@ -5,6 +5,7 @@
       :value="props.modelValue"
       :placeholder="placeholder"
       :type="type"
+      :maxlength="maxlength"
       @input="onInput"
       class="input-field border-b py-1 px-2 w-full"
     />
@@ -16,6 +17,7 @@ interface inputProps {
   modelValue: string | number
   placeholder: string
   type: string
+  maxlength?: number
 }
 
 const props = defineProps<inputProps>()
