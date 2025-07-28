@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-// import { useApi } from '@/api/useApi'
+import { useApi } from '@/api/useApi'
 
 interface Card {
   organization: string //카드사
@@ -29,71 +29,187 @@ interface UsageDetail {
 }
 
 export const useCardsStore = defineStore('cards', () => {
-  // const { request } = useApi()
+  const { request } = useApi()
 
   const cards = ref<Card[]>([
     {
       organization: '신한카드',
       cardId: 1,
-      cardName: '신한카드 Deep Dream',
-      cardNumber: '1234-5678-1234-5678',
-      cardPassword: '123',
-      userId: 'user1',
-      userPw: 'pw1',
-      userBdate: '900101',
+      cardName: '신한 프리미어',
+      cardNumber: '1234-5678-9012-3456',
+      cardPassword: '1234',
+      userId: 'testuser1',
+      userPw: 'password123',
+      userBdate: '19901215'
+    },
+    {
+      organization: '삼성카드',
+      cardId: 2,
+      cardName: '삼성 플래티넘',
+      cardNumber: '9876-5432-1098-7654',
+      cardPassword: '5678',
+      userId: 'testuser2',
+      userPw: 'password456',
+      userBdate: '19851020'
     },
     {
       organization: '국민카드',
-      cardId: 2,
-      cardName: 'KB국민 탄탄대로 온리유',
-      cardNumber: '8765-4321-8765-4321',
-      cardPassword: '456',
-      userId: 'user1',
-      userPw: 'pw1',
-      userBdate: '900101',
-    },
+      cardId: 3,
+      cardName: '국민 트래블러스',
+      cardNumber: '1111-2222-3333-4444',
+      cardPassword: '9876',
+      userId: 'testuser3',
+      userPw: 'password789',
+      userBdate: '19930305'
+    }
   ])
   const currentMonthBilling = ref<BillingInfo[]>([
-    { cardId: 1, amount: 150000, month: '2025-07' },
-    { cardId: 2, amount: 250000, month: '2025-07' },
+    {
+      cardId: 1,
+      amount: 285000,
+      month: '2025-07'
+    },
+    {
+      cardId: 2,
+      amount: 450000,
+      month: '2025-07'
+    },
+    {
+      cardId: 3,
+      amount: 320000,
+      month: '2025-07'
+    }
   ])
   const lastMonthBilling = ref<BillingInfo[]>([
-    { cardId: 1, amount: 120000, month: '2025-06' },
-    { cardId: 2, amount: 220000, month: '2025-06' },
+    {
+      cardId: 1,
+      amount: 320000,
+      month: '2025-06'
+    },
+    {
+      cardId: 2,
+      amount: 380000,
+      month: '2025-06'
+    },
+    {
+      cardId: 3,
+      amount: 290000,
+      month: '2025-06'
+    }
   ])
   const currentMonthUsage = ref<UsageDetail[]>([
     {
-      id: 'usage1',
+      id: 'usage_001',
       cardId: 1,
       date: '2025-07-20',
-      merchant: '스타벅스',
-      amount: 5000,
-      category: '식비',
+      merchant: '스타벅스 강남점',
+      amount: 8500,
+      category: '카페'
     },
     {
-      id: 'usage2',
+      id: 'usage_007',
       cardId: 1,
-      date: '2025-07-19',
-      merchant: 'CGV',
+      date: '2025-07-20',
+      merchant: '맥도날드 역삼점',
       amount: 15000,
-      category: '문화생활',
+      category: '식당'
     },
     {
-      id: 'usage3',
+      id: 'usage_008',
+      cardId: 1,
+      date: '2025-07-20',
+      merchant: '쿠팡 온라인',
+      amount: 35000,
+      category: '쇼핑'
+    },
+    {
+      id: 'usage_002',
       cardId: 1,
       date: '2025-07-19',
-      merchant: '맥도날드',
-      amount: 6900,
-      category: '식비',
+      merchant: '이마트 성수점',
+      amount: 65000,
+      category: '편의점'
     },
     {
-      id: 'usage4',
-      cardId: 2,
-      date: '2025-07-18',
-      merchant: '쿠팡',
-      amount: 30000,
-      category: '쇼핑',
+      id: 'usage_009',
+      cardId: 1,
+      date: '2025-07-19',
+      merchant: '롯데시네마 월드타워',
+      amount: 32000,
+      category: '공연'
     },
+    {
+      id: 'usage_003',
+      cardId: 1,
+      date: '2025-07-18',
+      merchant: 'CGV 강남점',
+      amount: 28000,
+      category: '공연'
+    },
+    {
+      id: 'usage_010',
+      cardId: 1,
+      date: '2025-07-18',
+      merchant: '파리바게뜨 강남역점',
+      amount: 12000,
+      category: '카페'
+    },
+    {
+      id: 'usage_011',
+      cardId: 1,
+      date: '2025-07-18',
+      merchant: '지마켓 온라인',
+      amount: 48000,
+      category: '쇼핑'
+    },
+    {
+      id: 'usage_004',
+      cardId: 2,
+      date: '2025-07-21',
+      merchant: '올리브영 홍대점',
+      amount: 35000,
+      category: '기타'
+    },
+    {
+      id: 'usage_012',
+      cardId: 2,
+      date: '2025-07-21',
+      merchant: '교보문고 광화문점',
+      amount: 25000,
+      category: '기타'
+    },
+    {
+      id: 'usage_005',
+      cardId: 2,
+      date: '2025-07-20',
+      merchant: '백화점 식당가',
+      amount: 120000,
+      category: '식당'
+    },
+    {
+      id: 'usage_013',
+      cardId: 2,
+      date: '2025-07-20',
+      merchant: '현대백화점 강남점',
+      amount: 85000,
+      category: '쇼핑'
+    },
+    {
+      id: 'usage_006',
+      cardId: 2,
+      date: '2025-07-19',
+      merchant: 'GS25 편의점',
+      amount: 12000,
+      category: '편의점'
+    },
+    {
+      id: 'usage_014',
+      cardId: 2,
+      date: '2025-07-19',
+      merchant: '투썸플레이스 홍대점',
+      amount: 18000,
+      category: '카페'
+    }
   ])
 
   const registeredCards = computed(() => cards.value)
@@ -112,31 +228,74 @@ export const useCardsStore = defineStore('cards', () => {
   }
 
   async function registerCard(cardData: Omit<Card, 'cardId'>) {
-    console.log('Dummy registerCard:', cardData)
-    const newCard: Card = { ...cardData, cardId: Math.floor(Math.random() * 1000) + 1 }
-    cards.value.push(newCard)
-    // Add dummy billing info for the new card
-    currentMonthBilling.value.push({ cardId: newCard.cardId, amount: 0, month: '2025-07' })
-    lastMonthBilling.value.push({ cardId: newCard.cardId, amount: 0, month: '2025-06' })
-    return newCard
+    try {
+      const response = await request({
+        method: 'POST',
+        url: '/cards/register',
+        data: cardData,
+      })
+
+      const newCard: Card = response.data
+      cards.value.push(newCard)
+
+      return newCard
+    } catch (error) {
+      console.error('카드 등록 실패:', error)
+      throw error
+    }
   }
 
   async function fetchCards() {
-    console.log('Dummy fetchCards')
-    // In a real app, you'd fetch cards and then their billing info
-    return cards.value
+    try {
+      const response = await request({
+        method: 'GET',
+        url: '/cards',
+      })
+
+      if (response.data && response.data.length > 0) {
+        cards.value = response.data
+      }
+      return cards.value
+    } catch (error) {
+      console.error('카드 목록 조회 실패, 더미 데이터 사용:', error)
+      return cards.value
+    }
   }
 
   async function fetchBillingInfo(cardId: number) {
-    console.log(`Dummy fetchBillingInfo for cardId: ${cardId}`)
-    // This would fetch billing info for a specific card
-    return getBillingByCardId(cardId)
+    try {
+      const response = await request({
+        method: 'GET',
+        url: `/cards/${cardId}/billing`,
+      })
+
+      const billingData = response.data
+      currentMonthBilling.value = billingData.currentMonth || []
+      lastMonthBilling.value = billingData.lastMonth || []
+
+      return getBillingByCardId(cardId)
+    } catch (error) {
+      console.error(`카드 ${cardId} 청구정보 조회 실패:`, error)
+      throw error
+    }
   }
 
   async function fetchUsageForCard(cardId: number) {
-    console.log(`Dummy fetchUsageForCard for cardId: ${cardId}`)
-    // This would fetch usage details for a specific card
-    return getUsageByCardId(cardId)
+    try {
+      const response = await request({
+        method: 'GET',
+        url: `/cards/${cardId}/usage`,
+      })
+
+      const usageData = response.data
+      const filteredUsage = currentMonthUsage.value.filter((usage) => usage.cardId !== cardId)
+      currentMonthUsage.value = [...filteredUsage, ...usageData]
+
+      return getUsageByCardId(cardId)
+    } catch (error) {
+      console.error(`카드 ${cardId} 사용내역 조회 실패:`, error)
+      throw error
+    }
   }
 
   return {
