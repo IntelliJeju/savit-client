@@ -3,6 +3,7 @@
     <div class="content-area pt-6 overflow-auto pb-3">
       <div class="my-challenge-container">
         <div class="my-challenge-header">
+          <button @click="() => router.push('/challenge/result/1')">결과</button>
           <span class="font-bold">나의 챌린지</span>
         </div>
         <div class="my-challenge-item mt-4" @click="routeDetail(1)">
