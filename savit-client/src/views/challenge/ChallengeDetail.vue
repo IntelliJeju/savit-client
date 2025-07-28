@@ -1,6 +1,6 @@
 <template>
   <div class="detail-page h-full grid grid-rows-[1fr_auto]">
-    <div class="detail-contents overflow-auto flex flex-col gap-4 p-4">
+    <div class="detail-contents overflow-auto flex flex-col gap-4 py-4">
       <div class="detail-info">
         <CardComponent>
           <div class="detail-info-category"><LabelItem>배달</LabelItem></div>
@@ -49,7 +49,7 @@
         </card-component>
       </div>
     </div>
-    <div class="detail-button p-4">
+    <div class="detail-button py-4">
       <ButtonItem text="챌린지 참여하기" />
     </div>
   </div>

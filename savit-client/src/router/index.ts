@@ -91,6 +91,7 @@ const routes: Array<RouteRecordRaw> = [
       requiresAuth: true,
       showBackButton: true,
       showHeader: true,
+      showTitle: true,
       title: '카드 이용내역',
     },
   },
@@ -170,7 +171,7 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/challenge/result',
+    path: '/challenge/result/:id',
     name: 'ChallengeResult',
     component: ChallengeResult,
     meta: {
