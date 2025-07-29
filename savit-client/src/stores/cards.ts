@@ -32,41 +32,56 @@ interface UsageDetail {
 export const useCardsStore = defineStore('cards', () => {
   const { request } = useApi()
 
-  const cards = ref<Card[]>([
-    {
-      organization: '신한카드',
-      cardId: 1,
-      cardName: '신한 프리미어',
-      cardNumber: '1234-5678-9012-3456',
-      cardPassword: '1234',
-      cardNickname: '신한 교통할인',
-      userId: 'testuser1',
-      userPw: 'password123',
-      userBdate: '19901215'
-    },
-    {
-      organization: '삼성카드',
-      cardId: 2,
-      cardName: '삼성 플래티넘',
-      cardNumber: '9876-5432-1098-7654',
-      cardPassword: '5678',
-      cardNickname: '삼성 쇼핑할인',
-      userId: 'testuser2',
-      userPw: 'password456',
-      userBdate: '19851020'
-    },
-    {
-      organization: '국민카드',
-      cardId: 3,
-      cardName: '국민 트래블러스',
-      cardNumber: '1111-2222-3333-4444',
-      cardPassword: '9876',
-      cardNickname: '국민 캐시백',
-      userId: 'testuser3',
-      userPw: 'password789',
-      userBdate: '19930305'
-    }
-  ])
+  // 더미 카드 데이터 초기화
+  const initializeCards = () => {
+    const defaultCards: Card[] = [
+      {
+        organization: '신한카드',
+        cardId: 1,
+        cardName: '신한 프리미어',
+        cardNumber: '1234-5678-9012-3456',
+        cardPassword: '1234',
+        cardNickname: '신한 교통할인',
+        userId: 'testuser1',
+        userPw: 'password123',
+        userBdate: '19901215'
+      },
+      {
+        organization: '삼성카드',
+        cardId: 2,
+        cardName: '삼성 플래티넘',
+        cardNumber: '9876-5432-1098-7654',
+        cardPassword: '5678',
+        cardNickname: '삼성 쇼핑할인',
+        userId: 'testuser2',
+        userPw: 'password456',
+        userBdate: '19851020'
+      },
+      {
+        organization: '국민카드',
+        cardId: 3,
+        cardName: '국민 트래블러스',
+        cardNumber: '1111-2222-3333-4444',
+        cardPassword: '9876',
+        cardNickname: '국민 캐시백',
+        userId: 'testuser3',
+        userPw: 'password789',
+        userBdate: '19930305'
+      }
+    ]
+
+    // localStorage에서 저장된 별칭 적용
+    const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+    defaultCards.forEach(card => {
+      if (savedNicknames[card.cardId]) {
+        card.cardNickname = savedNicknames[card.cardId]
+      }
+    })
+
+    return defaultCards
+  }
+
+  const cards = ref<Card[]>(initializeCards())
   const currentMonthBilling = ref<BillingInfo[]>([
     {
       cardId: 1,
@@ -231,7 +246,7 @@ export const useCardsStore = defineStore('cards', () => {
     return currentMonthUsage.value.filter((u) => u.cardId === cardId)
   }
 
-  async function registerCard(cardData: Omit<Card, 'cardId'>) {
+  async function registerCard(cardData: Omit<Card, 'cardId' | 'cardName'>) {
     try {
       const response = await request({
         method: 'POST',
@@ -259,9 +274,27 @@ export const useCardsStore = defineStore('cards', () => {
       if (response.data && response.data.length > 0) {
         cards.value = response.data
       }
+      
+      // localStorage에서 저장된 별칭 적용
+      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+      cards.value.forEach(card => {
+        if (savedNicknames[card.cardId]) {
+          card.cardNickname = savedNicknames[card.cardId]
+        }
+      })
+      
       return cards.value
     } catch (error) {
       console.error('카드 목록 조회 실패, 더미 데이터 사용:', error)
+      
+      // 더미 데이터에도 localStorage 별칭 적용
+      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+      cards.value.forEach(card => {
+        if (savedNicknames[card.cardId]) {
+          card.cardNickname = savedNicknames[card.cardId]
+        }
+      })
+      
       return cards.value
     }
   }
@@ -315,6 +348,11 @@ export const useCardsStore = defineStore('cards', () => {
         cards.value[cardIndex].cardNickname = nickname
       }
 
+      // 성공시 localStorage에서 해당 별칭 제거 (서버와 동기화됨)
+      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+      delete savedNicknames[cardId]
+      localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
+
       return response.data
     } catch (error) {
       console.error(`카드 ${cardId} 별칭 수정 실패:`, error)
@@ -322,7 +360,56 @@ export const useCardsStore = defineStore('cards', () => {
       if (cardIndex !== -1) {
         cards.value[cardIndex].cardNickname = nickname
       }
+
+      // 실패시 localStorage에 별칭 저장 (나중에 동기화용)
+      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+      savedNicknames[cardId] = nickname
+      localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
+      
       return null
+    }
+  }
+
+  // localStorage에 저장된 별칭들을 서버와 동기화
+  async function syncPendingNicknames() {
+    const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+    const pendingUpdates = Object.entries(savedNicknames)
+    
+    if (pendingUpdates.length === 0) {
+      return { success: true, synced: 0 }
+    }
+
+    console.log(`${pendingUpdates.length}개의 별칭을 서버와 동기화 중...`)
+    
+    let syncedCount = 0
+    const failedUpdates: { [key: string]: string } = {}
+
+    for (const [cardIdStr, nickname] of pendingUpdates) {
+      const cardId = parseInt(cardIdStr)
+      try {
+        await request({
+          method: 'PATCH',
+          url: `/cards/${cardId}/nickname`,
+          data: { nickname },
+        })
+        
+        syncedCount++
+        console.log(`카드 ${cardId} 별칭 동기화 성공: ${nickname}`)
+      } catch (error) {
+        console.error(`카드 ${cardId} 별칭 동기화 실패:`, error)
+        failedUpdates[cardIdStr] = nickname as string
+      }
+    }
+
+    // 동기화 성공한 것들은 localStorage에서 제거, 실패한 것들만 남김
+    localStorage.setItem('cardNicknames', JSON.stringify(failedUpdates))
+    
+    console.log(`별칭 동기화 완료: ${syncedCount}/${pendingUpdates.length}`)
+    
+    return {
+      success: Object.keys(failedUpdates).length === 0,
+      synced: syncedCount,
+      failed: Object.keys(failedUpdates).length
     }
   }
 
@@ -336,8 +423,9 @@ export const useCardsStore = defineStore('cards', () => {
     fetchBillingInfo,
     fetchUsageForCard,
     updateCardNickname,
-    // For CardUsage.vue to still have access to the full list for now
+    syncPendingNicknames,
     currentMonthBilling,
     currentMonthUsage,
   }
 })
+
