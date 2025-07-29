@@ -135,7 +135,7 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/challenge/current',
+    path: '/challenge/current/:id',
     name: 'ChallengeCurrent',
     component: ChallengeCurrent,
     meta: {
