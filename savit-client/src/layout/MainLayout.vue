@@ -35,7 +35,7 @@ const pageTitle = computed(() => {
 const gridRowsClass = computed(() => {
   const hasHeader = route.meta.showHeader
   const hasNavigation = route.meta.showNavigation
-  
+
   if (hasHeader && hasNavigation) {
     return 'grid-rows-[auto_1fr_auto]'
   } else if (hasHeader && !hasNavigation) {

@@ -1,12 +1,12 @@
 <template>
   <div v-if="!loading" class="challenge-main-page h-full grid grid-rows-[1fr_auto]">
-    <div class="content-area pt-6 overflow-auto pb-3">
+    <div class="content-area pt-6 overflow-y-auto overflow-x-hidden pb-3">
       <div class="my-challenge-container">
         <div class="my-challenge-header">
           <button @click="() => router.push('/challenge/result/1')">결과</button>
           <span class="font-bold">나의 챌린지</span>
         </div>
-        <div class="my-challenge-item mt-4" @click="routeDetail('1')">
+        <div class="my-challenge-item mt-4" @click="routeCurrent('1')">
           <card-component>
             <div class="my-challenge-label">
               <label-item>진행중</label-item>
@@ -83,6 +83,10 @@ onMounted(async () => {
 
 const routeDetail = (id: string) => {
   router.push(`/challenge/detail/${id}`)
+}
+
+const routeCurrent = (id: string) => {
+  router.push(`/challenge/current/${id}`)
 }
 </script>
 
