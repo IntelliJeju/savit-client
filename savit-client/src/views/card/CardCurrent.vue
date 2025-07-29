@@ -33,7 +33,29 @@
               <!-- 카드 정보 -->
               <div class="relative z-10 h-full flex flex-col justify-between">
                 <div>
-                  <div class="text-sm opacity-90">{{ currentCard?.cardName || '카드명' }}</div>
+                  <div class="flex items-center justify-between">
+                    <div v-if="!isEditingNickname" class="text-sm opacity-90 flex items-center gap-2">
+                      {{ currentCard?.cardNickname || '카드별칭' }}
+                      <button
+                        @click="startEditNickname"
+                        class="p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-all opacity-70 hover:opacity-100"
+                      >
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <input
+                      v-else
+                      v-model="editingNickname"
+                      @blur="saveNickname"
+                      @keyup.enter="saveNickname"
+                      @keyup.escape="cancelEditNickname"
+                      class="text-sm opacity-90 bg-transparent border-b border-white border-opacity-50 outline-none px-1 py-0.5 min-w-0 flex-1"
+                      ref="nicknameInput"
+                      maxlength="20"
+                    />
+                  </div>
                   <div class="text-3xl font-bold mt-8">
                     {{ currentBilling?.amount?.toLocaleString() || '-' }}원
                   </div>
@@ -171,7 +193,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 
@@ -180,6 +202,11 @@ const route = useRoute()
 const cardsStore = useCardsStore()
 
 const currentCardIndex = ref(0)
+
+// 별칭 편집 관련 상태
+const isEditingNickname = ref(false)
+const editingNickname = ref('')
+const nicknameInput = ref<HTMLInputElement | null>(null)
 
 // 슬라이드 관련 상태
 const isDragging = ref(false)
@@ -274,6 +301,40 @@ const updateUrlWithCardId = () => {
     currentQuery.cardId = currentCard.value.cardId.toString()
     router.replace({ query: currentQuery })
   }
+}
+
+// 별칭 편집 기능
+const startEditNickname = async () => {
+  if (!currentCard.value) return
+  
+  isEditingNickname.value = true
+  editingNickname.value = currentCard.value.cardNickname || ''
+  
+  await nextTick()
+  if (nicknameInput.value) {
+    nicknameInput.value.focus()
+    nicknameInput.value.select()
+  }
+}
+
+const saveNickname = async () => {
+  if (!currentCard.value || !editingNickname.value.trim()) {
+    cancelEditNickname()
+    return
+  }
+  
+  try {
+    await cardsStore.updateCardNickname(currentCard.value.cardId, editingNickname.value.trim())
+    isEditingNickname.value = false
+  } catch (error) {
+    console.error('별칭 수정 실패:', error)
+    cancelEditNickname()
+  }
+}
+
+const cancelEditNickname = () => {
+  isEditingNickname.value = false
+  editingNickname.value = ''
 }
 
 const nextCard = () => {
