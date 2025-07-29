@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5173/api',
+  baseURL: import.meta.env.VITE_APP_API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
