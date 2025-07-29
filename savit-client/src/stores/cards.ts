@@ -8,6 +8,7 @@ interface Card {
   cardName: string
   cardNumber: string
   cardPassword: string
+  cardNickname: string
   userId: string // 카드사 사용자 아이디
   userPw: string // 카드사 사용자 비밀번호
   userBdate: string // 사용자 생년월일
@@ -38,6 +39,7 @@ export const useCardsStore = defineStore('cards', () => {
       cardName: '신한 프리미어',
       cardNumber: '1234-5678-9012-3456',
       cardPassword: '1234',
+      cardNickname: '신한 교통할인',
       userId: 'testuser1',
       userPw: 'password123',
       userBdate: '19901215'
@@ -48,6 +50,7 @@ export const useCardsStore = defineStore('cards', () => {
       cardName: '삼성 플래티넘',
       cardNumber: '9876-5432-1098-7654',
       cardPassword: '5678',
+      cardNickname: '삼성 쇼핑할인',
       userId: 'testuser2',
       userPw: 'password456',
       userBdate: '19851020'
@@ -58,6 +61,7 @@ export const useCardsStore = defineStore('cards', () => {
       cardName: '국민 트래블러스',
       cardNumber: '1111-2222-3333-4444',
       cardPassword: '9876',
+      cardNickname: '국민 캐시백',
       userId: 'testuser3',
       userPw: 'password789',
       userBdate: '19930305'
@@ -298,6 +302,30 @@ export const useCardsStore = defineStore('cards', () => {
     }
   }
 
+  async function updateCardNickname(cardId: number, nickname: string) {
+    try {
+      const response = await request({
+        method: 'PATCH',
+        url: `/cards/${cardId}/nickname`,
+        data: { nickname },
+      })
+
+      const cardIndex = cards.value.findIndex(card => card.cardId === cardId)
+      if (cardIndex !== -1) {
+        cards.value[cardIndex].cardNickname = nickname
+      }
+
+      return response.data
+    } catch (error) {
+      console.error(`카드 ${cardId} 별칭 수정 실패:`, error)
+      const cardIndex = cards.value.findIndex(card => card.cardId === cardId)
+      if (cardIndex !== -1) {
+        cards.value[cardIndex].cardNickname = nickname
+      }
+      return null
+    }
+  }
+
   return {
     cards,
     registeredCards,
@@ -307,6 +335,7 @@ export const useCardsStore = defineStore('cards', () => {
     fetchCards,
     fetchBillingInfo,
     fetchUsageForCard,
+    updateCardNickname,
     // For CardUsage.vue to still have access to the full list for now
     currentMonthBilling,
     currentMonthUsage,
