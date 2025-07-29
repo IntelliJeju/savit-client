@@ -3,10 +3,10 @@
     class="result-page relative h-full ml-[-1rem] mr-[-1rem] px-6 text-white overflow-hidden pb-6"
     :class="backgroundClass"
   >
-    <div class="result-header relative flex p-4 items-center">
+    <div class="result-header relative flex py-4 items-center">
       <button class="text-white absolute" @click="router.go(-1)">
-        <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
-      </button>
+        <v-icon name="hi-chevron-left" scale="1.5"></v-icon></button
+      >,
       <span class="title flex-1 text-[1.5rem] font-bold text-white text-center">
         {{ titleText }}
       </span>
