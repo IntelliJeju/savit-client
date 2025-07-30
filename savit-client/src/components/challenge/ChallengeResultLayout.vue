@@ -26,12 +26,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import router from '@/router/index.ts'
+import { useRouter } from 'vue-router'
 
 interface Props {
   resultType: 'success' | 'fail'
 }
 
+const router = useRouter()
 const props = defineProps<Props>()
 
 const backgroundClass = computed(() => {
