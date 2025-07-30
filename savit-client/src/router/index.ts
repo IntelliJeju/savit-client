@@ -27,10 +27,6 @@ const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
 
 const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    redirect: '/auth/login',
-  },
   //auth
   {
     path: '/auth/login',
@@ -196,6 +192,11 @@ const routes: Array<RouteRecordRaw> = [
       title: '',
     },
   },
+  // 404 페이지 - 존재하지 않는 모든 경로를 /home으로 리다이렉트
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/home',
+  },
 ]
 
 const router = createRouter({
@@ -206,7 +207,8 @@ const router = createRouter({
 // 기본값 설정
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const isLocalhost =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
   // localhost에서는 인증 체크 건너뛰기
   if (isLocalhost) {
