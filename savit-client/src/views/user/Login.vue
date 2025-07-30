@@ -23,16 +23,11 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
-
-const authStore = useAuthStore()
-const router = useRouter()
+const url = import.meta.env.VITE_APP_API_BASE_URL
 
 const handleKakaoLogin = async () => {
   try {
-    await authStore.kakaoLogin()
-    router.push('/home')
+    window.location.href = url + '/auth/kakao'
   } catch (error) {
     console.error('카카오 로그인 실패:', error)
   }
