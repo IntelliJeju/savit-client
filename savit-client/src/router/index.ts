@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/auth'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const MainLayout = () => import('@/layout/MainLayout.vue')
@@ -7,6 +8,7 @@ const DashBoard = () => import('@/views/DashBoard.vue')
 
 // Auth
 const Login = () => import('@/views/user/Login.vue')
+const LoginCallback = () => import('@/views/user/LoginCallback.vue')
 
 // Card
 const CardCurrent = () => import('@/views/card/CardCurrent.vue')
@@ -25,15 +27,23 @@ const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
 
 const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    redirect: '/auth/login',
-  },
   //auth
   {
     path: '/auth/login',
     name: 'Login',
     component: Login,
+    meta: {
+      showNavigation: false,
+      requiresAuth: false,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
+    },
+  },
+  {
+    path: '/auth/login/callback',
+    name: 'LoginCallback',
+    component: LoginCallback,
     meta: {
       showNavigation: false,
       requiresAuth: false,
@@ -135,7 +145,7 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: '/challenge/current',
+    path: '/challenge/current/:id',
     name: 'ChallengeCurrent',
     component: ChallengeCurrent,
     meta: {
@@ -182,6 +192,11 @@ const routes: Array<RouteRecordRaw> = [
       title: '',
     },
   },
+  // 404 페이지 - 존재하지 않는 모든 경로를 /home으로 리다이렉트
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/home',
+  },
 ]
 
 const router = createRouter({
@@ -191,21 +206,26 @@ const router = createRouter({
 
 // 기본값 설정
 router.beforeEach((to, from, next) => {
-  if (!to.meta.hasOwnProperty('showNavigation')) {
-    to.meta.showNavigation = true
+  const authStore = useAuthStore()
+  const isLocalhost =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
+  // localhost에서는 인증 체크 건너뛰기
+  if (isLocalhost) {
+    next()
+    return
   }
-  if (!to.meta.hasOwnProperty('showBackButton')) {
-    to.meta.showBackButton = false
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next('/auth/login')
+    return
   }
-  if (!to.meta.hasOwnProperty('requiresAuth')) {
-    to.meta.requiresAuth = true
+
+  if (to.path === '/auth/login' && authStore.isLoggedIn) {
+    next('/home')
+    return
   }
-  if (!to.meta.hasOwnProperty('showHeader')) {
-    to.meta.showHeader = true
-  }
-  if (!to.meta.hasOwnProperty('title')) {
-    to.meta.title = ''
-  }
+
   next()
 })
 

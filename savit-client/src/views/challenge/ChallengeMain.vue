@@ -1,12 +1,12 @@
 <template>
-  <div class="challenge-main-page h-full grid grid-rows-[1fr_auto]">
-    <div class="content-area pt-6 overflow-auto pb-3">
+  <div v-if="!loading" class="challenge-main-page h-full grid grid-rows-[1fr_auto]">
+    <div class="content-area pt-6 overflow-y-auto overflow-x-hidden pb-3">
       <div class="my-challenge-container">
         <div class="my-challenge-header">
           <button @click="() => router.push('/challenge/result/1')">결과</button>
           <span class="font-bold">나의 챌린지</span>
         </div>
-        <div class="my-challenge-item mt-4" @click="routeDetail(1)">
+        <div class="my-challenge-item mt-4" @click="routeCurrent('1')">
           <card-component>
             <div class="my-challenge-label">
               <label-item>진행중</label-item>
@@ -29,14 +29,19 @@
         <div class="avail-challenge-header">
           <span class="text-base font-bold">이번 주 참여 가능 챌린지</span>
         </div>
-        <div v-for="item in dummy" class="avail-challenge-item mt-4" @click="routeDetail(1)">
+        <div
+          v-for="item in availChallengeList"
+          :key="item.id"
+          class="avail-challenge-item mt-4"
+          @click="routeDetail(item.id)"
+        >
           <card-component>
             <div class="avail-challenge-label">
-              <label-item>{{ item.category }}</label-item>
+              <label-item>{{ item.categoryName }}</label-item>
             </div>
             <div class="avail-challenge-title mt-2 text-xl font-bold">{{ item.title }}</div>
             <div class="avail-challenge-due">
-              <span class="font-bold text-xs">{{ item.due }}</span>
+              <span class="font-bold text-xs">{{ item.startDate }}~{{ item.endDate }}</span>
             </div>
           </card-component>
         </div>
@@ -59,36 +64,29 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 import LabelItem from '@/components/label/LabelItem.vue'
 import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import router from '@/router/index.ts'
+import { useChallengeStore } from '@/stores/challenges.ts'
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 
-const dummy = [
-  {
-    category: '배달',
-    title: '배달음식 10회 이하 주문',
-    due: '2025/07/16~2025/07/23',
-  },
-  {
-    category: '배달',
-    title: '배달음식 10회 이하 주문',
-    due: '2025/07/16~2025/07/23',
-  },
-  {
-    category: '배달',
-    title: '배달음식 10회 이하 주문',
-    due: '2025/07/16~2025/07/23',
-  },
-  {
-    category: '배달',
-    title: '배달음식 10회 이하 주문',
-    due: '2025/07/16~2025/07/23',
-  },
-]
+const challengeStore = useChallengeStore()
 
-const routeDetail = (id: number) => {
+const {
+  getAvailChallengeList,
+  // getAvailChallengeDetail,
+  // availChallengeDetailMap,
+} = challengeStore
+const { availChallengeList, loading } = storeToRefs(challengeStore)
+
+onMounted(async () => {
+  await getAvailChallengeList()
+})
+
+const routeDetail = (id: string) => {
   router.push(`/challenge/detail/${id}`)
 }
 
-const test = () => {
-  router.push('/challenge/detail')
+const routeCurrent = (id: string) => {
+  router.push(`/challenge/current/${id}`)
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ChallengeResultLayout result-type="fail">
+    <ChallengeResultLayout result-type="success">
       <div class="result-container bg-[#00000030] rounded-lg p-10">
         <div class="result-header flex flex-col items-center gap-2">
           <span class="text-[1.75rem] font-bold">배달음식 10회 이하 주문</span>
@@ -40,16 +40,12 @@
       </div>
       <div class="result-ment-container bg-[#00000030] rounded-lg p-6 mt-6 flex flex-col gap-6">
         <div class="ment-header text-center text-[2rem] font-bold">
-          <span>💡 배달 절약 팁</span>
+          <span>{{ ment.title }}</span>
         </div>
         <div class="ment-content text-[1.25rem]">
-          <div>
-            <p class="font-bold">🏠 집에서 요리</p>
-            <p>간단한 요리 레시피를 배워 배달 욕구를 줄여보세요.</p>
-          </div>
-          <div class="mt-4">
-            <p class="font-bold">📱 배달 앱 삭제</p>
-            <p>일시적으로 배달 앱을 삭제하고 다른 취미를 찾아보세요.</p>
+          <div v-for="content in ment.content">
+            <p class="font-bold">{{ content.subtitle }}</p>
+            <p>{{ content.body }}</p>
           </div>
         </div>
       </div>
@@ -59,6 +55,20 @@
 
 <script setup lang="ts">
 import ChallengeResultLayout from '@/components/challenge/ChallengeResultLayout.vue'
+
+const ment = {
+  title: '💡 배달 절약 팁',
+  content: [
+    {
+      subtitle: '🏠 집에서 요리',
+      body: '간단한 요리 레시피를 배워 배알 욕구를 줄여보세요.',
+    },
+    {
+      subtitle: '📱 배달 앱 삭제',
+      body: '일시적으로 배달 앱을 삭제하고 다른 취미를 찾아보세요.',
+    },
+  ],
+}
 </script>
 
 <style scoped></style>

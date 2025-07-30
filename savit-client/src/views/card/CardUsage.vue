@@ -7,7 +7,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div>
-              <div class="text-sm text-slate-600 mb-1">{{cardName}}</div>
+              <div class="text-sm text-slate-600 mb-1">{{cardNickname}}</div>
               <div v-if="billingInfo.current" class="text-2xl font-bold text-slate-800">
                 {{ billingInfo.current.amount.toLocaleString() }}원
               </div>
@@ -96,6 +96,11 @@ const sortOrder = ref<'newest' | 'oldest'>('newest')
 const cardName = computed(() => {
   const card = cardsStore.cards.find((c) => c.cardId === cardId.value)
   return card ? card.cardName : '카드'
+})
+
+const cardNickname = computed(() => {
+  const card = cardsStore.cards.find((c) => c.cardId === cardId.value)
+  return card ? card.cardNickname : '카드별칭'
 })
 
 const billingInfo = computed(() => {
@@ -241,3 +246,4 @@ onMounted(async () => {
   background-color: #f8fafc;
 }
 </style>
+

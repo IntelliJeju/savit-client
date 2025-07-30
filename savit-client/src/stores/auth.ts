@@ -9,49 +9,46 @@ interface User {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(false)
   const { request } = useApi()
 
+  const isAuthenticated = ref(false)
   const user = ref<User | null>(null)
-
-  const token = ref<string | null>(null)
+  const accessToken = ref<string | null>(null)
+  const refreshToken = ref<string | null>(null)
 
   const isLoggedIn = computed(() => {
-    return isAuthenticated.value && !!token.value
+    return isAuthenticated.value && !!accessToken.value
   })
 
   const currentUser = computed(() => {
     return user.value
   })
 
-  async function kakaoLogin() {
+  function setJWTToken(access: string, refresh: string) {
+    localStorage.setItem('accessToken', access)
+    localStorage.setItem('refreshToken', refresh)
+
+    accessToken.value = access
+    refreshToken.value = refresh
+    isAuthenticated.value = true
+  }
+
+  function kakaoLogin(token: string) {
     try {
-      // const response = await request({
-      //   method: 'POST',
-      //   url: '/auth/kakao/login',
-      //   data: {
-      //     accessToken: 'temp-kakao-token',
-      //   },
-      // })
+      // const tempToken = 'temp-kakao-token'
+      // const tempUser: User = {
+      //   memberId: 'temp-user-123',
+      //   name: '테스트 사용자',
+      //   email: 'temp@example.com',
+      // }
 
-      const tempToken = 'temp-kakao-token'
-      const tempUser: User = {
-        memberId: 'temp-user-123',
-        name: '테스트 사용자',
-        email: 'temp@example.com',
-      }
-
-      token.value = tempToken
-      user.value = tempUser
+      accessToken.value = token
       isAuthenticated.value = true
 
-      localStorage.setItem('authToken', tempToken)
-      localStorage.setItem('authUser', JSON.stringify(tempUser))
-
+      localStorage.setItem('accessToken', token)
       console.log('카카오 로그인 성공!')
     } catch (error) {
       console.error('카카오 로그인 실패:', error)
-
       throw error
     }
   }
@@ -59,22 +56,22 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     isAuthenticated.value = false
     user.value = null
-    token.value = null
+    accessToken.value = null
 
-    localStorage.removeItem('authToken')
+    localStorage.removeItem('accessToken')
     localStorage.removeItem('authUser')
 
     console.log('로그아웃 되었습니다.')
   }
 
   function restoreAuthentication() {
-    const storedToken = localStorage.getItem('authToken')
-    const userString = localStorage.getItem('authUser')
+    const storedToken = localStorage.getItem('accessToken')
+    const storedRefreshToken = localStorage.getItem('refreshToken')
 
-    if (storedToken && userString) {
+    if (storedToken && storedRefreshToken) {
       try {
-        token.value = storedToken
-        user.value = JSON.parse(userString)
+        accessToken.value = storedToken
+        refreshToken.value = storedRefreshToken
         isAuthenticated.value = true
         console.log('로그인 정보를 복원했습니다.')
       } catch (error) {
@@ -87,9 +84,10 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     isAuthenticated,
     user,
-    token,
+    accessToken,
     isLoggedIn,
     currentUser,
+    setJWTToken,
     kakaoLogin,
     logout,
     restoreAuthentication,

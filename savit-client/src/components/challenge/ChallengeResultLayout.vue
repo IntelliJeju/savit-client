@@ -3,7 +3,7 @@
     class="result-page relative h-full ml-[-1rem] mr-[-1rem] px-6 text-white overflow-hidden pb-6"
     :class="backgroundClass"
   >
-    <div class="result-header relative flex p-4 items-center">
+    <div class="result-header relative flex py-4 items-center">
       <button class="text-white absolute" @click="router.go(-1)">
         <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
       </button>
@@ -26,12 +26,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import router from '@/router/index.ts'
+import { useRouter } from 'vue-router'
 
 interface Props {
   resultType: 'success' | 'fail'
 }
 
+const router = useRouter()
 const props = defineProps<Props>()
 
 const backgroundClass = computed(() => {

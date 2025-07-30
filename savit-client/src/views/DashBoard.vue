@@ -1,5 +1,7 @@
 <template>
-  <div>DashBoard.vue</div>
+  <div>
+    <!-- <FCMTokenTest /> -->
+  </div>
 </template>
 
 <script setup lang="ts"></script>

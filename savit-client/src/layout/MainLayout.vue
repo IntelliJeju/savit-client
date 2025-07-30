@@ -13,10 +13,10 @@
 <script setup lang="ts">
 import Header from './Header.vue'
 import BottomNavigation from '@/components/navigation/BottomNavigation.vue'
-import router from '@/router/index.ts'
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const router = useRouter()
 const route = useRoute()
 
 const pageTitle = computed(() => {
@@ -35,7 +35,7 @@ const pageTitle = computed(() => {
 const gridRowsClass = computed(() => {
   const hasHeader = route.meta.showHeader
   const hasNavigation = route.meta.showNavigation
-  
+
   if (hasHeader && hasNavigation) {
     return 'grid-rows-[auto_1fr_auto]'
   } else if (hasHeader && !hasNavigation) {

@@ -15,7 +15,7 @@
 import { computed } from 'vue'
 
 const props = defineProps<{
-  name: string
+  name?: string
   minValue: number
   maxValue: number
   value: number

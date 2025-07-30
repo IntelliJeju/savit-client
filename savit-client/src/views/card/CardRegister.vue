@@ -114,6 +114,7 @@ const cardData = ref({
   cardName: '',
   cardNumber: '',
   cardPassword: '',
+  cardNickname: '',
   userId: '',
   userPw: '',
   userBdate: '',
@@ -131,9 +132,11 @@ const handleRegisterCard = async () => {
       cardName: '',
       cardNumber: '',
       cardPassword: '',
+      cardNickname: '',
       userId: '',
       userPw: '',
       userBdate: '',
+      
     }
     
     router.push('/card/current')
