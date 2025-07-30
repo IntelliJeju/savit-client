@@ -14,8 +14,9 @@ const authStore = useAuthStore()
 const { setJWTToken } = authStore
 
 onMounted(() => {
-  const auth = route.params.auth as string
-  const refresh = route.params.refresh as string
+  console.log(route)
+  const auth = route.query.accessToken as string
+  const refresh = route.query.refreshToken as string
   setJWTToken(auth, refresh)
   router.replace('/home')
 })

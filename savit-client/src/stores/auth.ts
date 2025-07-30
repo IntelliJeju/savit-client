@@ -30,6 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     authToken.value = auth
     refreshToken.value = refresh
+    isAuthenticated.value = true
   }
 
   function kakaoLogin(token: string) {
@@ -65,12 +66,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   function restoreAuthentication() {
     const storedToken = localStorage.getItem('authToken')
-    const userString = localStorage.getItem('authUser')
+    const storedRefreshToken = localStorage.getItem('refreshToken')
 
-    if (storedToken && userString) {
+    if (storedToken) {
       try {
         authToken.value = storedToken
-        user.value = JSON.parse(userString)
+        refreshToken.value = storedRefreshToken
         isAuthenticated.value = true
         console.log('로그인 정보를 복원했습니다.')
       } catch (error) {
