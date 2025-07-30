@@ -1,5 +1,7 @@
 <template>
-  <div><FCMTokenTest /></div>
+  <div>
+    <!-- <FCMTokenTest /> -->
+  </div>
 </template>
 
 <script setup lang="ts">
