@@ -13,10 +13,10 @@
 <script setup lang="ts">
 import Header from './Header.vue'
 import BottomNavigation from '@/components/navigation/BottomNavigation.vue'
-import router from '@/router/index.ts'
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const router = useRouter()
 const route = useRoute()
 
 const pageTitle = computed(() => {
