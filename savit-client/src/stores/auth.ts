@@ -13,22 +13,22 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = ref(false)
   const user = ref<User | null>(null)
-  const authToken = ref<string | null>(null)
+  const accessToken = ref<string | null>(null)
   const refreshToken = ref<string | null>(null)
 
   const isLoggedIn = computed(() => {
-    return isAuthenticated.value && !!authToken.value
+    return isAuthenticated.value && !!accessToken.value
   })
 
   const currentUser = computed(() => {
     return user.value
   })
 
-  function setJWTToken(auth: string, refresh: string) {
-    localStorage.setItem('authToken', auth)
+  function setJWTToken(access: string, refresh: string) {
+    localStorage.setItem('accessToken', access)
     localStorage.setItem('refreshToken', refresh)
 
-    authToken.value = auth
+    accessToken.value = access
     refreshToken.value = refresh
     isAuthenticated.value = true
   }
@@ -42,10 +42,10 @@ export const useAuthStore = defineStore('auth', () => {
       //   email: 'temp@example.com',
       // }
 
-      authToken.value = token
+      accessToken.value = token
       isAuthenticated.value = true
 
-      localStorage.setItem('authToken', token)
+      localStorage.setItem('accessToken', token)
       console.log('카카오 로그인 성공!')
     } catch (error) {
       console.error('카카오 로그인 실패:', error)
@@ -56,21 +56,21 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     isAuthenticated.value = false
     user.value = null
-    authToken.value = null
+    accessToken.value = null
 
-    localStorage.removeItem('authToken')
+    localStorage.removeItem('accessToken')
     localStorage.removeItem('authUser')
 
     console.log('로그아웃 되었습니다.')
   }
 
   function restoreAuthentication() {
-    const storedToken = localStorage.getItem('authToken')
+    const storedToken = localStorage.getItem('accessToken')
     const storedRefreshToken = localStorage.getItem('refreshToken')
 
     if (storedToken) {
       try {
-        authToken.value = storedToken
+        accessToken.value = storedToken
         refreshToken.value = storedRefreshToken
         isAuthenticated.value = true
         console.log('로그인 정보를 복원했습니다.')
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     isAuthenticated,
     user,
-    authToken,
+    accessToken,
     isLoggedIn,
     currentUser,
     setJWTToken,
