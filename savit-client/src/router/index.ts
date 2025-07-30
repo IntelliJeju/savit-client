@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const MainLayout = () => import('@/layout/MainLayout.vue')
@@ -207,6 +206,13 @@ const router = createRouter({
 // 기본값 설정
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
+  // localhost에서는 인증 체크 건너뛰기
+  if (isLocalhost) {
+    next()
+    return
+  }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next('/auth/login')
