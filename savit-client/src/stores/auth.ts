@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
     const storedToken = localStorage.getItem('accessToken')
     const storedRefreshToken = localStorage.getItem('refreshToken')
 
-    if (storedToken) {
+    if (storedToken && storedRefreshToken) {
       try {
         accessToken.value = storedToken
         refreshToken.value = storedRefreshToken
