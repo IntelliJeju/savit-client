@@ -3,7 +3,7 @@
     <Header v-show="route.meta.showHeader" :show-back-button="route.meta.showBackButton">{{
       pageTitle
     }}</Header>
-    <div class="main-content bg-[#f5f5f5] overflow-auto" :class="{ 'px-4': route.name !== 'Login' }"><router-view /></div>
+    <div class="main-content bg-[#f5f5f5] overflow-auto px-4"><router-view /></div>
     <div class="footer" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
