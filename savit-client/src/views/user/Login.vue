@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-t from-[#333333] to-[#0AB68B] flex flex-col">
+  <div class="min-h-screen bg-gradient-to-t from-[#333333] to-[#0AB68B] flex flex-col mr-[-1rem] ml-[-1rem]">
     <div class="flex-1"></div>
     <div class="flex-1 flex items-center justify-center px-8">
       <img
