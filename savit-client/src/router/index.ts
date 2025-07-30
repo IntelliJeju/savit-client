@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const MainLayout = () => import('@/layout/MainLayout.vue')
@@ -45,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/auth/login/callback',
-    name: 'Login',
+    name: 'LoginCallback',
     component: LoginCallback,
     meta: {
       showNavigation: false,
@@ -204,21 +206,18 @@ const router = createRouter({
 
 // 기본값 설정
 router.beforeEach((to, from, next) => {
-  if (!to.meta.hasOwnProperty('showNavigation')) {
-    to.meta.showNavigation = true
+  const authStore = useAuthStore()
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next('/auth/login')
+    return
   }
-  if (!to.meta.hasOwnProperty('showBackButton')) {
-    to.meta.showBackButton = false
+
+  if (to.path === '/auth/login' && authStore.isLoggedIn) {
+    next('/home')
+    return
   }
-  if (!to.meta.hasOwnProperty('requiresAuth')) {
-    to.meta.requiresAuth = true
-  }
-  if (!to.meta.hasOwnProperty('showHeader')) {
-    to.meta.showHeader = true
-  }
-  if (!to.meta.hasOwnProperty('title')) {
-    to.meta.title = ''
-  }
+
   next()
 })
 
