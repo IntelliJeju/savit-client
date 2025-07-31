@@ -210,6 +210,8 @@ router.beforeEach((to, from, next) => {
   const isLocalhost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
+  next()
+
   // localhost에서는 인증 체크 건너뛰기
   if (isLocalhost) {
     next()
