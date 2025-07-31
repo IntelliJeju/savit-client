@@ -13,13 +13,13 @@
             </div>
             <div class="my-challenge-title mt-4 text-2xl font-bold">배달음식 10회 이하 주문</div>
             <div class="my-challenge-progress mt-4">
-              <div class="text-xs font-bold">4일째 진행중</div>
+              <div class="text-xs font-medium text-slate-600">4일째 진행중</div>
               <div class="mt-1">
                 <ProgressBar name="myChallenge" :min-value="0" :max-value="100" :value="30" />
               </div>
               <div class="mt-1 flex justify-between">
-                <span class="font-bold">{{ Math.floor((30 / 100) * 100) }}%</span>
-                <span class="font-bold text-xs">2025/07/16~2025/07/23</span>
+                <span class="font-semibold">{{ Math.floor((30 / 100) * 100) }}%</span>
+                <span class="text-xs text-slate-500">2025/07/16~2025/07/23</span>
               </div>
             </div>
           </card-component>
@@ -39,9 +39,9 @@
             <div class="avail-challenge-label">
               <label-item>{{ item.categoryName }}</label-item>
             </div>
-            <div class="avail-challenge-title mt-2 text-xl font-bold">{{ item.title }}</div>
+            <div class="avail-challenge-title mt-2 text-xl font-semibold">{{ item.title }}</div>
             <div class="avail-challenge-due">
-              <span class="font-bold text-xs">{{ item.startDate }}~{{ item.endDate }}</span>
+              <span class="text-xs text-slate-500">{{ item.startDate }}~{{ item.endDate }}</span>
             </div>
           </card-component>
         </div>
