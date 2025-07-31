@@ -1,13 +1,14 @@
 <template>
   <div class="mb-6">
     <swiper
+      :modules="[Navigation, Pagination]"
       :slides-per-view="1"
       :space-between="20"
       :centered-slides="true"
-      :pagination="{ clickable: true, el: '.swiper-pagination' }"
+      :pagination="{ clickable: true, el: '.custom-pagination' }"
       :navigation="{
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
+        nextEl: '.custom-next',
+        prevEl: '.custom-prev',
       }"
       @swiper="onSwiper"
       @slide-change="onSlideChange"
@@ -92,10 +93,11 @@
       </swiper-slide>
     </swiper>
 
-    <!-- 커스텀 네비게이션 -->
-    <div class="flex justify-center items-center gap-4 mt-4" v-if="totalSlots > 1">
+    <!-- 외부 네비게이션 -->
+    <div class="relative flex justify-center items-center mt-4" v-if="totalSlots > 1">
+      <!-- 이전 버튼 -->
       <button
-        class="swiper-button-prev w-10 h-10 bg-transparent border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50"
+        class="custom-prev absolute left-0 w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50 shadow-sm"
       >
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -105,9 +107,13 @@
           />
         </svg>
       </button>
-      <div class="swiper-pagination flex space-x-2"></div>
+      
+      <!-- 페이지네이션 (가운데) -->
+      <div class="custom-pagination flex justify-center items-center space-x-2"></div>
+      
+      <!-- 다음 버튼 -->
       <button
-        class="swiper-button-next w-10 h-10 bg-transparent border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50"
+        class="custom-next absolute right-0 w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50 shadow-sm"
       >
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -118,6 +124,7 @@
         </svg>
       </button>
     </div>
+
   </div>
 </template>
 
@@ -220,39 +227,39 @@ defineExpose({
   justify-content: center;
 }
 
-/* 커스텀 페이지네이션 */
-.swiper-pagination {
-  position: static !important;
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+/* 외부 네비게이션 스타일 */
+.custom-prev,
+.custom-next {
+  cursor: pointer;
 }
 
-.swiper-pagination .swiper-pagination-bullet {
+.custom-prev:disabled,
+.custom-next:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 외부 페이지네이션 스타일 */
+.custom-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 40px; /* 버튼과 같은 높이로 맞춤 */
+}
+
+.custom-pagination .swiper-pagination-bullet {
   width: 8px;
   height: 8px;
   background-color: #cbd5e1;
-  opacity: 1;
   border-radius: 50%;
+  opacity: 1;
   transition: background-color 0.15s ease-in-out;
+  cursor: pointer;
 }
 
-.swiper-pagination .swiper-pagination-bullet-active {
+.custom-pagination .swiper-pagination-bullet-active {
   background-color: #16a34a;
-}
-
-/* 커스텀 네비게이션 버튼 */
-.swiper-button-prev,
-.swiper-button-next {
-  position: static !important;
-  margin: 0 !important;
-  width: 2.5rem !important;
-  height: 2.5rem !important;
-}
-
-.swiper-button-prev::after,
-.swiper-button-next::after {
-  display: none;
 }
 
 /* 터치 반응 개선 */
