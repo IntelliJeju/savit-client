@@ -44,7 +44,7 @@ export const useCardsStore = defineStore('cards', () => {
         cardNickname: '신한 교통할인',
         userId: 'testuser1',
         userPw: 'password123',
-        userBdate: '19901215'
+        userBdate: '19901215',
       },
       {
         organization: '삼성카드',
@@ -55,7 +55,7 @@ export const useCardsStore = defineStore('cards', () => {
         cardNickname: '삼성 쇼핑할인',
         userId: 'testuser2',
         userPw: 'password456',
-        userBdate: '19851020'
+        userBdate: '19851020',
       },
       {
         organization: '국민카드',
@@ -66,13 +66,13 @@ export const useCardsStore = defineStore('cards', () => {
         cardNickname: '국민 캐시백',
         userId: 'testuser3',
         userPw: 'password789',
-        userBdate: '19930305'
-      }
+        userBdate: '19930305',
+      },
     ]
 
     // localStorage에서 저장된 별칭 적용
     const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-    defaultCards.forEach(card => {
+    defaultCards.forEach((card) => {
       if (savedNicknames[card.cardId]) {
         card.cardNickname = savedNicknames[card.cardId]
       }
@@ -86,35 +86,35 @@ export const useCardsStore = defineStore('cards', () => {
     {
       cardId: 1,
       amount: 285000,
-      month: '2025-07'
+      month: '2025-07',
     },
     {
       cardId: 2,
       amount: 450000,
-      month: '2025-07'
+      month: '2025-07',
     },
     {
       cardId: 3,
       amount: 320000,
-      month: '2025-07'
-    }
+      month: '2025-07',
+    },
   ])
   const lastMonthBilling = ref<BillingInfo[]>([
     {
       cardId: 1,
       amount: 320000,
-      month: '2025-06'
+      month: '2025-06',
     },
     {
       cardId: 2,
       amount: 380000,
-      month: '2025-06'
+      month: '2025-06',
     },
     {
       cardId: 3,
       amount: 290000,
-      month: '2025-06'
-    }
+      month: '2025-06',
+    },
   ])
   const currentMonthUsage = ref<UsageDetail[]>([
     {
@@ -123,7 +123,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-20',
       merchant: '스타벅스 강남점',
       amount: 8500,
-      category: '카페'
+      category: '카페',
     },
     {
       id: 'usage_007',
@@ -131,7 +131,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-20',
       merchant: '맥도날드 역삼점',
       amount: 15000,
-      category: '식당'
+      category: '식당',
     },
     {
       id: 'usage_008',
@@ -139,7 +139,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-20',
       merchant: '쿠팡 온라인',
       amount: 35000,
-      category: '쇼핑'
+      category: '쇼핑',
     },
     {
       id: 'usage_002',
@@ -147,7 +147,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-19',
       merchant: '이마트 성수점',
       amount: 65000,
-      category: '편의점'
+      category: '편의점',
     },
     {
       id: 'usage_009',
@@ -155,7 +155,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-19',
       merchant: '롯데시네마 월드타워',
       amount: 32000,
-      category: '공연'
+      category: '공연',
     },
     {
       id: 'usage_003',
@@ -163,7 +163,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-18',
       merchant: 'CGV 강남점',
       amount: 28000,
-      category: '공연'
+      category: '공연',
     },
     {
       id: 'usage_010',
@@ -171,7 +171,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-18',
       merchant: '파리바게뜨 강남역점',
       amount: 12000,
-      category: '카페'
+      category: '카페',
     },
     {
       id: 'usage_011',
@@ -179,7 +179,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-18',
       merchant: '지마켓 온라인',
       amount: 48000,
-      category: '쇼핑'
+      category: '쇼핑',
     },
     {
       id: 'usage_004',
@@ -187,7 +187,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-21',
       merchant: '올리브영 홍대점',
       amount: 35000,
-      category: '기타'
+      category: '기타',
     },
     {
       id: 'usage_012',
@@ -195,7 +195,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-21',
       merchant: '교보문고 광화문점',
       amount: 25000,
-      category: '기타'
+      category: '기타',
     },
     {
       id: 'usage_005',
@@ -203,7 +203,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-20',
       merchant: '백화점 식당가',
       amount: 120000,
-      category: '식당'
+      category: '식당',
     },
     {
       id: 'usage_013',
@@ -211,7 +211,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-20',
       merchant: '현대백화점 강남점',
       amount: 85000,
-      category: '쇼핑'
+      category: '쇼핑',
     },
     {
       id: 'usage_006',
@@ -219,7 +219,7 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-19',
       merchant: 'GS25 편의점',
       amount: 12000,
-      category: '편의점'
+      category: '편의점',
     },
     {
       id: 'usage_014',
@@ -227,8 +227,16 @@ export const useCardsStore = defineStore('cards', () => {
       date: '2025-07-19',
       merchant: '투썸플레이스 홍대점',
       amount: 18000,
-      category: '카페'
-    }
+      category: '카페',
+    },
+    {
+      id: 'usage_015',
+      cardId: 3,
+      date: '2025-07-19',
+      merchant: '투썸플레이스 홍대점',
+      amount: 18000,
+      category: '카페',
+    },
   ])
 
   const registeredCards = computed(() => cards.value)
@@ -274,27 +282,27 @@ export const useCardsStore = defineStore('cards', () => {
       if (response.data && response.data.length > 0) {
         cards.value = response.data
       }
-      
+
       // localStorage에서 저장된 별칭 적용
       const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-      cards.value.forEach(card => {
+      cards.value.forEach((card) => {
         if (savedNicknames[card.cardId]) {
           card.cardNickname = savedNicknames[card.cardId]
         }
       })
-      
+
       return cards.value
     } catch (error) {
       console.error('카드 목록 조회 실패, 더미 데이터 사용:', error)
-      
+
       // 더미 데이터에도 localStorage 별칭 적용
       const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-      cards.value.forEach(card => {
+      cards.value.forEach((card) => {
         if (savedNicknames[card.cardId]) {
           card.cardNickname = savedNicknames[card.cardId]
         }
       })
-      
+
       return cards.value
     }
   }
@@ -343,7 +351,7 @@ export const useCardsStore = defineStore('cards', () => {
         data: { nickname },
       })
 
-      const cardIndex = cards.value.findIndex(card => card.cardId === cardId)
+      const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
       if (cardIndex !== -1) {
         cards.value[cardIndex].cardNickname = nickname
       }
@@ -356,7 +364,7 @@ export const useCardsStore = defineStore('cards', () => {
       return response.data
     } catch (error) {
       console.error(`카드 ${cardId} 별칭 수정 실패:`, error)
-      const cardIndex = cards.value.findIndex(card => card.cardId === cardId)
+      const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
       if (cardIndex !== -1) {
         cards.value[cardIndex].cardNickname = nickname
       }
@@ -365,7 +373,7 @@ export const useCardsStore = defineStore('cards', () => {
       const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
       savedNicknames[cardId] = nickname
       localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
-      
+
       return null
     }
   }
@@ -374,13 +382,13 @@ export const useCardsStore = defineStore('cards', () => {
   async function syncPendingNicknames() {
     const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
     const pendingUpdates = Object.entries(savedNicknames)
-    
+
     if (pendingUpdates.length === 0) {
       return { success: true, synced: 0 }
     }
 
     console.log(`${pendingUpdates.length}개의 별칭을 서버와 동기화 중...`)
-    
+
     let syncedCount = 0
     const failedUpdates: { [key: string]: string } = {}
 
@@ -392,7 +400,7 @@ export const useCardsStore = defineStore('cards', () => {
           url: `/cards/${cardId}/nickname`,
           data: { nickname },
         })
-        
+
         syncedCount++
         console.log(`카드 ${cardId} 별칭 동기화 성공: ${nickname}`)
       } catch (error) {
@@ -403,13 +411,13 @@ export const useCardsStore = defineStore('cards', () => {
 
     // 동기화 성공한 것들은 localStorage에서 제거, 실패한 것들만 남김
     localStorage.setItem('cardNicknames', JSON.stringify(failedUpdates))
-    
+
     console.log(`별칭 동기화 완료: ${syncedCount}/${pendingUpdates.length}`)
-    
+
     return {
       success: Object.keys(failedUpdates).length === 0,
       synced: syncedCount,
-      failed: Object.keys(failedUpdates).length
+      failed: Object.keys(failedUpdates).length,
     }
   }
 
@@ -428,4 +436,3 @@ export const useCardsStore = defineStore('cards', () => {
     currentMonthUsage,
   }
 })
-

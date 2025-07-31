@@ -1,0 +1,272 @@
+<template>
+  <div class="mb-6">
+    <swiper
+      :slides-per-view="1"
+      :space-between="20"
+      :centered-slides="true"
+      :pagination="{ clickable: true, el: '.swiper-pagination' }"
+      :navigation="{
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      }"
+      @swiper="onSwiper"
+      @slide-change="onSlideChange"
+      class="card-swiper"
+    >
+      <!-- 등록된 카드들 -->
+      <swiper-slide v-for="(card, index) in cards" :key="card.cardId">
+        <div
+          class="w-full h-48 rounded-xl p-6 text-white relative overflow-hidden"
+          :style="{
+            backgroundColor: getCardBgColor(card.organization),
+          }"
+        >
+          <!-- 카드 배경 패턴 -->
+          <div class="absolute top-0 right-0 w-24 h-24 rounded-full bg-white opacity-10 -translate-y-8 translate-x-8"></div>
+          <div class="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-white opacity-5 translate-y-8 -translate-x-8"></div>
+
+          <!-- 카드 정보 -->
+          <div class="relative z-10 h-full flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <div
+                  v-if="!isEditingNickname || currentCardIndex !== index"
+                  class="text-sm opacity-90 flex items-center gap-2"
+                >
+                  {{ card.cardNickname || '카드별칭' }}
+                  <button
+                    @click="$emit('edit-nickname', index)"
+                    class="p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-all opacity-70 hover:opacity-100"
+                  >
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <input
+                  v-else-if="isEditingNickname && currentCardIndex === index"
+                  :value="editingNickname"
+                  @input="$emit('update-nickname', ($event.target as HTMLInputElement).value)"
+                  @blur="$emit('save-nickname')"
+                  @keyup.enter="$emit('save-nickname')"
+                  @keyup.escape="$emit('cancel-edit')"
+                  class="text-sm opacity-90 bg-transparent border-b border-white border-opacity-50 outline-none px-1 py-0.5 min-w-0 flex-1"
+                  ref="nicknameInput"
+                  maxlength="20"
+                />
+              </div>
+              <div class="text-3xl font-bold mt-8">{{ getBillingAmount(card.cardId) }}원</div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-end">
+                <div class="text-sm opacity-90">이번 달 사용 금액</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </swiper-slide>
+
+      <!-- 새 카드 등록 버튼 -->
+      <swiper-slide>
+        <router-link
+          to="/card/register"
+          class="block w-full h-48 rounded-3xl p-6 relative overflow-hidden border-2 border-dashed border-slate-300 bg-white hover:bg-slate-50 active:scale-95 transition-all"
+        >
+          <div class="relative z-10 h-full flex flex-col justify-center items-center text-center">
+            <div class="w-16 h-16 bg-app-light-gray rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-app-green" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="text-slate-800 text-lg font-semibold mb-2">새 카드 등록</div>
+            <div class="text-slate-500 text-sm">카드를 추가해보세요</div>
+          </div>
+        </router-link>
+      </swiper-slide>
+    </swiper>
+
+    <!-- 커스텀 네비게이션 -->
+    <div class="flex justify-center items-center gap-4 mt-4" v-if="totalSlots > 1">
+      <button
+        class="swiper-button-prev w-10 h-10 bg-transparent border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50"
+      >
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+      <div class="swiper-pagination flex space-x-2"></div>
+      <button
+        class="swiper-button-next w-10 h-10 bg-transparent border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50"
+      >
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, nextTick, watch } from 'vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation, Pagination } from 'swiper/modules'
+import type { Swiper as SwiperType } from 'swiper'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+
+interface Card {
+  cardId: number
+  cardNickname: string
+  organization: string
+}
+
+interface Props {
+  cards: Card[]
+  currentCardIndex: number
+  isEditingNickname: boolean
+  editingNickname: string
+  getBillingAmount: (cardId: number) => string
+}
+
+interface Emits {
+  (e: 'slide-change', index: number): void
+  (e: 'edit-nickname', index: number): void
+  (e: 'update-nickname', value: string): void
+  (e: 'save-nickname'): void
+  (e: 'cancel-edit'): void
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const swiperInstance = ref<SwiperType | null>(null)
+const nicknameInput = ref<HTMLInputElement | null>(null)
+
+const totalSlots = computed(() => props.cards.length + 1)
+
+// Swiper 이벤트 핸들러
+const onSwiper = (swiper: SwiperType) => {
+  swiperInstance.value = swiper
+}
+
+const onSlideChange = (swiper: SwiperType) => {
+  emit('slide-change', swiper.activeIndex)
+}
+
+// 카드 배경색 함수
+const getCardBgColor = (organization: string) => {
+  const colorMap: { [key: string]: string } = {
+    국민카드: '#FFD700',
+    신한카드: '#1E40AF',
+    하나카드: '#16A34A',
+    삼성카드: '#6366F1',
+  }
+  return colorMap[organization] || '#4ade80'
+}
+
+// 외부에서 슬라이드 이동을 위한 메서드
+const slideTo = (index: number) => {
+  if (swiperInstance.value) {
+    swiperInstance.value.slideTo(index)
+  }
+}
+
+// 편집 모드일 때 input에 포커스
+watch(
+  () => props.isEditingNickname,
+  async (newVal) => {
+    if (newVal) {
+      await nextTick()
+      if (nicknameInput.value) {
+        nicknameInput.value.focus()
+        nicknameInput.value.select()
+      }
+    }
+  }
+)
+
+// 외부에서 접근 가능한 메서드들 expose
+defineExpose({
+  slideTo,
+})
+</script>
+
+<style scoped>
+/* Swiper 커스텀 스타일 */
+.card-swiper {
+  width: 100%;
+  max-width: 20rem;
+  margin: 0 auto;
+}
+
+.card-swiper .swiper-slide {
+  display: flex;
+  justify-content: center;
+}
+
+/* 커스텀 페이지네이션 */
+.swiper-pagination {
+  position: static !important;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.swiper-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background-color: #cbd5e1;
+  opacity: 1;
+  border-radius: 50%;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.swiper-pagination .swiper-pagination-bullet-active {
+  background-color: #16a34a;
+}
+
+/* 커스텀 네비게이션 버튼 */
+.swiper-button-prev,
+.swiper-button-next {
+  position: static !important;
+  margin: 0 !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  display: none;
+}
+
+/* 터치 반응 개선 */
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+/* 호버 효과 */
+.hover\:bg-slate-50:hover {
+  background-color: rgb(248 250 252);
+}
+
+/* 전환 효과 */
+.transition-all {
+  transition: all 0.15s ease-in-out;
+}
+</style>
