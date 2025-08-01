@@ -112,7 +112,7 @@ import InputField from '@/components/input/InputField.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import organization from '@/utils/cardOrganization.ts'
 import { storeToRefs } from 'pinia'
-import type { Card } from '@/types/card'
+import type { registerCardForm } from '@/types/card'
 
 const cardsStore = useCardsStore()
 
@@ -121,7 +121,7 @@ const { registerCard } = cardsStore
 
 const router = useRouter()
 
-const cardData = ref<Omit<Card, 'cardId' | 'cardName' | 'cardNickname'>>({
+const cardData = ref<registerCardForm>({
   organization: '',
   encryptedCardNo: '',
   cardPassword: '',

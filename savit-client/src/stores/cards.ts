@@ -1,7 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
-import type { Card, BillingInfo, UsageDetail, RegisterResponse } from '@/types/card'
+import type {
+  Card,
+  registerCardForm,
+  BillingInfo,
+  UsageDetail,
+  RegisterResponse,
+} from '@/types/card'
 
 export const useCardsStore = defineStore('cards', () => {
   const { request, loading } = useApi()
@@ -26,23 +32,23 @@ export const useCardsStore = defineStore('cards', () => {
         organization: '삼성카드',
         cardId: 2,
         cardName: '삼성 플래티넘',
-        cardNumber: '9876-5432-1098-7654',
+        encryptedCardNo: '9876-5432-1098-7654',
         cardPassword: '5678',
         cardNickname: '삼성 쇼핑할인',
-        userId: 'testuser2',
-        userPw: 'password456',
-        userBdate: '19851020',
+        loginId: 'testuser2',
+        loginPw: 'password456',
+        birthDate: '19851020',
       },
       {
         organization: '국민카드',
         cardId: 3,
         cardName: '국민 트래블러스',
-        cardNumber: '1111-2222-3333-4444',
+        encryptedCardNo: '1111-2222-3333-4444',
         cardPassword: '9876',
         cardNickname: '국민 캐시백',
-        userId: 'testuser3',
-        userPw: 'password789',
-        userBdate: '19930305',
+        loginId: 'testuser3',
+        loginPw: 'password789',
+        birthDate: '19930305',
       },
     ]
 
@@ -57,7 +63,7 @@ export const useCardsStore = defineStore('cards', () => {
     return defaultCards
   }
 
-  const cards = ref<Card[]>(initializeCards())
+  const cards = ref<Card[]>([])
   const currentMonthBilling = ref<BillingInfo[]>([
     {
       cardId: 1,
@@ -255,7 +261,7 @@ export const useCardsStore = defineStore('cards', () => {
     }
   ])
 
-  const registeredCards = computed(() => cards.value)
+  const cardsList = computed(() => cards.value || [])
 
   const getBillingByCardId = (cardId: number) => {
     const current = currentMonthBilling.value.find((b) => b.cardId === cardId)
@@ -270,7 +276,7 @@ export const useCardsStore = defineStore('cards', () => {
     return currentMonthUsage.value.filter((u) => u.cardId === cardId)
   }
 
-  async function registerCard(cardData: Omit<Card, 'cardId' | 'cardName' | 'cardNickname'>) {
+  async function registerCard(cardData: registerCardForm) {
     try {
       const response = await request({
         method: 'POST',
@@ -293,31 +299,25 @@ export const useCardsStore = defineStore('cards', () => {
         url: '/cards',
       })
 
-      if (response.data && response.data.length > 0) {
-        cards.value = response.data
-      }
+      cards.value = response.cards
 
       // localStorage에서 저장된 별칭 적용
-      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-      cards.value.forEach((card) => {
-        if (savedNicknames[card.cardId]) {
-          card.cardNickname = savedNicknames[card.cardId]
-        }
-      })
-
-      return cards.value
+      // const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+      // cards.value.forEach((card) => {
+      //   if (savedNicknames[card.cardId]) {
+      //     card.cardNickname = savedNicknames[card.cardId]
+      //   }
+      // })
     } catch (error) {
       console.error('카드 목록 조회 실패, 더미 데이터 사용:', error)
 
       // 더미 데이터에도 localStorage 별칭 적용
-      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-      cards.value.forEach((card) => {
-        if (savedNicknames[card.cardId]) {
-          card.cardNickname = savedNicknames[card.cardId]
-        }
-      })
-
-      return cards.value
+      // const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+      // cards.value.forEach((card) => {
+      //   if (savedNicknames[card.cardId]) {
+      //     card.cardNickname = savedNicknames[card.cardId]
+      //   }
+      // })
     }
   }
 
@@ -436,8 +436,7 @@ export const useCardsStore = defineStore('cards', () => {
   }
 
   return {
-    cards,
-    registeredCards,
+    cardsList,
     loading,
     currentMonthBilling,
     currentMonthUsage,
