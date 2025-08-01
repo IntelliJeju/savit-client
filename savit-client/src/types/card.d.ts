@@ -8,7 +8,7 @@ export interface registerCardForm {
 }
 
 export interface Card {
-  cardId: string
+  cardId: number
   cardName: string
   resCardNo: string
   usageAmount: number
@@ -34,16 +34,34 @@ export interface RegisteredCardInfo {
 }
 
 export interface BillingInfo {
-  cardId: string
+  cardId: number
   amount: number
   month: string
 }
 
 export interface UsageDetail {
   id: string
-  cardId: string
+  cardId: number
   date: string
   merchant: string
   amount: number
   category: string
+}
+
+export interface Transaction {
+  id: string | null
+  cardId: number
+  budgetCategoryId: number | null
+  categoryId: number | null
+  resCardNo: string
+  resUsedDate: string // YYYYMMDD 형식
+  resUsedTime: string // HHMMSS 형식
+  resUsedAmount: string // 금액 (string으로 전달됨)
+  resCancelYN: string // 취소 여부 (0: 정상, 1: 취소)
+  resCancelAmount: string
+  resTotalAmount: number | null
+  resMemberStoreName: string // 가맹점명
+  resMemberStoreType: string // 가맹점 유형
+  createdAt: number[] // [년, 월, 일, 시, 분, 초, 나노초] 형식
+  updatedAt: number[] // [년, 월, 일, 시, 분, 초, 나노초] 형식
 }

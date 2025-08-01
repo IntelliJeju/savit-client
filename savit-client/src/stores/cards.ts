@@ -1,8 +1,10 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
+import transactionDummy from '@/stores/transactionDummy'
 import type {
   Card,
+  Transaction,
   registerCardForm,
   BillingInfo,
   UsageDetail,
@@ -18,14 +20,14 @@ export const useCardsStore = defineStore('cards', () => {
   const initializeCards = () => {
     const defaultCards: Card[] = [
       {
-        cardId: '1',
+        cardId: 1,
         cardName: '나라사랑체크카드(일반형 RF)',
         resCardNo: '949094******0001',
         usageAmount: 0,
         resImageLink: 'https://img1.kbcard.com/ST/img/cxc/kbcard/upload/img/product/04120_img.png',
       },
       {
-        cardId: '2',
+        cardId: 2,
         cardName: '나라사랑체크카드(일반형 RF)',
         resCardNo: '949094******0001',
         usageAmount: 0,
@@ -45,6 +47,8 @@ export const useCardsStore = defineStore('cards', () => {
   }
 
   const cards = ref<Card[]>(initializeCards())
+  const transactions = ref<Transaction[]>([])
+
   const currentMonthBilling = ref<BillingInfo[]>([
     {
       cardId: 1,
@@ -244,6 +248,8 @@ export const useCardsStore = defineStore('cards', () => {
 
   const cardsList = computed(() => cards.value || [])
 
+  const transactionsList = computed(() => transactions.value || [])
+
   const getBillingByCardId = (cardId: string) => {
     const current = currentMonthBilling.value.find((b) => b.cardId === cardId)
     const last = lastMonthBilling.value.find((b) => b.cardId === cardId)
@@ -299,6 +305,22 @@ export const useCardsStore = defineStore('cards', () => {
       //     card.cardNickname = savedNicknames[card.cardId]
       //   }
       // })
+    }
+  }
+
+  //Post: codef 불러오기
+  //Get: DB 불러오기
+  async function fetchTransactions(cardId: number, method: string) {
+    try {
+      const response = await request({
+        method: method,
+        url: `cards/${cardId}/approvals`,
+      })
+      // const response = transactionDummy
+      transactions.value = response
+    } catch (error) {
+      console.error('fetchTransactions error: ', error)
+      throw error
     }
   }
 
@@ -422,6 +444,9 @@ export const useCardsStore = defineStore('cards', () => {
     currentMonthBilling,
     currentMonthUsage,
     registeredCard,
+    transactions,
+    transactionsList,
+    fetchTransactions,
     getBillingByCardId,
     getUsageByCardId,
     registerCard,

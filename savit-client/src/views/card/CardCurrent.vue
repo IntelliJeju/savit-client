@@ -82,14 +82,18 @@
                   />
                 </div>
                 <div>
-                  <div class="font-medium text-slate-800">{{ transaction.merchant }}</div>
-                  <div class="text-sm text-slate-500">{{ transaction.date }}</div>
+                  <div class="font-medium text-slate-800">{{ transaction.resMemberStoreName }}</div>
+                  <div class="text-sm text-slate-500">{{ transaction.resUsedDate }}</div>
                 </div>
               </div>
               <div class="text-right">
                 <div class="font-semibold">
-                  {{ transaction.type === 'payment' ? '-' : ''
-                  }}{{ transaction.amount.toLocaleString() }}원
+                  {{ transaction.resCancelYN === '0' ? '-' : '+'
+                  }}{{
+                    (
+                      Number(transaction.resUsedAmount) * (transaction.resCancelYN === '0' ? 1 : -1)
+                    ).toLocaleString()
+                  }}원
                 </div>
               </div>
             </div>
@@ -111,7 +115,7 @@ const router = useRouter()
 const route = useRoute()
 const cardsStore = useCardsStore()
 
-const { cardsList } = storeToRefs(cardsStore)
+const { cardsList, transactionsList } = storeToRefs(cardsStore)
 
 const currentCardIndex = ref(0)
 const cardSliderRef = ref<InstanceType<typeof CardSlider> | null>(null)
@@ -132,7 +136,7 @@ const isRegistrationCard = computed(() => {
 // 슬라이드 변경 이벤트 핸들러
 const onSlideChange = (index: number) => {
   currentCardIndex.value = index
-  updateUrlWithCardId()
+  // updateUrlWithCardId()
 }
 
 // 청구 금액 가져오기 헬퍼 함수
@@ -150,18 +154,8 @@ const billingChange = computed(() => {
 
 // 최근 거래내역 (현재 카드의 실제 데이터)
 const recentTransactions = computed(() => {
-  if (!currentCard.value) return []
-
-  const cardUsage = cardsStore.getUsageByCardId(currentCard.value.cardId)
-  return cardUsage
-    .slice(0, 3) // 최근 3개만
-    .map((usage) => ({
-      merchant: usage.merchant,
-      amount: usage.amount,
-      date: formatDate(usage.date),
-      category: usage.category,
-      type: 'payment',
-    }))
+  // if (!currentCard.value) return []
+  return transactionsList.value.filter((u) => u.cardId === currentCard.value.cardId).slice(0, 3)
 })
 
 
