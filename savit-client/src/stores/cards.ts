@@ -1,36 +1,10 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
-
-interface Card {
-  organization: string //카드사
-  cardId: number
-  cardName: string
-  cardNumber: string
-  cardPassword: string
-  cardNickname: string
-  userId: string // 카드사 사용자 아이디
-  userPw: string // 카드사 사용자 비밀번호
-  userBdate: string // 사용자 생년월일
-}
-
-interface BillingInfo {
-  cardId: number
-  amount: number
-  month: string
-}
-
-interface UsageDetail {
-  id: string
-  cardId: number
-  date: string
-  merchant: string
-  amount: number
-  category: string
-}
+import type { Card, BillingInfo, UsageDetail } from '@/types/card'
 
 export const useCardsStore = defineStore('cards', () => {
-  const { request } = useApi()
+  const { request, loading } = useApi()
 
   // 더미 카드 데이터 초기화
   const initializeCards = () => {
@@ -39,12 +13,12 @@ export const useCardsStore = defineStore('cards', () => {
         organization: '신한카드',
         cardId: 1,
         cardName: '신한 프리미어',
-        cardNumber: '1234-5678-9012-3456',
+        encryptedCardNo: '1234-5678-9012-3456',
         cardPassword: '1234',
         cardNickname: '신한 교통할인',
-        userId: 'testuser1',
-        userPw: 'password123',
-        userBdate: '19901215',
+        loginId: 'testuser1',
+        loginPw: 'password123',
+        birthDate: '19901215',
       },
       {
         organization: '삼성카드',
@@ -294,7 +268,7 @@ export const useCardsStore = defineStore('cards', () => {
     return currentMonthUsage.value.filter((u) => u.cardId === cardId)
   }
 
-  async function registerCard(cardData: Omit<Card, 'cardId' | 'cardName'>) {
+  async function registerCard(cardData: Omit<Card, 'cardId' | 'cardName' | 'cardNickname'>) {
     try {
       const response = await request({
         method: 'POST',
@@ -464,6 +438,9 @@ export const useCardsStore = defineStore('cards', () => {
   return {
     cards,
     registeredCards,
+    loading,
+    currentMonthBilling,
+    currentMonthUsage,
     getBillingByCardId,
     getUsageByCardId,
     registerCard,
@@ -472,7 +449,5 @@ export const useCardsStore = defineStore('cards', () => {
     fetchUsageForCard,
     updateCardNickname,
     syncPendingNicknames,
-    currentMonthBilling,
-    currentMonthUsage,
   }
 })

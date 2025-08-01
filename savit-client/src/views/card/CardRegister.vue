@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-app-light-gray">
+    <div v-if="loading">Loading...</div>
     <div class="max-w-sm mx-auto p-4">
       <!-- 카드 등록 폼 -->
       <form @submit.prevent="handleRegisterCard" class="space-y-5">
@@ -7,7 +8,9 @@
         <CardComponent>
           <div class="space-y-4">
             <div>
-              <label for="organization" class="block text-sm font-bold text-slate-700 mb-2">카드사</label>
+              <label for="organization" class="block text-sm font-bold text-slate-700 mb-2"
+                >카드사</label
+              >
               <select
                 id="organization"
                 v-model="cardData.organization"
@@ -15,32 +18,26 @@
                 required
               >
                 <option value="" disabled>카드사를 선택해주세요</option>
-                <option value="국민카드">국민카드</option>
-                <option value="삼성카드">삼성카드</option>
-                <option value="현대카드">현대카드</option>
-                <option value="롯데카드">롯데카드</option>
-                <option value="신한카드">신한카드</option>
-                <option value="하나카드">하나카드</option>
-                <option value="우리카드">우리카드</option>
-                <option value="NH농협카드">NH농협카드</option>
-                <option value="BC카드">BC카드</option>
-                <option value="카카오뱅크">카카오뱅크</option>
-                <option value="토스뱅크">토스뱅크</option>
+                <option v-for="card in organization" :value="card.code">{{ card.name }}</option>
               </select>
             </div>
-            
+
             <div>
-              <label for="cardNumber" class="block text-sm font-bold text-slate-700 mb-2">카드 번호</label>
+              <label for="encryptedCardNo" class="block text-sm font-bold text-slate-700 mb-2"
+                >카드 번호</label
+              >
               <InputField
-                v-model="cardData.cardNumber"
+                v-model="cardData.encryptedCardNo"
                 placeholder="카드 번호를 입력해주세요"
                 type="text"
                 :maxlength="16"
               />
             </div>
-            
+
             <div>
-              <label for="cardPassword" class="block text-sm font-bold text-slate-700 mb-2">카드 비밀번호 (앞 두자리)</label>
+              <label for="cardPassword" class="block text-sm font-bold text-slate-700 mb-2"
+                >카드 비밀번호 (앞 두자리)</label
+              >
               <InputField
                 v-model="cardData.cardPassword"
                 placeholder="카드 비밀번호 앞 두자리를 입력해주세요"
@@ -48,29 +45,35 @@
                 :maxlength="2"
               />
             </div>
-            
+
             <div>
-              <label for="userId" class="block text-sm font-bold text-slate-700 mb-2">사용자 ID</label>
+              <label for="loginId" class="block text-sm font-bold text-slate-700 mb-2"
+                >사용자 ID</label
+              >
               <InputField
-                v-model="cardData.userId"
+                v-model="cardData.loginId"
                 placeholder="카드사 사이트 로그인 ID"
                 type="text"
               />
             </div>
-            
+
             <div>
-              <label for="userPw" class="block text-sm font-bold text-slate-700 mb-2">사용자 비밀번호</label>
+              <label for="loginPw" class="block text-sm font-bold text-slate-700 mb-2"
+                >사용자 비밀번호</label
+              >
               <InputField
-                v-model="cardData.userPw"
+                v-model="cardData.loginPw"
                 placeholder="카드사 사이트 로그인 비밀번호"
                 type="password"
               />
             </div>
-            
+
             <div>
-              <label for="userBdate" class="block text-sm font-bold text-slate-700 mb-2">생년월일</label>
+              <label for="birthDate" class="block text-sm font-bold text-slate-700 mb-2"
+                >생년월일</label
+              >
               <InputField
-                v-model="cardData.userBdate"
+                v-model="cardData.birthDate"
                 placeholder="YYYYMMDD (예: 20001225)"
                 type="text"
                 :maxlength="8"
@@ -81,16 +84,18 @@
 
         <!-- 등록 버튼 -->
         <div class="pb-4">
-          <ButtonItem text="카드 등록하기"/>
+          <ButtonItem text="카드 등록하기" />
         </div>
       </form>
 
       <!-- 안내 메시지 -->
-      <CardComponent>  
+      <CardComponent>
         <div class="flex items-start gap-3">
           <div>
             <p class="text-sm text-slate-700 font-medium mb-1">안전한 정보 보호</p>
-            <p class="text-xs text-slate-600">입력하신 모든 정보는 암호화되어 안전하게 보관됩니다.</p>
+            <p class="text-xs text-slate-600">
+              입력하신 모든 정보는 암호화되어 안전하게 보관됩니다.
+            </p>
           </div>
         </div>
       </CardComponent>
@@ -105,41 +110,40 @@ import { useRouter } from 'vue-router'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import InputField from '@/components/input/InputField.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
+import organization from '@/utils/cardOrganization.ts'
+import { storeToRefs } from 'pinia'
+import type { Card } from '@/types/card'
 
 const cardsStore = useCardsStore()
+
+const { loading } = storeToRefs(cardsStore)
+const { registerCard } = cardsStore
+
 const router = useRouter()
 
-const cardData = ref({
+const cardData = ref<Omit<Card, 'cardId' | 'cardName' | 'cardNickname'>>({
   organization: '',
-  cardId: 0,
-  cardName: '',
-  cardNumber: '',
+  encryptedCardNo: '',
   cardPassword: '',
-  cardNickname: '',
-  userId: '',
-  userPw: '',
-  userBdate: '',
+  loginId: '',
+  loginPw: '',
+  birthDate: '',
 })
 
 const handleRegisterCard = async () => {
   try {
-    const { cardId, ...dataToSend } = cardData.value
-    await cardsStore.registerCard(dataToSend)
-    
+    await registerCard(cardData.value)
+
     alert('카드가 성공적으로 등록되었습니다!')
     cardData.value = {
       organization: '',
-      cardId: 0,
-      cardName: '',
-      cardNumber: '',
+      encryptedCardNo: '',
       cardPassword: '',
-      cardNickname: '',
-      userId: '',
-      userPw: '',
-      userBdate: '',
-      
+      loginId: '',
+      loginPw: '',
+      birthDate: '',
     }
-    
+
     router.push('/card/current')
   } catch (error) {
     alert('카드 등록에 실패했습니다.')
@@ -160,7 +164,10 @@ const handleRegisterCard = async () => {
 
 /* 전환 효과 */
 .transition-colors {
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
 }
 
 /* 활성 상태 효과 */
@@ -174,6 +181,8 @@ const handleRegisterCard = async () => {
 }
 
 .shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 </style>
