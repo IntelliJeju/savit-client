@@ -34,14 +34,14 @@ export interface RegisteredCardInfo {
 }
 
 export interface BillingInfo {
-  cardId: number
+  cardId: string
   amount: number
   month: string
 }
 
 export interface UsageDetail {
   id: string
-  cardId: number
+  cardId: string
   date: string
   merchant: string
   amount: number

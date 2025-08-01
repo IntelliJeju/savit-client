@@ -136,7 +136,7 @@ const onSlideChange = (index: number) => {
 }
 
 // 청구 금액 가져오기 헬퍼 함수
-const getBillingAmount = (cardId: number) => {
+const getBillingAmount = (cardId: string) => {
   const billing = cardsStore.getBillingByCardId(cardId)
   return billing.current?.amount?.toLocaleString() || '-'
 }
