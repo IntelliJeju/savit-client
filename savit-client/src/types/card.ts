@@ -10,6 +10,24 @@ export interface Card {
   birthDate: string // 사용자 생년월일
 }
 
+export interface RegisterResponse {
+  connectedId: string
+  cards: RegisteredCardInfo[]
+}
+
+export interface RegisteredCardInfo {
+  resCardName: string
+  resCardNo: string
+  resCardType: string
+  resUserNm: string
+  resSleepYN: string
+  resTrafficYN: string
+  resValidPeriod: string
+  resIssueDate: string
+  resImageLink: string
+  resState: string
+}
+
 export interface BillingInfo {
   cardId: number
   amount: number
