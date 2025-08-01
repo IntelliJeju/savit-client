@@ -237,13 +237,13 @@ router.beforeEach((to, from, next) => {
   const isLocalhost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
-  next()
+  // next()
 
-  // localhost에서는 인증 체크 건너뛰기
-  if (isLocalhost) {
-    next()
-    return
-  }
+  // // localhost에서는 인증 체크 건너뛰기
+  // if (isLocalhost) {
+  //   next()
+  //   return
+  // }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next('/auth/login')
