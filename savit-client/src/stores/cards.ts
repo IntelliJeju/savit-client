@@ -18,37 +18,18 @@ export const useCardsStore = defineStore('cards', () => {
   const initializeCards = () => {
     const defaultCards: Card[] = [
       {
-        organization: '신한카드',
-        cardId: 1,
-        cardName: '신한 프리미어',
-        encryptedCardNo: '1234-5678-9012-3456',
-        cardPassword: '1234',
-        cardNickname: '신한 교통할인',
-        loginId: 'testuser1',
-        loginPw: 'password123',
-        birthDate: '19901215',
+        cardId: '1',
+        cardName: '나라사랑체크카드(일반형 RF)',
+        resCardNo: '949094******0001',
+        usageAmount: 0,
+        resImageLink: 'https://img1.kbcard.com/ST/img/cxc/kbcard/upload/img/product/04120_img.png',
       },
       {
-        organization: '삼성카드',
-        cardId: 2,
-        cardName: '삼성 플래티넘',
-        encryptedCardNo: '9876-5432-1098-7654',
-        cardPassword: '5678',
-        cardNickname: '삼성 쇼핑할인',
-        loginId: 'testuser2',
-        loginPw: 'password456',
-        birthDate: '19851020',
-      },
-      {
-        organization: '국민카드',
-        cardId: 3,
-        cardName: '국민 트래블러스',
-        encryptedCardNo: '1111-2222-3333-4444',
-        cardPassword: '9876',
-        cardNickname: '국민 캐시백',
-        loginId: 'testuser3',
-        loginPw: 'password789',
-        birthDate: '19930305',
+        cardId: '2',
+        cardName: '나라사랑체크카드(일반형 RF)',
+        resCardNo: '949094******0001',
+        usageAmount: 0,
+        resImageLink: 'https://img1.kbcard.com/ST/img/cxc/kbcard/upload/img/product/04120_img.png',
       },
     ]
 
@@ -63,7 +44,7 @@ export const useCardsStore = defineStore('cards', () => {
     return defaultCards
   }
 
-  const cards = ref<Card[]>([])
+  const cards = ref<Card[]>(initializeCards())
   const currentMonthBilling = ref<BillingInfo[]>([
     {
       cardId: 1,
@@ -263,7 +244,7 @@ export const useCardsStore = defineStore('cards', () => {
 
   const cardsList = computed(() => cards.value || [])
 
-  const getBillingByCardId = (cardId: number) => {
+  const getBillingByCardId = (cardId: string) => {
     const current = currentMonthBilling.value.find((b) => b.cardId === cardId)
     const last = lastMonthBilling.value.find((b) => b.cardId === cardId)
     return {
@@ -272,7 +253,7 @@ export const useCardsStore = defineStore('cards', () => {
     }
   }
 
-  const getUsageByCardId = (cardId: number) => {
+  const getUsageByCardId = (cardId: string) => {
     return currentMonthUsage.value.filter((u) => u.cardId === cardId)
   }
 

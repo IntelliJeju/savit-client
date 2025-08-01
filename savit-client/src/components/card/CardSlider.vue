@@ -22,12 +22,12 @@
             backgroundImage: `url(${card.resImageLink})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            backgroundRepeat: 'no-repeat',
           }"
         >
           <!-- 그라디언트 오버레이 -->
           <div class="absolute inset-0 bg-gradient-to-br from-black/30 to-black/60"></div>
-          
+
           <!-- 카드 정보 -->
           <div class="relative z-10 h-full flex flex-col justify-between p-6 text-white">
             <div>
@@ -37,7 +37,7 @@
                   class="text-sm opacity-90 flex items-center gap-2 drop-shadow-lg"
                 >
                   {{ card.cardName || '카드별칭' }}
-                  <button 
+                  <button
                     @click="$emit('edit-nickname', index)"
                     class="p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-all opacity-70 hover:opacity-100"
                   >
@@ -56,7 +56,9 @@
                   maxlength="20"
                 />
               </div>
-              <div class="text-3xl font-bold mt-8 drop-shadow-lg">{{ getBillingAmount(card.cardId) }}원</div>
+              <div class="text-3xl font-bold mt-8 drop-shadow-lg">
+                {{ getBillingAmount(card.cardId) }}원
+              </div>
             </div>
 
             <div>
@@ -142,7 +144,7 @@ interface Props {
   currentCardIndex: number
   isEditingNickname: boolean
   editingNickname: string
-  getBillingAmount: (cardId: number) => string
+  getBillingAmount: (cardId: string) => string
 }
 
 interface Emits {
