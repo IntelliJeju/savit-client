@@ -3,7 +3,7 @@
     <div class="max-w-sm mx-auto p-4">
       <!-- 카드 슬라이더 -->
       <CardSlider
-        :cards="cardsStore.registeredCards"
+        :cards="cardsList"
         :current-card-index="currentCardIndex"
         :is-editing-nickname="isEditingNickname"
         :editing-nickname="editingNickname"
@@ -17,7 +17,10 @@
       />
 
       <!-- 저번 달 대비 변화량 -->
-      <CardComponent class="mb-6">
+      <div
+        v-if="cardsList.length > 0 && !isRegistrationCard"
+        class="bg-white rounded-2xl p-5 border border-slate-200 mb-6"
+      >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div
@@ -50,7 +53,8 @@
       </CardComponent>
       <!-- </div> -->
 
-      <div v-if="cardsStore.registeredCards.length > 0 && !isRegistrationCard" class="mb-6">
+      <!-- 최근 카드 이용내역 -->
+      <div v-if="cardsList.length > 0 && !isRegistrationCard" class="mb-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-slate-800">최근 이용내역</h3>
           <router-link
@@ -101,13 +105,13 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CardSlider from '@/components/card/CardSlider.vue'
-import CategoryIcon from '@/components/icon/CategoryIcon.vue'
-import CardComponent from '@/components/card/CardComponent.vue'
-import { mapCategoryToMainCategory } from '@/utils/category'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const route = useRoute()
 const cardsStore = useCardsStore()
+
+const { cardsList } = storeToRefs(cardsStore)
 
 const currentCardIndex = ref(0)
 const cardSliderRef = ref<InstanceType<typeof CardSlider> | null>(null)
@@ -118,11 +122,11 @@ const editingNickname = ref('')
 
 // 카드 슬라이더 관련
 const totalCardSlots = computed(() => {
-  return (cardsStore.registeredCards?.length || 0) + 1
+  return (cardsList.value?.length || 0) + 1
 })
 
 const isRegistrationCard = computed(() => {
-  return currentCardIndex.value >= (cardsStore.registeredCards?.length || 0)
+  return currentCardIndex.value >= (cardsList.value?.length || 0)
 })
 
 // 슬라이드 변경 이벤트 핸들러
@@ -189,7 +193,7 @@ const formatDate = (dateString: string) => {
 }
 
 const currentCard = computed(() => {
-  return cardsStore.registeredCards[currentCardIndex.value]
+  return cardsList.value[currentCardIndex.value]
 })
 
 const currentBilling = computed(() => {
@@ -217,7 +221,7 @@ const updateUrlWithCardId = () => {
 // 별칭 편집 기능
 const startEditNickname = (index: number) => {
   currentCardIndex.value = index
-  const targetCard = cardsStore.registeredCards[currentCardIndex.value]
+  const targetCard = cardsList.value[currentCardIndex.value]
   if (!targetCard) return
 
   isEditingNickname.value = true
@@ -225,7 +229,7 @@ const startEditNickname = (index: number) => {
 }
 
 const saveNickname = async () => {
-  const targetCard = cardsStore.registeredCards[currentCardIndex.value]
+  const targetCard = cardsList.value[currentCardIndex.value]
   if (!targetCard || !editingNickname.value.trim()) {
     cancelEditNickname()
     return
@@ -246,16 +250,14 @@ const cancelEditNickname = () => {
 }
 
 onMounted(() => {
-  if (cardsStore.registeredCards.length === 0) {
+  if (cardsList.value.length === 0) {
     cardsStore.fetchCards()
   }
 
   // URL에서 cardId가 있으면 해당 카드로 인덱스 설정
   const urlCardId = route.query.cardId
   if (urlCardId) {
-    const cardIndex = cardsStore.registeredCards.findIndex(
-      (card) => card.cardId === Number(urlCardId),
-    )
+    const cardIndex = cardsList.value.findIndex((card) => card.cardId === Number(urlCardId))
     if (cardIndex !== -1) {
       currentCardIndex.value = cardIndex
       // CardSlider 컴포넌트에서 해당 슬라이드로 이동

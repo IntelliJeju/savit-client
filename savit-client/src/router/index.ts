@@ -245,7 +245,7 @@ const router = createRouter({
 })
 
 // 기본값 설정
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const isLocalhost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -266,6 +266,22 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/auth/login' && authStore.isLoggedIn) {
     next('/home')
     return
+  }
+
+  // 인증된 사용자의 경우 카드 데이터 자동 로드
+  if (to.meta.requiresAuth && authStore.isLoggedIn) {
+    const { useCardsStore } = await import('@/stores/cards')
+    const cardsStore = useCardsStore()
+
+    // 카드 데이터가 없으면 불러오기
+    if (cardsStore.cardsList.length === 0) {
+      try {
+        await cardsStore.fetchCards()
+      } catch (error) {
+        console.error('카드 데이터 로드 실패:', error)
+        // 에러가 발생해도 페이지 이동은 계속 진행
+      }
+    }
   }
 
   next()

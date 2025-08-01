@@ -17,33 +17,31 @@
       <!-- 등록된 카드들 -->
       <swiper-slide v-for="(card, index) in cards" :key="card.cardId">
         <div
-          class="w-full h-48 rounded-xl p-6 text-white relative overflow-hidden"
+          class="w-full aspect-[16/10] rounded-xl relative overflow-hidden"
           :style="{
-            backgroundColor: getCardBgColor(card.organization),
+            backgroundImage: `url(${card.resImageLink})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }"
         >
-          <!-- 카드 배경 패턴 -->
-          <div class="absolute top-0 right-0 w-24 h-24 rounded-full bg-white opacity-10 -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-white opacity-5 translate-y-8 -translate-x-8"></div>
-
+          <!-- 그라디언트 오버레이 -->
+          <div class="absolute inset-0 bg-gradient-to-br from-black/30 to-black/60"></div>
+          
           <!-- 카드 정보 -->
-          <div class="relative z-10 h-full flex flex-col justify-between">
+          <div class="relative z-10 h-full flex flex-col justify-between p-6 text-white">
             <div>
               <div class="flex items-center justify-between">
                 <div
                   v-if="!isEditingNickname || currentCardIndex !== index"
-                  class="text-sm opacity-90 flex items-center gap-2"
+                  class="text-sm opacity-90 flex items-center gap-2 drop-shadow-lg"
                 >
-                  {{ card.cardNickname || '카드별칭' }}
-                  <button
+                  {{ card.cardName || '카드별칭' }}
+                  <button 
                     @click="$emit('edit-nickname', index)"
                     class="p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-all opacity-70 hover:opacity-100"
                   >
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                      />
-                    </svg>
+                    <v-icon name="hi-solid-pencil" scale="1" />
                   </button>
                 </div>
                 <input
@@ -58,12 +56,12 @@
                   maxlength="20"
                 />
               </div>
-              <div class="text-3xl font-bold mt-8">{{ getBillingAmount(card.cardId) }}원</div>
+              <div class="text-3xl font-bold mt-8 drop-shadow-lg">{{ getBillingAmount(card.cardId) }}원</div>
             </div>
 
             <div>
               <div class="flex justify-between items-end">
-                <div class="text-sm opacity-90">이번 달 사용 금액</div>
+                <div class="text-sm opacity-90 drop-shadow">이번 달 사용 금액</div>
               </div>
             </div>
           </div>
@@ -74,10 +72,12 @@
       <swiper-slide>
         <router-link
           to="/card/register"
-          class="block w-full h-48 rounded-3xl p-6 relative overflow-hidden border-2 border-dashed border-slate-300 bg-white hover:bg-slate-50 active:scale-95 transition-all"
+          class="block w-full aspect-[16/10] rounded-3xl p-6 relative overflow-hidden border-2 border-dashed border-slate-300 bg-white hover:bg-slate-50 active:scale-95 transition-all"
         >
           <div class="relative z-10 h-full flex flex-col justify-center items-center text-center">
-            <div class="w-16 h-16 bg-app-light-gray rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div
+              class="w-16 h-16 bg-app-light-gray rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
               <svg class="w-8 h-8 text-app-green" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fill-rule="evenodd"
@@ -107,10 +107,10 @@
           />
         </svg>
       </button>
-      
+
       <!-- 페이지네이션 (가운데) -->
       <div class="custom-pagination flex justify-center items-center space-x-2"></div>
-      
+
       <!-- 다음 버튼 -->
       <button
         class="custom-next absolute right-0 w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50 shadow-sm"
@@ -124,7 +124,6 @@
         </svg>
       </button>
     </div>
-
   </div>
 </template>
 
@@ -133,15 +132,10 @@ import { ref, computed, nextTick, watch } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination } from 'swiper/modules'
 import type { Swiper as SwiperType } from 'swiper'
+import type { Card } from '@/types/card.ts'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-
-interface Card {
-  cardId: number
-  cardNickname: string
-  organization: string
-}
 
 interface Props {
   cards: Card[]
@@ -205,7 +199,7 @@ watch(
         nicknameInput.value.select()
       }
     }
-  }
+  },
 )
 
 // 외부에서 접근 가능한 메서드들 expose
