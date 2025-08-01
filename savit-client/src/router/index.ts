@@ -13,6 +13,7 @@ const LoginCallback = () => import('@/views/user/LoginCallback.vue')
 // Card
 const CardCurrent = () => import('@/views/card/CardCurrent.vue')
 const CardRegister = () => import('@/views/card/CardRegister.vue')
+const RegisterCallback = () => import('@/views/card/RegisterCallback.vue')
 const CardUsage = () => import('@/views/card/CardUsage.vue')
 
 // Budget
@@ -92,6 +93,18 @@ const routes: Array<RouteRecordRaw> = [
       showBackButton: true,
       showHeader: true,
       title: '카드 등록',
+    },
+  },
+  {
+    path: '/card/register/callback',
+    name: 'RegisterCallback',
+    component: RegisterCallback,
+    meta: {
+      showNavigation: false,
+      requiresAuth: true,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
     },
   },
   {

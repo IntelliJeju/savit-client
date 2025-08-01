@@ -144,7 +144,7 @@ const handleRegisterCard = async () => {
       birthDate: '',
     }
 
-    router.push('/card/current')
+    router.push({ name: 'RegisterCallback' })
   } catch (error) {
     alert('카드 등록에 실패했습니다.')
     console.error('카드 등록 에러:', error)

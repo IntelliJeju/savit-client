@@ -1,10 +1,12 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
-import type { Card, BillingInfo, UsageDetail } from '@/types/card'
+import type { Card, BillingInfo, UsageDetail, RegisterResponse } from '@/types/card'
 
 export const useCardsStore = defineStore('cards', () => {
   const { request, loading } = useApi()
+
+  const registeredCard = ref<RegisterResponse>()
 
   // 더미 카드 데이터 초기화
   const initializeCards = () => {
@@ -276,10 +278,8 @@ export const useCardsStore = defineStore('cards', () => {
         data: cardData,
       })
 
-      const newCard: Card = response.data
-      cards.value.push(newCard)
-
-      return newCard
+      registeredCard.value = response
+      return response
     } catch (error) {
       console.error('카드 등록 실패:', error)
       throw error
@@ -441,6 +441,7 @@ export const useCardsStore = defineStore('cards', () => {
     loading,
     currentMonthBilling,
     currentMonthUsage,
+    registeredCard,
     getBillingByCardId,
     getUsageByCardId,
     registerCard,
