@@ -120,7 +120,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_001',
       cardId: 1,
-      date: '2025-07-20',
+      date: '2025-08-20',
       merchant: '스타벅스 강남점',
       amount: 8500,
       category: '카페',
@@ -128,7 +128,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_007',
       cardId: 1,
-      date: '2025-07-20',
+      date: '2025-08-20',
       merchant: '맥도날드 역삼점',
       amount: 15000,
       category: '식당',
@@ -136,7 +136,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_008',
       cardId: 1,
-      date: '2025-07-20',
+      date: '2025-08-20',
       merchant: '쿠팡 온라인',
       amount: 35000,
       category: '쇼핑',
@@ -144,31 +144,31 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_002',
       cardId: 1,
-      date: '2025-07-19',
+      date: '2025-08-19',
       merchant: '이마트 성수점',
       amount: 65000,
-      category: '편의점',
+      category: '편의점/마트'
     },
     {
       id: 'usage_009',
       cardId: 1,
-      date: '2025-07-19',
+      date: '2025-08-19',
       merchant: '롯데시네마 월드타워',
       amount: 32000,
-      category: '공연',
+      category: '영화'
     },
     {
       id: 'usage_003',
       cardId: 1,
-      date: '2025-07-18',
+      date: '2025-08-18',
       merchant: 'CGV 강남점',
       amount: 28000,
-      category: '공연',
+      category: '영화'
     },
     {
       id: 'usage_010',
       cardId: 1,
-      date: '2025-07-18',
+      date: '2025-08-18',
       merchant: '파리바게뜨 강남역점',
       amount: 12000,
       category: '카페',
@@ -176,7 +176,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_011',
       cardId: 1,
-      date: '2025-07-18',
+      date: '2025-08-18',
       merchant: '지마켓 온라인',
       amount: 48000,
       category: '쇼핑',
@@ -184,7 +184,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_004',
       cardId: 2,
-      date: '2025-07-21',
+      date: '2025-08-21',
       merchant: '올리브영 홍대점',
       amount: 35000,
       category: '기타',
@@ -192,7 +192,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_012',
       cardId: 2,
-      date: '2025-07-21',
+      date: '2025-08-21',
       merchant: '교보문고 광화문점',
       amount: 25000,
       category: '기타',
@@ -200,7 +200,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_005',
       cardId: 2,
-      date: '2025-07-20',
+      date: '2025-08-20',
       merchant: '백화점 식당가',
       amount: 120000,
       category: '식당',
@@ -208,7 +208,7 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_013',
       cardId: 2,
-      date: '2025-07-20',
+      date: '2025-08-20',
       merchant: '현대백화점 강남점',
       amount: 85000,
       category: '쇼핑',
@@ -216,27 +216,67 @@ export const useCardsStore = defineStore('cards', () => {
     {
       id: 'usage_006',
       cardId: 2,
-      date: '2025-07-19',
+      date: '2025-08-19',
       merchant: 'GS25 편의점',
       amount: 12000,
-      category: '편의점',
+      category: '편의점/마트'
     },
     {
       id: 'usage_014',
       cardId: 2,
-      date: '2025-07-19',
+      date: '2025-08-19',
       merchant: '투썸플레이스 홍대점',
       amount: 18000,
-      category: '카페',
+      category: '카페'
     },
     {
       id: 'usage_015',
-      cardId: 3,
-      date: '2025-07-19',
-      merchant: '투썸플레이스 홍대점',
-      amount: 18000,
-      category: '카페',
+      cardId: 1,
+      date: '2025-08-17',
+      merchant: '서울대병원',
+      amount: 45000,
+      category: '의료비'
     },
+    {
+      id: 'usage_016',
+      cardId: 2,
+      date: '2025-08-16',
+      merchant: '해커스어학원',
+      amount: 280000,
+      category: '교육'
+    },
+    {
+      id: 'usage_017',
+      cardId: 1,
+      date: '2025-08-15',
+      merchant: 'CGV 압구정점',
+      amount: 24000,
+      category: '영화'
+    },
+    {
+      id: 'usage_018',
+      cardId: 2,
+      date: '2025-08-14',
+      merchant: '넷플릭스',
+      amount: 17000,
+      category: '정기구독'
+    },
+    {
+      id: 'usage_019',
+      cardId: 3,
+      date: '2025-08-13',
+      merchant: '강남세브란스병원',
+      amount: 65000,
+      category: '의료비'
+    },
+    {
+      id: 'usage_020',
+      cardId: 3,
+      date: '2025-08-12',
+      merchant: 'YTN사이언스 아카데미',
+      amount: 150000,
+      category: '교육'
+    }
   ])
 
   const registeredCards = computed(() => cards.value)

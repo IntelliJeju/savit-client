@@ -90,16 +90,12 @@
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray"
-                >
-                  <svg class="w-5 h-5 text-app-dark-green" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
+                <div class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray">
+                  <CategoryIcon 
+                    :category="mapCategoryToMainCategory(transaction.category)"
+                    :color="'#028174'"
+                    :size="20"
+                  />
                 </div>
                 <div>
                   <div class="font-medium text-slate-800">{{ transaction.merchant }}</div>
@@ -125,6 +121,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CardSlider from '@/components/card/CardSlider.vue'
+import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -180,6 +177,58 @@ const recentTransactions = computed(() => {
       type: 'payment',
     }))
 })
+
+// 카테고리를 대분류로 매핑하는 함수
+const mapCategoryToMainCategory = (category: string): '식비' | '교통' | '생활' | '문화' | '기타' => {
+  const categoryMapping: { [key: string]: '식비' | '교통' | '생활' | '문화' | '기타' } = {
+    // 식비 관련
+    '식당': '식비',
+    '카페': '식비',
+    '배달': '식비',
+    '음식점': '식비',
+    '베이커리': '식비',
+    '패스트푸드': '식비',
+    
+    // 교통 관련
+    '대중교통': '교통',
+    '택시': '교통',
+    '주유소': '교통',
+    '교통': '교통',
+    '버스': '교통',
+    '지하철': '교통',
+    
+    // 생활 관련
+    '통신비': '생활',
+    '공과금': '생활',
+    '편의점/마트': '생활',
+    '마트': '생활',
+    '편의점': '생활',
+    '온라인쇼핑': '생활',
+    '생활용품': '생활',
+    
+    // 문화 관련
+    '공연': '문화',
+    '쇼핑': '문화',
+    '유흥': '문화',
+    '영화': '문화',
+    '도서': '문화',
+    '게임': '문화',
+    
+    // 기본값은 기타
+  }
+  
+  return categoryMapping[category] || '기타'
+}
+
+const getCardBgColor = (organization: string) => {
+  const colorMap: { [key: string]: string } = {
+    '국민카드': '#FFD700',
+    '신한카드': '#1E40AF',
+    '하나카드': '#16A34A',
+    '삼성카드': '#6366F1',
+  }
+  return colorMap[organization] || '#4ade80'
+}
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
