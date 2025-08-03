@@ -18,6 +18,8 @@ const CardUsage = () => import('@/views/card/CardUsage.vue')
 // Budget
 const BudgetCheck = () => import('@/views/budget/BudgetCheck.vue')
 const BudgetSetting = () => import('@/views/budget/BudgetSetting.vue')
+const BudgetChoice = () => import('@/views/budget/BudgetChoice.vue')
+const BudgetCategorySetting = () => import('@/views/budget/BudgetCategorySetting.vue')
 
 // Challenge
 const ChallengeMain = () => import('@/views/challenge/ChallengeMain.vue')
@@ -127,7 +129,31 @@ const routes: Array<RouteRecordRaw> = [
       requiresAuth: true,
       showBackButton: true,
       showHeader: true,
+      title: '전체 예산 설정',
+    },
+  },
+  {
+    path: '/budget/categorysetting',
+    name: 'BudgetCategorySetting',
+    component: BudgetCategorySetting,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showHeader: true,
       title: '카테고리 예산 설정',
+    },
+  },
+  {
+    path: '/budget/choice',
+    name: 'BudgetChoice',
+    component: BudgetChoice,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showHeader: true,
+      title: '예산 타입 선택',
     },
   },
 
