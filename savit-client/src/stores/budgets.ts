@@ -2,19 +2,15 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
 import { useCardsStore } from './cards'
-
-export type MainCategory = '식비' | '교통' | '생활' | '문화' | '기타'
-export type SubCategory = 
-  | '식당' | '카페' | '배달'
-  | '대중교통' | '택시'
-  | '통신비' | '공과금' | '편의점/마트' | '의료비' | '교육'
-  | '공연' | '쇼핑' | '유흥' | '영화' | '정기구독'
-  | '기타'
-
-export interface CategoryMapping {
-  main: MainCategory
-  sub: SubCategory
-}
+import { 
+  type MainCategory, 
+  type SubCategory,
+  CATEGORY_MAPPINGS,
+  CATEGORY_ORDER,
+  getMainCategoryFromSub
+} from '@/constants/categories'
+import { calculateSum, groupBy } from '@/utils/calculations'
+import { logger } from '@/utils/logger'
 
 interface CategoryBudget {
   mainCategory: MainCategory
@@ -91,49 +87,20 @@ export const useBudgetsStore = defineStore('budgets', () => {
     '기타': 75000
   }
   
-  const categoryMappings: CategoryMapping[] = [
-    { main: '식비', sub: '식당' }, { main: '식비', sub: '카페' }, { main: '식비', sub: '배달' },
-    { main: '교통', sub: '대중교통' }, { main: '교통', sub: '택시' },
-    { main: '생활', sub: '통신비' }, { main: '생활', sub: '공과금' }, { main: '생활', sub: '편의점/마트' },
-    { main: '생활', sub: '의료비' }, { main: '생활', sub: '교육' },
-    { main: '문화', sub: '공연' }, { main: '문화', sub: '쇼핑' }, { main: '문화', sub: '유흥' },
-    { main: '문화', sub: '영화' }, { main: '문화', sub: '정기구독' },
-    { main: '기타', sub: '기타' }
-  ]
-  
-  const getMainCategoryFromSub = (subCategory: SubCategory): MainCategory => {
-    const mapping = categoryMappings.find(m => m.sub === subCategory)
-    return mapping?.main || '기타'
-  }
   
   const groupSubCategoriesByMain = (categoryBudgets: CategoryBudget[]): MainCategoryBudget[] => {
-    const mainCategoryMap = new Map<MainCategory, CategoryBudget[]>()
+    const groupedByMain = groupBy(categoryBudgets, 'mainCategory')
     
-    categoryBudgets.forEach(categoryBudget => {
-      const mainCategory = getMainCategoryFromSub(categoryBudget.subCategory)
-      if (!mainCategoryMap.has(mainCategory)) {
-        mainCategoryMap.set(mainCategory, [])
-      }
-      mainCategoryMap.get(mainCategory)!.push(categoryBudget)
-    })
+    const mainCategoryBudgets: MainCategoryBudget[] = Object.entries(groupedByMain).map(([mainCategory, subCategories]) => ({
+      mainCategory: mainCategory as MainCategory,
+      totalBudget: calculateSum(subCategories, 'budgetAmount'),
+      totalSpent: calculateSum(subCategories, 'spentAmount'),
+      subCategories
+    }))
     
-    const mainCategoryBudgets: MainCategoryBudget[] = []
-    mainCategoryMap.forEach((subCategories, mainCategory) => {
-      const totalBudget = subCategories.reduce((sum, cat) => sum + cat.budgetAmount, 0)
-      const totalSpent = subCategories.reduce((sum, cat) => sum + cat.spentAmount, 0)
-      
-      mainCategoryBudgets.push({
-        mainCategory,
-        totalBudget,
-        totalSpent,
-        subCategories
-      })
-    })
-    
-    const categoryOrder: MainCategory[] = ['식비', '교통', '생활', '문화', '기타']
-    return mainCategoryBudgets.sort((a, b) => {
-      return categoryOrder.indexOf(a.mainCategory) - categoryOrder.indexOf(b.mainCategory)
-    })
+    return mainCategoryBudgets.sort((a, b) => 
+      CATEGORY_ORDER.indexOf(a.mainCategory) - CATEGORY_ORDER.indexOf(b.mainCategory)
+    )
   }
   
   const calculateSpentAmount = (subCategory: SubCategory, month: string): number => {
@@ -157,7 +124,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     })
     
     const mainCategoryBudgets = groupSubCategoriesByMain(categoryBudgets)
-    const totalSpent = categoryBudgets.reduce((sum, cat) => sum + cat.spentAmount, 0)
+    const totalSpent = calculateSum(categoryBudgets, 'spentAmount')
     const remainingBudget = budget.totalBudget - totalSpent
     const spendingRatio = budget.totalBudget > 0 ? (totalSpent / budget.totalBudget) * 100 : 0
     
@@ -180,7 +147,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
       })
       categorySpendingData.value[month] = response.data
     } catch (error) {
-      console.error(`${month} 카테고리별 지출 조회 실패:`, error)
+      logger.apiError('GET', `/spending/categories/${month}`, error)
       if (month === '2025-08') {
         categorySpendingData.value[month] = dummyCategorySpending
       }
@@ -202,7 +169,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
           budgetAmount: item.budgetAmount || 0,
           spentAmount: item.spentAmount || 0
         }))
-        const totalBudget = categoryBudgets.reduce((sum: number, cat: CategoryBudget) => sum + cat.budgetAmount, 0)
+        const totalBudget = calculateSum(categoryBudgets, 'budgetAmount')
         
         budget = {
           id: `budget_${month}`,
@@ -227,7 +194,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
         currentBudget.value = budget
       }
     } catch (error) {
-      console.error(`${month} 예산 조회 실패:`, error)
+      logger.apiError('GET', `/budgets/${month}`, error)
       if (month === '2025-08') {
         monthlyBudgets.value.push(dummyBudgetData)
         if (month === new Date().toISOString().slice(0, 7)) {
@@ -255,7 +222,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     monthlyBudgets,
     currentBudget,
     currentBudgetSummary,
-    categoryMappings,
+    categoryMappings: CATEGORY_MAPPINGS,
     dummyBudgetData,
     dummyCategorySpending,
     getMainCategoryFromSub,

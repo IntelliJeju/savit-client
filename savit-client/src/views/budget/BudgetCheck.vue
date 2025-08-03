@@ -8,7 +8,7 @@
 
     <div v-else-if="!budgetSummary" class="text-center py-10 text-gray-600">
       <p>설정된 예산이 없습니다.</p>
-      <button @click="loadTestData" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
+      <button @click="loadTestData" class="bg-app-blue text-white px-4 py-2 rounded-lg text-sm">
         테스트 데이터 로드
       </button>
     </div>
@@ -36,21 +36,21 @@
               <CategoryIcon 
                 :category="mainCategory.mainCategory" 
                 :color="categoryColor"
-                :size="28"
+                :size="24"
               />
             </div>
             <div class="min-w-0 flex-1">
-              <div class="text-base font-medium text-black truncate">
-                {{ mainCategory.mainCategory }} {{ mainCategory.spendingRatio.toFixed(1) }}%
+              <div class="text-[16px] font-semibold text-black truncate">
+                {{ mainCategory.mainCategory }} <span class="text-[12px] font-normal">{{ mainCategory.spendingRatio.toFixed(1)}}%</span>
               </div>
             </div>
           </div>
           
           <div v-if="mainCategory.expanded" class="flex items-baseline gap-1">
             <div class="text-sm font-semibold" :class="getAmountClass(mainCategory)">
-              {{ formatCurrency(mainCategory.totalSpent) }}
+              지출 {{ formatCurrency(mainCategory.totalSpent) }}
             </div>
-            <div class="text-xs text-gray-600">/ {{ formatCurrency(mainCategory.totalBudget) }}</div>
+            <div class="text-sm text-gray-600">/ {{ formatCurrency(mainCategory.totalBudget) }}</div>
           </div>
         </div>
 
@@ -74,8 +74,8 @@
         <div v-if="mainCategory.expanded" class="border-t border-gray-200 pt-4">
           <div class="mb-5">
             <div class="flex justify-between items-center mb-3">
-              <h4 class="text-sm font-medium text-gray-600 m-0 flex-1">
-                {{ getPrevMonth() }} {{ mainCategory.mainCategory }} {{ getPrevMonthRatio(mainCategory) }}%
+              <h4 class="text-[14px] font-semibold text-gray-600 m-0 flex-1">
+                {{ getPrevMonth() }} {{ mainCategory.mainCategory }} <span class="text-[12px] font-normal">{{ getPrevMonthRatio(mainCategory) }}% </span>
               </h4>
               <div class="flex items-baseline gap-1">
                 <div class="text-xs text-gray-800 font-medium">{{ formatCurrency(getPrevMonthSpent(mainCategory)) }}</div>
@@ -127,7 +127,8 @@ import SegmentedProgressBar from '@/components/progressBar/SegmentedProgressBar.
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import { useBudgetsStore } from '@/stores/budgets'
-import type { MainCategoryBudget, MainCategory } from '@/stores/budgets'
+import type { MainCategoryBudget } from '@/stores/budgets'
+import type { MainCategory } from '@/constants/categories'
 
 const budgetsStore = useBudgetsStore()
 const isLoading = ref(true)
@@ -159,12 +160,12 @@ const getSubCategoryColor = (subCategory: string): string => {
 }
 
 const getExpandedClass = (mainCategory: any) => ({
-  'bg-gray-50 border-l-4 border-red-400': mainCategory.isOverBudget && mainCategory.expanded,
+  'bg-gray-50 border-l-4 border-app-red': mainCategory.isOverBudget && mainCategory.expanded,
   'bg-gray-50': mainCategory.expanded && !mainCategory.isOverBudget
 })
 
 const getAmountClass = (mainCategory: any): string => {
-  return mainCategory.isOverBudget ? 'text-red-400' : 'text-blue-500'
+  return mainCategory.isOverBudget ? 'text-app-red' : 'text-app-blue'
 }
 
 const toggleCategory = (category: MainCategory) => {
