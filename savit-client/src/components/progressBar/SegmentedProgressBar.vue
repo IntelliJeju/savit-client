@@ -9,8 +9,8 @@
         :key="`${name}-segment-${index}`"
         class="progress-segment h-2"
         :class="{
-          'rounded-l-full': index === 0,
-          'rounded-r-full': index === segments.length - 1
+          'rounded-l-full': isFirstVisibleSegment(index),
+          'rounded-r-full': isLastVisibleSegment(index)
         }"
         :style="{ 
           width: (segment.value / total) * 100 + '%',
@@ -68,6 +68,30 @@ const props = withDefaults(defineProps<{
 }>(), {
   showLegend: true
 })
+
+// 첫 번째로 보이는 세그먼트인지 확인
+const isFirstVisibleSegment = (index: number): boolean => {
+  // 현재 세그먼트 이전에 값이 0보다 큰 세그먼트가 있는지 확인
+  for (let i = 0; i < index; i++) {
+    if (props.segments[i].value > 0) {
+      return false
+    }
+  }
+  // 현재 세그먼트가 0보다 큰 값을 가지는지 확인
+  return props.segments[index].value > 0
+}
+
+// 마지막으로 보이는 세그먼트인지 확인
+const isLastVisibleSegment = (index: number): boolean => {
+  // 현재 세그먼트 이후에 값이 0보다 큰 세그먼트가 있는지 확인
+  for (let i = index + 1; i < props.segments.length; i++) {
+    if (props.segments[i].value > 0) {
+      return false
+    }
+  }
+  // 현재 세그먼트가 0보다 큰 값을 가지는지 확인
+  return props.segments[index].value > 0
+}
 </script>
 
 <style scoped>
