@@ -5,7 +5,6 @@ import { useCardsStore } from './cards'
 import { calculateSum } from '@/utils/calculations'
 import { logger } from '@/utils/logger'
 
-// Types
 import type { 
   MainCategory, 
   SubCategory, 
@@ -17,10 +16,8 @@ import type {
   MonthSummary
 } from '@/types/budgets'
 
-// Constants
 import { STORAGE_KEYS, DUMMY_SPENDING_DATA, BUDGET_AMOUNTS } from '@/constants/budgets'
 
-// Utils
 import { 
   CATEGORY_MAPPINGS,
   getMainCategoryFromSub,
@@ -34,29 +31,22 @@ import {
 } from '@/utils/budgetUtils'
 import { saveToStorage, loadFromStorage } from '@/utils/storage'
 
-// Re-export types for backward compatibility
 export type { MainCategory, SubCategory, MonthlyBudget, BudgetSummary, BudgetSettingRequest, BudgetSettingResponse, MainCategoryBudget }
 
-/**
- * 예산 관리 Pinia Store
- */
 export const useBudgetsStore = defineStore('budgets', () => {
-  // Dependencies
   const { request } = useApi()
   const cardsStore = useCardsStore()
   
-  // State
   const monthlyBudgets = ref<MonthlyBudget[]>(loadFromStorage<MonthlyBudget[]>(STORAGE_KEYS.MONTHLY_BUDGETS) || [])
   const currentBudget = ref<MonthlyBudget | null>(loadFromStorage<MonthlyBudget>(STORAGE_KEYS.CURRENT_BUDGET))
   const categorySpendingData = ref<Record<string, Record<SubCategory, number>>>({})
   
-  // Dummy data
+  // 테스트용 더미 데이터
   const dummyBudgetData = createDummyBudgetData()
   const dummyCategorySpending = DUMMY_SPENDING_DATA.current
   const dummyPrevMonthSpending = DUMMY_SPENDING_DATA.prevMonth
   const dummyPrevPrevMonthSpending = DUMMY_SPENDING_DATA.prevPrevMonth
 
-  // Computed
   const currentBudgetSummary = computed((): BudgetSummary | null => {
     if (!currentBudget.value) return null
     
@@ -77,7 +67,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   })
 
-  // API 호출 함수들
   const makeApiCall = async (config: any, fallbackResponse?: any) => {
     try {
       return await request(config)
@@ -87,7 +76,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  // 예산 설정
   const setBudgetForMonth = async (budgetRequest: BudgetSettingRequest): Promise<BudgetSettingResponse> => {
     const validation = validateBudgetSettings(budgetRequest)
     if (!validation.isValid) {
@@ -114,7 +102,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  // 전체 예산 설정
   const setTotalBudget = async (month: string, totalBudget: number): Promise<BudgetSettingResponse> => {
     const validation = validateTotalBudget(month, totalBudget)
     if (!validation.isValid) {
@@ -140,12 +127,10 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  // 전체 예산 업데이트 또는 생성
   const updateOrCreateTotalBudget = (month: string, totalBudget: number) => {
     const existingIndex = monthlyBudgets.value.findIndex(b => b?.month === month)
     
     if (existingIndex !== -1) {
-      // 기존 예산 업데이트
       monthlyBudgets.value[existingIndex].totalBudget = totalBudget
       monthlyBudgets.value[existingIndex].updatedAt = new Date().toISOString()
       
@@ -154,7 +139,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
         saveToStorage(STORAGE_KEYS.CURRENT_BUDGET, currentBudget.value)
       }
     } else {
-      // 새 예산 생성
       const newBudget = createNewBudget(month, totalBudget)
       monthlyBudgets.value.push(newBudget)
       
@@ -167,7 +151,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     saveToStorage(STORAGE_KEYS.MONTHLY_BUDGETS, monthlyBudgets.value)
   }
 
-  // 지출 데이터 업데이트
   const updateSpendingData = (mainCategoryBudgets: MainCategoryBudget[], month: string): MainCategoryBudget[] => {
     return mainCategoryBudgets.map(mainCategory => {
       const updatedSubCategories = mainCategory.subCategories.map(sub => ({
@@ -183,7 +166,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     })
   }
 
-  // 서브카테고리 지출 금액 계산
   const calculateSpentAmount = (subCategory: SubCategory, month: string): number => {
     const monthData = categorySpendingData.value[month]
     if (monthData?.[subCategory]) return monthData[subCategory]
@@ -193,7 +175,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
       .reduce((sum, usage) => sum + usage.amount, 0)
   }
 
-  // 스토어에 예산 업데이트
   const updateBudgetInStore = (budget: MonthlyBudget, month: string): void => {
     if (!budget?.month) {
       console.warn('Invalid budget object:', budget)
@@ -217,7 +198,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     saveToStorage(STORAGE_KEYS.MONTHLY_BUDGETS, monthlyBudgets.value)
   }
 
-  // 카테고리별 지출 데이터 가져오기
   const fetchCategorySpending = async (month: string): Promise<void> => {
     try {
       const response = await request({
@@ -233,7 +213,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  // 월별 예산 데이터 가져오기
   const fetchBudgetsByMonth = async (month: string): Promise<void> => {
     try {
       const response = await request({
@@ -254,7 +233,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  // 현재 월 예산 초기화
   const initializeCurrentMonthBudget = async (): Promise<void> => {
     const currentMonth = getCurrentMonth()
     await Promise.all([
@@ -263,14 +241,12 @@ export const useBudgetsStore = defineStore('budgets', () => {
     ])
   }
 
-  // 테스트 데이터 로드
   const loadTestData = async (): Promise<void> => {
     monthlyBudgets.value = dummyBudgetData ? [dummyBudgetData] : []
     currentBudget.value = dummyBudgetData
     categorySpendingData.value['2025-08'] = dummyCategorySpending
   }
 
-  // 과거 월별 요약 데이터
   const getPreviousMonthsSummary = (monthsBack: number): MonthSummary => {
     const now = new Date()
     const targetDate = new Date(now.getFullYear(), now.getMonth() - monthsBack, 1)
@@ -289,27 +265,19 @@ export const useBudgetsStore = defineStore('budgets', () => {
     return { month: monthStr, monthName, totalSpent, totalBudget }
   }
 
-  // Store 반환값
   return {
-    // State
     monthlyBudgets,
     currentBudget,
     categorySpendingData,
-    
-    // Computed
     currentBudgetSummary,
-    
-    // Constants & Utils
     categoryMappings: CATEGORY_MAPPINGS,
     getMainCategoryFromSub,
-    
-    // Dummy Data
+
     dummyBudgetData,
     dummyCategorySpending,
     dummyPrevMonthSpending,
     dummyPrevPrevMonthSpending,
     
-    // Actions
     setBudgetForMonth,
     setTotalBudget,
     updateSpendingData,
@@ -317,7 +285,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     loadTestData,
     getPreviousMonthsSummary,
     
-    // Internal functions (for testing)
     validateBudgetSettings,
     createBudgetFromSettings
   }
