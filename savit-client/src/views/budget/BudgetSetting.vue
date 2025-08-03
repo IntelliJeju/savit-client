@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-app-light-gray">
+  <div :class="styles.pageBackground">
     <div class="max-w-sm mx-auto p-4">
       <!-- Header Card -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 mb-6">
+      <div :class="[styles.cardContainer, 'mb-6']">
         <div class="flex items-center justify-between mb-4">
-          <button class="w-10 h-10 rounded-xl bg-app-light-gray hover:bg-slate-200 flex items-center justify-center transition-colors">
+          <button :class="[styles.iconContainer, 'hover:bg-slate-200 transition-colors cursor-pointer']">
             <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Budget Sliders -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+      <div :class="[styles.cardContainerSmall, 'overflow-hidden mb-6']">
         <div class="p-5">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-lg font-semibold text-slate-800">카테곣먌별 비율 설정</h2>
@@ -58,7 +58,7 @@
             <!-- Category info - 별도 행으로 분리 -->
             <div class="flex justify-between">
               <div v-for="(category, index) in categories" :key="index" class="flex flex-col items-center flex-1">
-                <div class="w-10 h-10 rounded-2xl flex items-center justify-center mb-2 bg-app-light-gray">
+                <div :class="[styles.iconContainerRound, 'mb-2']">
                   <component :is="category.icon" class="w-5 h-5 text-app-dark-green" />
                 </div>
                 <p class="text-xs font-medium text-slate-800 mb-1">{{ category.name }}</p>
@@ -68,9 +68,9 @@
           </div>
 
           <!-- Total and Action -->
-          <div class="bg-app-light-gray rounded-xl p-4 flex items-center justify-between">
+          <div :class="['bg-app-light-gray rounded-xl p-4', styles.flexBetween]">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center" :class="totalPercentage === 100 ? 'bg-app-light-blue' : 'bg-app-light-red'">
+              <div :class="[styles.iconContainer, getStatusColor(totalPercentage === 100, 'bg')]">
                 <svg v-if="totalPercentage === 100" class="w-5 h-5 text-app-blue" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
@@ -80,7 +80,7 @@
               </div>
               <div>
                 <div class="text-sm text-slate-600 mb-1">총 배분비율</div>
-                <div class="text-2xl font-bold" :class="totalPercentage === 100 ? 'text-app-blue' : 'text-app-red'">
+                <div :class="['text-2xl font-bold', getStatusColor(totalPercentage === 100, 'text')]">
                   {{ totalPercentage }}%
                 </div>
               </div>
@@ -128,6 +128,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useCommonStyles } from '@/composables/useCommonStyles'
+import { calculateSum } from '@/utils/calculations'
 
 // Icon components (simplified SVG icons)
 const RestaurantIcon = {
@@ -212,8 +214,10 @@ const dragState = ref<DragState>({
 })
 
 const totalPercentage = computed(() => {
-  return categories.value.reduce((sum, cat) => sum + cat.percentage, 0)
+  return calculateSum(categories.value, 'percentage')
 })
+
+const { styles, getStatusColor } = useCommonStyles()
 
 const calculateAmount = (percentage: number) => {
   return Math.round((totalBudget * percentage) / 100)
