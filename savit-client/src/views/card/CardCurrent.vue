@@ -25,13 +25,6 @@
               :class="billingChange >= 0 ? 'bg-app-light-red' : 'bg-app-light-blue'"
             >
               <v-icon v-if="billingChange >= 0" name="hi-arrow-narrow-up" class="w-6 text-app-red" /> 
-              <!-- <svg v-else class="w-5 h-5 text-app-blue" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fill-rule="evenodd"
-                  d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg> -->
               <v-icon v-else name="hi-arrow-narrow-down" class="w-6 text-app-blue"/>
             </div>
             <div>
@@ -110,6 +103,7 @@ import { useCardsStore } from '@/stores/cards'
 import CardSlider from '@/components/card/CardSlider.vue'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
+import { mapCategoryToMainCategory } from '@/utils/category'
 
 const router = useRouter()
 const route = useRoute()
@@ -166,47 +160,6 @@ const recentTransactions = computed(() => {
     }))
 })
 
-// 카테고리를 대분류로 매핑하는 함수
-const mapCategoryToMainCategory = (category: string): '식비' | '교통' | '생활' | '문화' | '기타' => {
-  const categoryMapping: { [key: string]: '식비' | '교통' | '생활' | '문화' | '기타' } = {
-    // 식비 관련
-    '식당': '식비',
-    '카페': '식비',
-    '배달': '식비',
-    '음식점': '식비',
-    '베이커리': '식비',
-    '패스트푸드': '식비',
-    
-    // 교통 관련
-    '대중교통': '교통',
-    '택시': '교통',
-    '주유소': '교통',
-    '교통': '교통',
-    '버스': '교통',
-    '지하철': '교통',
-    
-    // 생활 관련
-    '통신비': '생활',
-    '공과금': '생활',
-    '편의점/마트': '생활',
-    '마트': '생활',
-    '편의점': '생활',
-    '온라인쇼핑': '생활',
-    '생활용품': '생활',
-    
-    // 문화 관련
-    '공연': '문화',
-    '쇼핑': '문화',
-    '유흥': '문화',
-    '영화': '문화',
-    '도서': '문화',
-    '게임': '문화',
-    
-    // 기본값은 기타
-  }
-  
-  return categoryMapping[category] || '기타'
-}
 
 const getCardBgColor = (organization: string) => {
   const colorMap: { [key: string]: string } = {

@@ -88,6 +88,7 @@ import { useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
+import { mapCategoryToMainCategory } from '@/utils/category'
 
 const route = useRoute()
 const cardsStore = useCardsStore()
@@ -185,47 +186,6 @@ const formatDateHeader = (dateString: string) => {
   }
 }
 
-// 카테고리를 대분류로 매핑하는 함수
-const mapCategoryToMainCategory = (category: string): '식비' | '교통' | '생활' | '문화' | '기타' => {
-  const categoryMapping: { [key: string]: '식비' | '교통' | '생활' | '문화' | '기타' } = {
-    // 식비 관련
-    '식당': '식비',
-    '카페': '식비',
-    '배달': '식비',
-    '음식점': '식비',
-    '베이커리': '식비',
-    '패스트푸드': '식비',
-    
-    // 교통 관련
-    '대중교통': '교통',
-    '택시': '교통',
-    '주유소': '교통',
-    '교통': '교통',
-    '버스': '교통',
-    '지하철': '교통',
-    
-    // 생활 관련
-    '통신비': '생활',
-    '공과금': '생활',
-    '편의점/마트': '생활',
-    '마트': '생활',
-    '편의점': '생활',
-    '온라인쇼핑': '생활',
-    '생활용품': '생활',
-    
-    // 문화 관련
-    '공연': '문화',
-    '쇼핑': '문화',
-    '유흥': '문화',
-    '영화': '문화',
-    '도서': '문화',
-    '게임': '문화',
-    
-    // 기본값은 기타
-  }
-  
-  return categoryMapping[category] || '기타'
-}
 
 const fetchCardData = async (cardId: number) => {
   if (cardId) {
