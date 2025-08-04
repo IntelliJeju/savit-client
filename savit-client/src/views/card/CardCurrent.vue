@@ -17,35 +17,22 @@
       />
 
       <!-- 저번 달 대비 변화량 -->
-      <div
-        v-if="cardsStore.registeredCards.length > 0 && !isRegistrationCard"
-        class="bg-white rounded-2xl p-5 border border-slate-200 mb-6"
-      >
+      <CardComponent class="mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div
               class="w-10 h-10 rounded-xl flex items-center justify-center"
               :class="billingChange >= 0 ? 'bg-app-light-red' : 'bg-app-light-blue'"
             >
-              <svg
-                v-if="billingChange >= 0"
-                class="w-5 h-5 text-app-red"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <svg v-else class="w-5 h-5 text-app-blue" fill="currentColor" viewBox="0 0 20 20">
+              <v-icon v-if="billingChange >= 0" name="hi-arrow-narrow-up" class="w-6 text-app-red" /> 
+              <!-- <svg v-else class="w-5 h-5 text-app-blue" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fill-rule="evenodd"
                   d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z"
                   clip-rule="evenodd"
                 />
-              </svg>
+              </svg> -->
+              <v-icon v-else name="hi-arrow-narrow-down" class="w-6 text-app-blue"/>
             </div>
             <div>
               <div class="text-sm text-slate-600 mb-1">저번 달 대비</div>
@@ -67,9 +54,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </CardComponent>
+      <!-- </div> -->
 
-      <!-- 최근 카드 이용내역 -->
       <div v-if="cardsStore.registeredCards.length > 0 && !isRegistrationCard" class="mb-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-slate-800">최근 이용내역</h3>
@@ -81,7 +68,7 @@
           </router-link>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <CardComponent>
           <div
             v-for="(transaction, index) in recentTransactions"
             :key="index"
@@ -110,7 +97,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </CardComponent>
       </div>
     </div>
   </div>
@@ -122,6 +109,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CardSlider from '@/components/card/CardSlider.vue'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
+import CardComponent from '@/components/card/CardComponent.vue'
 
 const router = useRouter()
 const route = useRoute()

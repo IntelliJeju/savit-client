@@ -3,7 +3,7 @@
     <div class="max-w-sm mx-auto p-4">
 
       <!-- 이번 달 청구 금액 -->
-      <div class="bg-app-bg-green rounded-2xl p-5 border border-slate-200 mb-6">
+      <CardComponent class="mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div>
@@ -15,7 +15,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </CardComponent>  
 
       <!-- 정렬 옵션 -->
       <div class="flex items-center justify-between mb-4">
@@ -30,11 +30,9 @@
 
       <!-- 이용내역 리스트 -->
       <div v-if="groupedUsage.length > 0" class="space-y-4">
-        <div
+        <CardComponent
           v-for="group in groupedUsage"
-          :key="group.date"
-          class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
-        >
+          :key="group.date">
           <div class="px-4 py-3 bg-slate-50 border-b border-slate-200">
             <h4 class="text-sm font-medium text-slate-700">{{ formatDateHeader(group.date) }}</h4>
           </div>
@@ -67,7 +65,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </CardComponent>
       </div>
       
       <!-- 빈 상태 -->
@@ -89,6 +87,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
+import CardComponent from '@/components/card/CardComponent.vue'
 
 const route = useRoute()
 const cardsStore = useCardsStore()
@@ -119,7 +118,7 @@ const sortedUsage = computed(() => {
   return usage.sort((a, b) => {
     const dateA = new Date(a.date)
     const dateB = new Date(b.date)
-    if (sortOrder.value === 'newest') {
+    if  (sortOrder.value === 'newest') {
       return dateB.getTime() - dateA.getTime()
     } else {
       return dateA.getTime() - dateB.getTime()
