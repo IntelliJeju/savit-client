@@ -117,31 +117,7 @@ const routes: Array<RouteRecordRaw> = [
       requiresAuth: true,
       showBackButton: false,
       showHeader: true,
-      title: '카테고리별 지출',
-    },
-  },
-  {
-    path: '/budget/setting',
-    name: 'BudgetSetting',
-    component: BudgetSetting,
-    meta: {
-      showNavigation: true,
-      requiresAuth: true,
-      showBackButton: true,
-      showHeader: true,
-      title: '전체 예산 설정',
-    },
-  },
-  {
-    path: '/budget/categorysetting',
-    name: 'BudgetCategorySetting',
-    component: BudgetCategorySetting,
-    meta: {
-      showNavigation: true,
-      requiresAuth: true,
-      showBackButton: true,
-      showHeader: true,
-      title: '카테고리 예산 설정',
+      title: '카테고리별 지출내역',
     },
   },
   {
@@ -156,6 +132,31 @@ const routes: Array<RouteRecordRaw> = [
       title: '예산 타입 선택',
     },
   },
+  {
+    path: '/budget/all',
+    name: 'BudgetSetting',
+    component: BudgetSetting,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showHeader: true,
+      title: '전체 예산 설정',
+    },
+  },
+  {
+    path: '/budget/categories/list',
+    name: 'BudgetCategorySetting',
+    component: BudgetCategorySetting,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showHeader: true,
+      title: '카테고리 예산 설정',
+    },
+  },
+
 
   //challenge
   {

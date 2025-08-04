@@ -142,7 +142,7 @@ const saveBudget = async () => {
     if (result && result.success) {
       alert(`${formatCurrency(amount)}원으로 예산이 설정되었습니다!\n카테고리별 세부 설정을 진행합니다.`)
       router.push({ 
-        path: '/budget/categorysetting', 
+        path: '/budget/setting/categories', 
         query: { totalBudget: amount, month: currentMonth } 
       })
     } else {

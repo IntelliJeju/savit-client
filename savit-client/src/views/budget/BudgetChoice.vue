@@ -33,11 +33,11 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 const router = useRouter()
 
 const handleBudgetSetting = () => {
-  router.push('/budget/setting')
+  router.push('/budget/all')
 }
 
 const handleCategoryBudgetSetting = () => {
-  router.push('/budget/categorysetting')
+  router.push('/budget/categories/list')
 }
 </script>
 
