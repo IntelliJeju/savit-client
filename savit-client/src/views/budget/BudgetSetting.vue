@@ -39,7 +39,7 @@
       </div>
       
       <div class="flex items-center text-app-dark-gray text-sm">
-        <img src="@/assets/img/info.png" class="w-4 h-4 mr-2" />
+        <v-icon name="hi-information-circle" class="w-6 mr-2" /> 
         <span>지난 지출/예산 내역을 참고해서 설정해보세요</span>
       </div>
     </div>

@@ -19,12 +19,12 @@
         :class="getExpandedClass(mainCategory)"
       >
         <div class="absolute top-2 right-2" @click="toggleCategory(mainCategory.mainCategory)">
-          <div class="text-[8px] text-app-dark-gray transition-transform duration-200 cursor-pointer m-1" :class="{ 'rotate-180': mainCategory.expanded }">
-            ◥◤
+          <div class="text-[8px] text-app-dark-gray transition-transform duration-200 cursor-pointer" :class="{ 'rotate-180': mainCategory.expanded }">
+            <v-icon name="oi-triangle-down" class="w-8"/>
           </div>
         </div>
         
-        <div class="flex justify-between items-center cursor-pointer mb-1 mt-2" @click="toggleCategory(mainCategory.mainCategory)">
+        <div class="flex justify-between items-center cursor-pointer mb-1 mt-4" @click="toggleCategory(mainCategory.mainCategory)">
           <div class="flex items-center flex-1 min-w-0">
             <div class="w-6 flex-shrink-0">
               <CategoryIcon 

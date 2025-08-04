@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
 import { useCardsStore } from './cards'
 import { calculateSum } from '@/utils/calculations'
-import { logger } from '@/utils/logger'
 
 import type { 
   MainCategory, 
@@ -71,7 +70,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     try {
       return await request(config)
     } catch (error) {
-      logger.apiError(config.method, config.url, error)
       return fallbackResponse || { success: true }
     }
   }
@@ -97,7 +95,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
       
       return response
     } catch (error) {
-      logger.apiError('POST', '/budgets/set', error)
       return { success: false, message: '예산 설정 중 오류가 발생했습니다' }
     }
   }
@@ -122,7 +119,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
       
       return response
     } catch (error) {
-      logger.apiError('POST', '/budgets/total', error)
       return { success: false, message: '전체 예산 설정 중 오류가 발생했습니다' }
     }
   }
@@ -206,7 +202,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
       })
       categorySpendingData.value[month] = response.data
     } catch (error) {
-      logger.apiError('GET', `/spending/categories/${month}`, error)
       if (month === '2025-08') {
         categorySpendingData.value[month] = dummyCategorySpending
       }
@@ -226,7 +221,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
       
       updateBudgetInStore(budget, month)
     } catch (error) {
-      logger.apiError('GET', `/budgets/${month}`, error)
       if (month === '2025-08') {
         updateBudgetInStore(dummyBudgetData, month)
       }

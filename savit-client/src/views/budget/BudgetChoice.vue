@@ -10,7 +10,7 @@
       <div class="p-6">
         <ButtonItem text="전체 예산 설정" @click="handleBudgetSetting" />
         <div class="mt-4 text-app-dark-gray text-sm flex items-center">
-          <img src="@/assets/img/info.png" class="w-6 mr-2" alt="정보" /> 
+          <v-icon name="hi-information-circle" class="w-6 mr-2" /> 
           한 달 동안 사용할 전체 예산액을 설정합니다
         </div>
       </div>
@@ -18,7 +18,7 @@
       <div class="p-6">
         <ButtonItem text="카테고리별 예산 설정" @click="handleCategoryBudgetSetting" />
         <div class="mt-4 text-app-dark-gray text-sm flex items-center">
-          <img src="@/assets/img/info.png" class="w-6 mr-2" alt="정보" />
+          <v-icon name="hi-information-circle" class="w-6 mr-2" /> 
           식비, 교통, 문화, 생활, 기타 카테고리 예산을 각각 설정합니다
         </div>
       </div>
