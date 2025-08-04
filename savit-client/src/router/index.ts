@@ -278,7 +278,7 @@ router.beforeEach(async (to, from, next) => {
     // 카드 데이터가 없으면 불러오기
     if (cardsStore.cardsList.length === 0) {
       try {
-        // await cardsStore.fetchCards()
+        await cardsStore.fetchCards()
       } catch (error) {
         console.error('카드 데이터 로드 실패:', error)
         // 에러가 발생해도 페이지 이동은 계속 진행

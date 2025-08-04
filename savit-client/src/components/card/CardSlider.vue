@@ -57,7 +57,7 @@
                 />
               </div>
               <div class="text-3xl font-bold mt-8 drop-shadow-lg">
-                {{ getBillingAmount(card.cardId) }}원
+                {{ totalAmount.toLocaleString() }}원
               </div>
             </div>
 
@@ -144,7 +144,7 @@ interface Props {
   currentCardIndex: number
   isEditingNickname: boolean
   editingNickname: string
-  getBillingAmount: (cardId: string) => string
+  totalAmount: number
 }
 
 interface Emits {

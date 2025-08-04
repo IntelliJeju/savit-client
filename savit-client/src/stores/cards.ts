@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
-import transactionDummy from '@/stores/transactionDummy'
 import type {
   Card,
   Transaction,
@@ -46,7 +45,8 @@ export const useCardsStore = defineStore('cards', () => {
     return defaultCards
   }
 
-  const cards = ref<Card[]>(initializeCards())
+  // const cards = ref<Card[]>(initializeCards())
+  const cards = ref<Card[]>()
   const transactions = ref<Transaction[]>([])
 
   const currentMonthBilling = ref<BillingInfo[]>([
@@ -259,6 +259,14 @@ export const useCardsStore = defineStore('cards', () => {
     }
   }
 
+  const getTotalUsageByIdMonth = computed(() => (cardId: number, month: number) => {
+    return (
+      transactions.value
+        .filter((u) => u.cardId === cardId && month === Number(u.resUsedDate.slice(4, 6)))
+        .reduce((acc, cur) => acc + Number(cur.resUsedAmount), 0) || 0
+    )
+  })
+
   const getUsageByCardId = (cardId: string) => {
     return currentMonthUsage.value.filter((u) => u.cardId === cardId)
   }
@@ -446,6 +454,7 @@ export const useCardsStore = defineStore('cards', () => {
     registeredCard,
     transactions,
     transactionsList,
+    getTotalUsageByIdMonth,
     fetchTransactions,
     getBillingByCardId,
     getUsageByCardId,
