@@ -4,12 +4,15 @@
     
     <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
       <p class="font-bold text-lg mb-4">이번 달 예산 금액</p>
-      <InputField
-        v-model="displayAmount"
-        placeholder="설정할 예산액을 입력해주세요."
-        type="text"
-        class="text-3xl font-bold text-right"
-        @input="handleAmountInput"/>
+      <div class="relative flex items-center">
+        <InputField
+          v-model="displayAmount"
+          placeholder="설정할 예산액을 입력해주세요."
+          type="text"
+          class="text-3xl font-bold text-right pr-12"
+          @input="handleAmountInput"/>
+        <span class="absolute right-2 text-3xl font-bold text-app-dark-gray">원</span>
+      </div>
     </div>
     
     <div class="bg-white rounded-xl shadow-sm p-6 mb-20">
@@ -41,7 +44,7 @@
       </div>
     </div>
     
-    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+    <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t">
       <div class="max-w-4xl mx-auto">
         <ButtonItem 
           @click="saveBudget"
