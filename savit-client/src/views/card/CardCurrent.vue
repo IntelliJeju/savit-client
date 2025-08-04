@@ -111,7 +111,7 @@ import now from '@/utils/date.ts'
 
 const cardsStore = useCardsStore()
 
-const { cardsList, transactionsList, getTotalUsageByIdMonth } = storeToRefs(cardsStore)
+const { cardsList, getTransactionsByCard, getTotalUsageByIdMonth } = storeToRefs(cardsStore)
 
 const currentCardIndex = ref(0)
 const cardSliderRef = ref<InstanceType<typeof CardSlider> | null>(null)
@@ -119,6 +119,12 @@ const cardSliderRef = ref<InstanceType<typeof CardSlider> | null>(null)
 // 별칭 편집 관련 상태
 const isEditingNickname = ref(false)
 const editingNickname = ref('')
+
+// 최근 거래내역 (현재 카드의 실제 데이터)
+const recentTransactions = computed(() => {
+  if (!currentCard.value) return []
+  return getTransactionsByCard.value(currentCard.value.cardId).slice(0, 3)
+})
 
 // 현재 카드의 사용량 계산 (동적)
 const lastMonthUsage = computed(() => {
@@ -147,23 +153,6 @@ const isRegistrationCard = computed(() => {
 // 슬라이드 변경 이벤트 핸들러
 const onSlideChange = (index: number) => {
   currentCardIndex.value = index
-}
-
-// 최근 거래내역 (현재 카드의 실제 데이터)
-const recentTransactions = computed(() => {
-  // if (!currentCard.value) return []
-  return transactionsList.value.filter((u) => u.cardId === currentCard.value.cardId).slice(0, 3)
-})
-
-
-const getCardBgColor = (organization: string) => {
-  const colorMap: { [key: string]: string } = {
-    '국민카드': '#FFD700',
-    '신한카드': '#1E40AF',
-    '하나카드': '#16A34A',
-    '삼성카드': '#6366F1',
-  }
-  return colorMap[organization] || '#4ade80'
 }
 
 const formatDate = (dateString: string) => {

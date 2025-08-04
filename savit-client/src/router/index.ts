@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
+import type { Card } from '@/types/card'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const MainLayout = () => import('@/layout/MainLayout.vue')
@@ -278,7 +279,10 @@ router.beforeEach(async (to, from, next) => {
     // 카드 데이터가 없으면 불러오기
     if (cardsStore.cardsList.length === 0) {
       try {
-        await cardsStore.fetchCards()
+        const cards = await cardsStore.fetchCards()
+
+        const promises = cards.map((card: Card) => cardsStore.fetchTransactions(card.cardId, 'GET'))
+        await Promise.allSettled(promises)
       } catch (error) {
         console.error('카드 데이터 로드 실패:', error)
         // 에러가 발생해도 페이지 이동은 계속 진행
