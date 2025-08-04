@@ -7,11 +7,8 @@
     <!-- 예산 데이터가 없을 때 -->
     <div v-else-if="!budgetSummary" class="text-center py-10 text-app-dark-gray">
       <p>설정된 예산이 없습니다.</p>
-      <button @click="loadTestData" class="bg-app-blue text-white px-4 py-2 rounded-lg text-sm">
-        테스트 데이터 로드
-      </button>
     </div>
-    <div v-else class="bg-white rounded-xl shadow-sm p-4">
+    <CardComponent>
       <div 
         v-for="mainCategory in mainCategories" 
         :key="mainCategory.mainCategory"
@@ -105,8 +102,8 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="p-4 mt-4">
+    </CardComponent>
+    <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-app-gray z-10">
       <ButtonItem 
         text="예산 설정"
         @click="handleBudgetSetting"
@@ -125,6 +122,7 @@ import { useBudgetsStore } from '@/stores/budgets'
 import type { MainCategoryBudget } from '@/stores/budgets'
 import type { MainCategory } from '@/stores/budgets'
 import router from '@/router'
+import CardComponent from '@/components/card/CardComponent.vue'
 
 const budgetsStore = useBudgetsStore()
 const isLoading = ref(true) 
