@@ -1,18 +1,23 @@
 <template>
-  <div class="max-w-4xl mx-auto min-h-screen px-4 bg-gray-50">
-    <div class="py-5"></div>
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-      <div class="flex justify-between items-center mb-4">
-        <div class="text-center">
-          <div class="text-sm text-app-dark-gray mb-1">이번달 전체 예산</div>
-          <div class="text-2xl font-bold text-app-dark-gray">{{ formatCurrency(totalBudget) }}원</div>
-        </div>
-        <div class="text-center">
-          <div class="text-sm text-app-dark-gray mb-1">남은 예산</div>
-          <div class="text-2xl font-bold text-app-green">{{ formatCurrency(remainingBudget) }}원</div>
+<div class="min-h-screen bg-gray-50">
+    <!-- 상단 고정 예산 박스 -->
+    <div class="fixed top-16 left-0 right-0 z-50 bg-white border-b shadow-sm">
+      <div class="max-w-4xl mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="text-left ml-4">
+            <div class="text-sm text-app-dark-gray mb-1">이번달 전체 예산</div>
+            <div class="text-xl font-bold text-app-dark-gray">{{ formatCurrency(totalBudget) }}원</div>
+          </div>
+          <div class="text-right mr-4">
+            <div class="text-sm text-app-dark-gray mb-1">남은 예산</div>
+            <div class="text-xl font-bold text-app-green">{{ formatCurrency(remainingBudget) }}원</div>
+          </div>
         </div>
       </div>
     </div>
+    
+    <!-- 메인 컨텐츠 (상단 여백 추가) -->
+    <div class="max-w-4xl mx-auto px-4 pt-24 pb-6">
 
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
       <div v-for="(category, index) in categories" :key="index" class="mb-6 last:mb-0">
@@ -48,7 +53,7 @@
             <ButtonItem 
               @click="handleRecommendationClick"
               :disabled="isLoading"
-              class="w-20 h-8">
+              style="width: 70px; height: 32px;">
               {{ isLoading ? '추천 중...' : '추천' }}
             </ButtonItem>
           </div>
@@ -81,12 +86,13 @@
     </div>
 
     <!-- 설정 버튼 -->
-    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+    <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t">
       <div class="max-w-4xl mx-auto">
         <ButtonItem
           @click="handleSaveBudgetClick"
           text="설정"/>
       </div>
+    </div>
     </div>
   </div>
 </template>
