@@ -186,7 +186,7 @@ const startEditNickname = (index: number) => {
   if (!targetCard) return
 
   isEditingNickname.value = true
-  editingNickname.value = targetCard.cardNickname || ''
+  // editingNickname.value = targetCard.cardNickname || ''
 }
 
 const saveNickname = async () => {
@@ -197,7 +197,7 @@ const saveNickname = async () => {
   }
 
   try {
-    await cardsStore.updateCardNickname(targetCard.cardId, editingNickname.value.trim())
+    // await cardsStore.updateCardNickname(targetCard.cardId, editingNickname.value.trim())
     isEditingNickname.value = false
   } catch (error) {
     console.error('별칭 수정 실패:', error)
