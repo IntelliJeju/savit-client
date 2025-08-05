@@ -13,7 +13,7 @@ export interface Challenge {
 
 // 기존 인터페이스도 유지
 export interface availChallengeList {
-  id: string
+  challengeId: string
   title: string
   startDate: string
   endDate: string

@@ -57,8 +57,10 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = false
     user.value = null
     accessToken.value = null
+    refreshToken.value = null
 
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('authUser')
 
     console.log('로그아웃 되었습니다.')

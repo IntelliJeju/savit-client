@@ -31,9 +31,9 @@
         </div>
         <div
           v-for="item in availChallengeList"
-          :key="item.id"
+          :key="item.challengeId"
           class="avail-challenge-item mt-4"
-          @click="routeDetail(item.id)"
+          @click="routeDetail(item.challengeId)"
         >
           <card-component>
             <div class="avail-challenge-label">
@@ -72,13 +72,17 @@ const challengeStore = useChallengeStore()
 
 const {
   getAvailChallengeList,
-  // getAvailChallengeDetail,
+  getAvailChallengeDetail,
   // availChallengeDetailMap,
 } = challengeStore
 const { availChallengeList, loading } = storeToRefs(challengeStore)
 
 onMounted(async () => {
   await getAvailChallengeList()
+  const promisses = availChallengeList.value.map((challenge) => {
+    getAvailChallengeDetail(challenge.challengeId)
+  })
+  await Promise.allSettled(promisses)
 })
 
 const routeDetail = (id: string) => {
