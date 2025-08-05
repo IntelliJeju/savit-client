@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
 import { useCardsStore } from './cards'
+import type { Transaction } from '@/types/card'
 import { calculateSum } from '@/utils/calculations'
 
 import { 
@@ -212,12 +213,22 @@ export const useBudgetsStore = defineStore('budgets', () => {
       spendingByCategory[subCategory as SubCategory] = 0
     })
     
-    cardsStore.currentMonthUsage
-      .filter(usage => usage.date.startsWith(month))
-      .forEach(usage => {
-        const category = usage.category as SubCategory
+    // Get all transactions from all cards for the specified month
+    const allTransactions: Transaction[] = []
+    cardsStore.cardsList.forEach(card => {
+      const cardTransactions = cardsStore.getTransactionsByCard(card.cardId)
+      allTransactions.push(...cardTransactions)
+    })
+    
+    allTransactions
+      .filter((transaction: Transaction) => transaction.resUsedDate.startsWith(month.replace('-', '')))
+      .forEach((transaction: Transaction) => {
+        // For now, we'll use the store type as category mapping
+        // This should be updated based on how categories are determined
+        const category = transaction.resMemberStoreType as SubCategory
         if (Object.values(CATEGORIES.SUB).flat().includes(category)) {
-          spendingByCategory[category] += usage.amount
+          const amount = transaction.resCancelYN === '0' ? Number(transaction.resUsedAmount) : 0
+          spendingByCategory[category] += amount
         }
       })
     
