@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-4xl mx-auto min-h-screen px-4">
-    <div class="py-5"></div>
+    <div class="py-2"></div>
     <div v-if="isLoading" class="text-center py-10 text-app-dark-gray">
       <p>예산 정보를 불러오는 중...</p>
     </div>
@@ -72,7 +72,7 @@
               </h4>
               <div class="flex items-baseline gap-1">
                 <div class="text-xs text-app-dark-gray font-semibold">{{ formatCurrency(getPrevMonthSpent(mainCategory)) }}</div>
-                <div class="text-xs text-app-dark-gray">/ {{ formatCurrency(mainCategory.budgetAmount) }}</div>
+                <div class="text-xs text-app-dark-gray">/ {{ formatCurrency(getPrevMonthBudgetAmount(mainCategory)) }}</div>
               </div>
             </div>
             <SegmentedProgressBar 
@@ -89,7 +89,7 @@
               </h4>
               <div class="flex items-baseline gap-1">
                 <div class="text-xs text-app-dark-gray font-semibold">{{ formatCurrency(getPrevPrevMonthSpent(mainCategory)) }}</div>
-                <div class="text-xs text-app-dark-gray">/ {{ formatCurrency(mainCategory.budgetAmount) }}</div>
+                <div class="text-xs text-app-dark-gray">/ {{ formatCurrency(getPrevPrevMonthBudgetAmount(mainCategory)) }}</div>
               </div>
             </div>
             <SegmentedProgressBar 
@@ -103,6 +103,8 @@
         </div>
       </div>
     </CardComponent>
+    <div class="py-12"></div>
+
     <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-app-gray z-10">
       <ButtonItem 
         text="예산 설정"
@@ -119,8 +121,8 @@ import SegmentedProgressBar from '@/components/progressBar/SegmentedProgressBar.
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import { useBudgetsStore } from '@/stores/budgets'
-import type { MainCategoryBudget } from '@/stores/budgets'
-import type { MainCategory } from '@/stores/budgets'
+import type { MainCategoryBudgetStatus, MainCategory } from '@/stores/budgets'
+import { formatCurrency } from '@/utils/calculations'
 import router from '@/router'
 import CardComponent from '@/components/card/CardComponent.vue'
 
@@ -189,69 +191,78 @@ const getMainCategorySegments = (mainCategory: any) => {
   }]
 }
 
-const getPrevMonthSegments = (mainCategory: MainCategoryBudget) => {
+const getPrevMonthSegments = (mainCategory: MainCategoryBudgetStatus) => {
   const isExpanded = expandedCategories.value.has(mainCategory.mainCategory)
+  const prevMonthData = getPrevMonthSpendingData()
+  const budgetAmount = getPrevMonthBudgetAmount(mainCategory)
   
   if (isExpanded) {
     return mainCategory.subCategories
-      .filter(sub => budgetsStore.dummyPrevMonthSpending[sub.subCategory] > 0)
+      .filter(sub => prevMonthData[sub.subCategory] > 0)
       .map(sub => ({
         label: sub.subCategory,
-        value: Math.min((budgetsStore.dummyPrevMonthSpending[sub.subCategory] / mainCategory.budgetAmount) * 100, 100),
+        value: Math.min((prevMonthData[sub.subCategory] / budgetAmount) * 100, 100),
         color: getSubCategoryColor(sub.subCategory)
       }))
   }
   
   const prevMonthTotal = mainCategory.subCategories.reduce((sum, sub) => 
-    sum + budgetsStore.dummyPrevMonthSpending[sub.subCategory], 0)
+    sum + prevMonthData[sub.subCategory], 0)
   
   return [{
     label: `${getPrevMonth()} 지출`,
-    value: Math.min((prevMonthTotal / mainCategory.budgetAmount) * 100, 100),
+    value: Math.min((prevMonthTotal / budgetAmount) * 100, 100),
     color: '#6b7280'
   }]
 }
 
-const getPrevPrevMonthSegments = (mainCategory: MainCategoryBudget) => {
+const getPrevPrevMonthSegments = (mainCategory: MainCategoryBudgetStatus) => {
   const isExpanded = expandedCategories.value.has(mainCategory.mainCategory)
+  const prevPrevMonthData = getPrevPrevMonthSpendingData()
+  const budgetAmount = getPrevPrevMonthBudgetAmount(mainCategory)
   
   if (isExpanded) {
     return mainCategory.subCategories
-      .filter(sub => budgetsStore.dummyPrevPrevMonthSpending[sub.subCategory] > 0)
+      .filter(sub => prevPrevMonthData[sub.subCategory] > 0)
       .map(sub => ({
         label: sub.subCategory,
-        value: Math.min((budgetsStore.dummyPrevPrevMonthSpending[sub.subCategory] / mainCategory.budgetAmount) * 100, 100),
+        value: Math.min((prevPrevMonthData[sub.subCategory] / budgetAmount) * 100, 100),
         color: getSubCategoryColor(sub.subCategory)
       }))
   }
   
   const prevPrevMonthTotal = mainCategory.subCategories.reduce((sum, sub) => 
-    sum + budgetsStore.dummyPrevPrevMonthSpending[sub.subCategory], 0)
+    sum + prevPrevMonthData[sub.subCategory], 0)
   
   return [{
     label: `${getPrevPrevMonth()} 지출`,
-    value: Math.min((prevPrevMonthTotal / mainCategory.budgetAmount) * 100, 100),
+    value: Math.min((prevPrevMonthTotal / budgetAmount) * 100, 100),
     color: '#9ca3af'
   }]
 }
 
-const getPrevMonthSpent = (mainCategory: MainCategoryBudget): number => {
+// 지출 금액 계산 유틸리티
+const calculateSpentAmount = (mainCategory: MainCategoryBudgetStatus, spendingData: Record<string, number>): number => {
   return mainCategory.subCategories.reduce((sum, sub) => 
-    sum + budgetsStore.dummyPrevMonthSpending[sub.subCategory], 0)
+    sum + (spendingData[sub.subCategory] || 0), 0)
 }
 
-const getPrevPrevMonthSpent = (mainCategory: MainCategoryBudget): number => {
-  return mainCategory.subCategories.reduce((sum, sub) => 
-    sum + budgetsStore.dummyPrevPrevMonthSpending[sub.subCategory], 0)
+const getPrevMonthSpent = (mainCategory: MainCategoryBudgetStatus): number => 
+  calculateSpentAmount(mainCategory, getPrevMonthSpendingData())
+
+const getPrevPrevMonthSpent = (mainCategory: MainCategoryBudgetStatus): number => 
+  calculateSpentAmount(mainCategory, getPrevPrevMonthSpendingData())
+
+// 비율 계산 유틸리티
+const calculateSpendingRatio = (spent: number, budget: number): string => {
+  return budget > 0 ? Math.min((spent / budget * 100), 100).toFixed(1) : '0.0'
 }
 
-const getPrevMonthRatio = (mainCategory: MainCategoryBudget): string => {
-  return Math.min((getPrevMonthSpent(mainCategory) / mainCategory.budgetAmount * 100), 100).toFixed(1)
-}
+const getPrevMonthRatio = (mainCategory: MainCategoryBudgetStatus): string => 
+  calculateSpendingRatio(getPrevMonthSpent(mainCategory), getPrevMonthBudgetAmount(mainCategory))
 
-const getPrevPrevMonthRatio = (mainCategory: MainCategoryBudget): string => {
-  return Math.min((getPrevPrevMonthSpent(mainCategory) / mainCategory.budgetAmount * 100), 100).toFixed(1)
-}
+const getPrevPrevMonthRatio = (mainCategory: MainCategoryBudgetStatus): string => 
+  calculateSpendingRatio(getPrevPrevMonthSpent(mainCategory), getPrevPrevMonthBudgetAmount(mainCategory))
 const getPrevMonth = (): string => {
   const date = new Date()
   date.setMonth(date.getMonth() - 1)
@@ -262,7 +273,6 @@ const getPrevPrevMonth = (): string => {
   date.setMonth(date.getMonth() - 2)
   return `${date.getMonth() + 1}월`
 }
-const formatCurrency = (amount: number): string => new Intl.NumberFormat('ko-KR').format(amount) + '원'
 const handleBudgetSetting = async() => {
   try{
     useBudgetsStore
@@ -271,17 +281,43 @@ const handleBudgetSetting = async() => {
   }
 }
 
-// 테스트 데이터 로드
-const loadTestData = async () => {
-  isLoading.value = true
-  try {
-    await budgetsStore.loadTestData()
-  } catch (error) {
-    console.error('테스트 데이터 로딩 실패:', error)
-  } finally {
-    isLoading.value = false
+// 이전 달 데이터 조회 유틸리티
+const createMonthlyDataUtils = () => {
+  const getMonthString = (monthsBack: number): string => {
+    const date = new Date()
+    date.setMonth(date.getMonth() - monthsBack)
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+  }
+
+  const getPrevMonthString = () => getMonthString(1)
+  const getPrevPrevMonthString = () => getMonthString(2)
+
+  const getPrevMonthSpendingData = () => budgetsStore.getSpendingByMonth(getPrevMonthString())
+  const getPrevPrevMonthSpendingData = () => budgetsStore.getSpendingByMonth(getPrevPrevMonthString())
+  const getPrevMonthBudgetData = () => budgetsStore.getBudgetByMonth(getPrevMonthString())
+  const getPrevPrevMonthBudgetData = () => budgetsStore.getBudgetByMonth(getPrevPrevMonthString())
+
+  return {
+    getPrevMonthSpendingData,
+    getPrevPrevMonthSpendingData,
+    getPrevMonthBudgetData,
+    getPrevPrevMonthBudgetData
   }
 }
+
+const { getPrevMonthSpendingData, getPrevPrevMonthSpendingData, getPrevMonthBudgetData, getPrevPrevMonthBudgetData } = createMonthlyDataUtils()
+
+// 예산 금액 조회 유틸리티
+const getBudgetAmountForCategory = (mainCategory: MainCategoryBudgetStatus, budgetData: MainCategoryBudgetStatus[]): number => {
+  const budget = budgetData.find(b => b.mainCategory === mainCategory.mainCategory)
+  return budget?.budgetAmount || mainCategory.budgetAmount
+}
+
+const getPrevMonthBudgetAmount = (mainCategory: MainCategoryBudgetStatus): number => 
+  getBudgetAmountForCategory(mainCategory, getPrevMonthBudgetData())
+
+const getPrevPrevMonthBudgetAmount = (mainCategory: MainCategoryBudgetStatus): number => 
+  getBudgetAmountForCategory(mainCategory, getPrevPrevMonthBudgetData())
 
 // 예산 데이터 로드 함수
 const loadBudgetData = async () => {

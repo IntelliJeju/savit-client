@@ -1,6 +1,4 @@
-/**
- * 카테고리를 대분류로 매핑하는 함수
- */
+// 서브카테고리 대분류로 매핑하는 함수
 export const mapCategoryToMainCategory = (category: string): '식비' | '교통' | '생활' | '문화' | '기타' => {
   const categoryMapping: { [key: string]: '식비' | '교통' | '생활' | '문화' | '기타' } = {
     // 식비 관련
