@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto min-h-screen px-4">
     <div class="flex-1"></div>
     
-    <h1 class="font-bold text-xl text-center mt-40 mb-10 text-app-dark-gray">
+    <h1 class="font-bold text-xl text-center mt-20 mb-10 text-app-dark-gray">
       어떤 예산을 설정하시겠어요?
     </h1>
     

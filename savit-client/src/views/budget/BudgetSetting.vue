@@ -1,8 +1,7 @@
 <template>
-  <div class="max-w-4xl mx-auto min-h-screen px-4 bg-gray-50">
+  <div class="max-w-4xl mx-auto min-h-screen px-4">
     <div class="py-5"></div>
-    
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
+    <CardComponent>
       <p class="font-bold text-lg mb-4">이번 달 예산 금액</p>
       <div class="relative flex items-center">
         <InputField
@@ -13,9 +12,9 @@
           @input="handleAmountInput"/>
         <span class="absolute right-2 text-3xl font-bold text-app-dark-gray">원</span>
       </div>
-    </div>
-    
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-20">
+    </CardComponent>
+    <div class="m-5"/>
+    <CardComponent>
       <p class="font-bold text-lg mb-6">나의 지출 / 예산 이력</p>
       
       <div class="flex justify-between items-center mb-4">
@@ -24,7 +23,7 @@
           <span :class="lastMonth.spending > lastMonth.budget ? 'text-app-red' : 'text-app-blue'" class="font-bold">
             {{ formatCurrency(lastMonth.spending) }}
           </span>
-          <span class="text-app-dark-gray"> / {{ formatCurrency(lastMonth.budget) }}원</span>
+          <span class="text-app-dark-gray"> / {{ formatCurrency(lastMonth.budget) }}</span>
         </div>
       </div>
       
@@ -34,7 +33,7 @@
           <span :class="twoMonthsAgo.spending > twoMonthsAgo.budget ? 'text-app-red' : 'text-app-blue'" class="font-bold">
             {{ formatCurrency(twoMonthsAgo.spending) }}
           </span>
-          <span class="text-app-dark-gray"> / {{ formatCurrency(twoMonthsAgo.budget) }}원</span>
+          <span class="text-app-dark-gray"> / {{ formatCurrency(twoMonthsAgo.budget) }}</span>
         </div>
       </div>
       
@@ -42,7 +41,7 @@
         <v-icon name="hi-information-circle" class="w-6 mr-2" /> 
         <span>지난 지출/예산 내역을 참고해서 설정해보세요</span>
       </div>
-    </div>
+    </CardComponent>
     
     <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t">
       <div class="max-w-4xl mx-auto">
@@ -60,6 +59,8 @@ import InputField from '@/components/input/InputField.vue'
 import { useBudgetsStore } from '@/stores/budgets'
 import { useRouter } from 'vue-router'
 import ButtonItem from '@/components/button/ButtonItem.vue'
+import CardComponent from '@/components/card/CardComponent.vue'
+import { formatCurrency, formatNumber } from '@/utils/calculations'
 
 const budgetsStore = useBudgetsStore()
 const isLoading = ref(false)
@@ -75,17 +76,10 @@ const getExistingBudget = (): string => {
 
 const budgetAmount = ref(getExistingBudget())
 
-// 숫자 포맷팅
-const formatNumber = (value: string): string => {
-  if (!value) return ''
-  const numericValue = value.replace(/[^\d]/g, '')
-  if (!numericValue) return ''
-  return parseInt(numericValue).toLocaleString('ko-KR')
-}
 
 // 표시용 값 (쉼표 포함)
 const displayAmount = computed({
-  get: () => formatNumber(budgetAmount.value),
+  get: () => formatNumber(parseInt(budgetAmount.value) || 0),
   set: (value: string) => {
     // 숫자만 추출해서 저장
     budgetAmount.value = value.replace(/[^\d]/g, '')
@@ -98,25 +92,45 @@ const handleAmountInput = (value: string) => {
   budgetAmount.value = numericValue
 }
 
-const lastMonthData = budgetsStore.getPreviousMonthsSummary(1)
-const twoMonthsAgoData = budgetsStore.getPreviousMonthsSummary(2)
-
 const lastMonth = ref({
-  name: lastMonthData.monthName,
-  spending: lastMonthData.totalSpent,
-  budget: lastMonthData.totalBudget
+  name: '',
+  spending: 0,
+  budget: 0
 })
 
 const twoMonthsAgo = ref({
-  name: twoMonthsAgoData.monthName,
-  spending: twoMonthsAgoData.totalSpent,
-  budget: twoMonthsAgoData.totalBudget
+  name: '',
+  spending: 0,
+  budget: 0
 })
 
-// 통화 포맷팅 함수
-const formatCurrency = (amount: number): string => {
-  return amount.toLocaleString('ko-KR')
+// 과거 데이터 로드
+const loadPreviousData = async () => {
+  try {
+    const lastMonthData = await budgetsStore.getPreviousMonthsSummary(1)
+    const twoMonthsAgoData = await budgetsStore.getPreviousMonthsSummary(2)
+    
+    lastMonth.value = {
+      name: lastMonthData.monthName,
+      spending: lastMonthData.totalSpent, 
+      budget: lastMonthData.totalBudget
+    }
+    
+    twoMonthsAgo.value = {
+      name: twoMonthsAgoData.monthName,
+      spending: twoMonthsAgoData.totalSpent,
+      budget: twoMonthsAgoData.totalBudget
+    }
+  } catch (error) {
+    console.error('Failed to load previous data:', error)
+  }
 }
+
+// 컴포넌트 마운트 시 데이터 로드
+onMounted(() => {
+  loadPreviousData()
+})
+
 
 // 예산 저장 함수
 const saveBudget = async () => {
@@ -140,9 +154,9 @@ const saveBudget = async () => {
     const result = await budgetsStore.setTotalBudget(currentMonth, amount)
     
     if (result && result.success) {
-      alert(`${formatCurrency(amount)}원으로 예산이 설정되었습니다!\n카테고리별 세부 설정을 진행합니다.`)
+      alert(`${formatCurrency(amount)}으로 예산이 설정되었습니다!\n카테고리별 세부 설정을 진행합니다.`)
       router.push({ 
-        path: '/budget/setting/categories', 
+        path: '/budget/categories/list', 
         query: { totalBudget: amount, month: currentMonth } 
       })
     } else {

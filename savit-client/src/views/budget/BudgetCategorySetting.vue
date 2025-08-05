@@ -1,92 +1,81 @@
 <template>
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen">
     <!-- 상단 고정 예산 박스 -->
-    <div class="fixed top-16 left-0 right-0 z-50 bg-white border-b shadow-sm">
+    <div class="fixed top-16 inset-x-0 z-50 bg-white border-b shadow-sm">
       <div class="max-w-4xl mx-auto px-4 py-4">
-        <div class="flex justify-between items-center">
-          <div class="text-left ml-4">
+        <div class="flex justify-between items-center mx-4">
+          <div>
             <div class="text-sm text-app-dark-gray mb-1">이번달 전체 예산</div>
-            <div class="text-xl font-bold text-app-dark-gray">{{ formatCurrency(totalBudget) }}원</div>
+            <div class="text-xl font-bold text-app-dark-gray">{{ formatCurrency(totalBudget) }}</div>
           </div>
-          <div class="text-right mr-4">
+          <div class="text-right">
             <div class="text-sm text-app-dark-gray mb-1">남은 예산</div>
-            <div class="text-xl font-bold text-app-green">{{ formatCurrency(remainingBudget) }}원</div>
+            <div class="text-xl font-bold text-app-green">{{ formatCurrency(remainingBudget) }}</div>
           </div>
         </div>
       </div>
     </div>
     
     <!-- 메인 컨텐츠 (상단 여백 추가) -->
-    <div class="max-w-4xl mx-auto px-4 pt-24 pb-6">
-
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-      <div v-for="(category, index) in categories" :key="index" class="mb-6 last:mb-0">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-3">
-            <CategoryIcon :category="category.name" :size="24" color="#028174" />
-            <span class="font-medium text-app-dark-gray">{{ category.name }}</span>
+    <div class="max-w-4xl mx-auto my-4 px-4 pt-24 pb-8">
+      <CardComponent class="mb-20">
+        <div v-for="(category, index) in categories" :key="index" class="mb-8 last:mb-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <CategoryIcon :category="category.name" :size="24" color="#028174" />
+              <span class="font-medium text-app-dark-gray">{{ category.name }}</span>
+            </div>
+            <p class="text-lg font-bold text-app-dark-gray">{{ category.percentage.toFixed(1) }}%</p>
           </div>
-          <span class="text-lg font-bold text-app-dark-gray">{{ category.percentage }}%</span>
-        </div>
         
-        <div class="relative">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="5"
-            v-model="category.percentage"
-            @input="handleSliderChange(index, $event)"
-            class="w-full h-2 bg-app-gray rounded-lg appearance-none cursor-pointer slider"
-            :style="{ 
-              background: `linear-gradient(to right, #10b981 0%, #10b981 ${category.percentage}%, #e5e7eb ${category.percentage}%, #e5e7eb 100%)`
-            }"
-          />
-        </div>
-      </div>
-      
-      <div class="mt-6 p-4 bg-app-light-gray rounded-xl">
-        <div class="flex items-center justify-between">
-          <span class="text-app-dark-gray">현재 설정량</span>
-          <div class="flex items-center gap-2">
-            <span :class="percentageClass">{{ totalPercentage }}%</span>
-            <ButtonItem 
-              @click="handleRecommendationClick"
-              :disabled="isLoading"
-              style="width: 70px; height: 32px;">
-              {{ isLoading ? '추천 중...' : '추천' }}
-            </ButtonItem>
+          <div class="relative">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              v-model="category.percentage"
+              @input="handleSliderChange(index, $event)"
+              class="w-full h-2 bg-app-gray rounded-lg appearance-none cursor-pointer range-slider"
+              :style="{ 
+                background: `linear-gradient(to right, #10b981 0%, #10b981 ${category.percentage}%, #e5e7eb ${category.percentage}%, #e5e7eb 100%)`
+              }"
+            />
           </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-20">
-      <div v-for="(category, index) in categories" :key="index" class="flex items-center justify-between py-4 border-b border-gray-200 last:border-b-0">
-        <div class="flex items-center gap-3">
-          <CategoryIcon :category="category.name" :size="24" color="#028174" />
-          <div>
-            <div class="font-medium text-app-dark-gray">{{ category.name }}</div>
-            <div class="text-sm text-gray-500">지난 달 {{ formatCurrency(category.lastMonthSpent) }}원</div>
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-500">지난 달 {{ formatCurrency(category.lastMonthSpent) }}</div>
+            <div class="flex items-center">
+              <input
+                type="text"
+                :value="formatCurrency(calculateCategoryAmount(category.percentage))"
+                @input="handleAmountInputChange(index, $event)"
+                @focus="handleAmountInputFocus($event)"
+                @blur="handleAmountInputBlur($event)"
+                class="text-lg font-bold text-app-dark-gray text-right bg-transparent w-28 cursor-pointer hover:bg-gray-100 rounded px-2 focus:outline-none"
+                placeholder="0"
+              />
+            </div>
           </div>
         </div>
-        <div class="text-right">
-          <input
-            type="text"
-            :value="formatCurrency(calculateCategoryAmount(category.percentage))"
-            @input="handleAmountInputChange(index, $event)"
-            @focus="handleAmountInputFocus($event)"
-            @blur="handleAmountInputBlur($event)"
-            class="text-lg font-bold text-app-dark-gray text-right bg-transparent border-none outline-none w-24 cursor-pointer hover:bg-gray-100 rounded px-2 py-1"
-            placeholder="0"
-          />
-          <span class="text-lg font-bold text-app-dark-gray">원</span>
+        <div class="mt-6 p-4 bg-app-light-gray rounded-xl">
+          <div class="flex items-center justify-between">
+            <span class="text-app-dark-gray">현재 설정량</span>
+            <div class="flex items-center gap-2">
+              <span :class="percentageClass">{{ totalPercentage.toFixed(1) }}%</span>
+              <ButtonItem 
+                @click="handleRecommendationClick"
+                :disabled="isLoading"
+                class="w-[70px] h-8">
+                {{ isLoading ? '추천 중...' : '추천' }}
+              </ButtonItem>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+    </CardComponent>
 
     <!-- 설정 버튼 -->
-    <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t">
+    <div class="fixed bottom-16 inset-x-0 p-4 bg-white border-t">
       <div class="max-w-4xl mx-auto">
         <ButtonItem
           @click="handleSaveBudgetClick"
@@ -100,26 +89,72 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useBudgetsStore } from '@/stores/budgets'
+import { useBudgetsStore, DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/stores/budgets'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
-import { DEFAULT_CATEGORIES, RECOMMENDATION_PATTERNS, RECOMMENDATION_VARIATION_RANGE, RECOMMENDATION_API_DELAY, DEFAULT_TOTAL_BUDGET } from '@/constants/budget'
-import type { CategoryData } from '@/types/budget'
-import { formatCurrency, calculateAmount, calculatePercentageFromAmount, extractNumericValue, extractNumericString, normalizeRatiosToHundredPercent, roundAndAdjustRatios, getCurrentMonth } from '@/utils/budgetCalculations'
+import type { CategoryData } from '@/stores/budgets'
+import { getCurrentMonth } from '@/utils/budgetUtils'
+import { formatCurrency } from '@/utils/calculations'
+import { 
+  calculateAmount, 
+  calculatePercentageFromAmount, 
+  extractNumericValue, 
+  adjustCategoriesProportionally,
+  adjustCategoriesForSlider,
+  redistributeExcessPercentage,
+  createInputHandlers
+} from '@/utils/calculations'
 import ButtonItem from '@/components/button/ButtonItem.vue'
+import CardComponent from '@/components/card/CardComponent.vue'
+
+const RECOMMENDATION_API_DELAY = 1000
+
+const createDefaultCategoryData = (defaultAmounts: Record<string, number>, categoryOrder: string[]) => {
+  return categoryOrder.map(category => ({
+    name: category,
+    percentage: 0,
+    lastMonthSpent: defaultAmounts[category] || 0
+  }))
+}
+
+const calculateDefaultTotalBudget = (defaultAmounts: Record<string, number>): number => {
+  return Object.values(defaultAmounts).reduce((sum, amount) => sum + amount, 0)
+}
+
 
 const route = useRoute()
 const router = useRouter()
 const budgetsStore = useBudgetsStore()
 const isLoading = ref(false)
 
+// 입력 핸들러 생성
+const { handleFocus: handleAmountInputFocus, handleBlur: handleAmountInputBlur } = createInputHandlers(formatCurrency)
+
 const totalBudget = ref((() => {
   const queryBudget = parseInt(route.query.totalBudget as string)
   return (!isNaN(queryBudget) && queryBudget > 0) 
     ? queryBudget 
-    : budgetsStore.currentBudget?.totalBudget || DEFAULT_TOTAL_BUDGET
+    : budgetsStore.currentBudget?.totalBudget || calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
 })())
 
-const categories = ref<CategoryData[]>([...DEFAULT_CATEGORIES])
+// 저장된 카테고리 데이터 불러오기
+const loadSavedCategories = () => {
+  const saved = localStorage.getItem('budget-category-settings')
+  if (saved) {
+    try {
+      return JSON.parse(saved)
+    } catch (error) {
+      console.error('저장된 카테고리 데이터 파싱 실패:', error)
+    }
+  }
+  return createDefaultCategoryData(DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER)
+}
+
+// 카테고리 데이터 저장
+const saveCategoriesData = (categoriesData: CategoryData[]) => {
+  localStorage.setItem('budget-category-settings', JSON.stringify(categoriesData))
+}
+
+const categories = ref<CategoryData[]>(loadSavedCategories() as CategoryData[])
 
 const totalPercentage = computed(() => 
   Math.round(categories.value.reduce((sum, cat) => sum + cat.percentage, 0) * 10) / 10
@@ -153,51 +188,33 @@ const handleAmountInputChange = (categoryIndex: number, event: Event) => {
   
   if (newPercentage + otherTotal > 100) {
     const excess = newPercentage + otherTotal - 100
-    adjustOtherCategories(categoryIndex, excess)
+    adjustCategoriesProportionally({ categories: categories.value, excludeIndex: categoryIndex, excess })
   }
-}
-
-// 다른 카테고리 비율 조정
-const adjustOtherCategories = (excludeIndex: number, excess: number) => {
-  const others = categories.value.filter((_, idx) => idx !== excludeIndex)
-  const totalOther = others.reduce((sum, cat) => sum + cat.percentage, 0)
   
-  if (totalOther === 0) return
-  
-  categories.value.forEach((cat, idx) => {
-    if (idx !== excludeIndex) {
-      const ratio = cat.percentage / totalOther
-      cat.percentage = Math.max(0, cat.percentage - excess * ratio)
-    }
-  })
+  // 변경사항 저장
+  saveCategoriesData(categories.value)
 }
 
-const handleAmountInputFocus = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  target.value = extractNumericString(target.value)
-  target.select()
-}
 
-const handleAmountInputBlur = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const amount = parseInt(extractNumericString(target.value)) || 0
-  target.value = formatCurrency(amount)
-}
 
 const handleRecommendationClick = async () => {
   isLoading.value = true
   try {
     await new Promise(resolve => setTimeout(resolve, RECOMMENDATION_API_DELAY))
 
-    // 현재는 랜덤 비율로 추천
-    const pattern = [...RECOMMENDATION_PATTERNS[Math.floor(Math.random() * RECOMMENDATION_PATTERNS.length)]]
-    const withVariation = pattern.map(ratio => 
-      Math.max(0, ratio + (Math.random() - 0.5) * RECOMMENDATION_VARIATION_RANGE)
-    )
-    const ratios = roundAndAdjustRatios(normalizeRatiosToHundredPercent(withVariation))
+    // DEFAULT_BUDGET_AMOUNTS 기반으로 비율 계산
+    const totalDefaultBudget = calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
     
-    categories.value.forEach((cat, idx) => cat.percentage = ratios[idx])
-    alert('사회초년생 평균 소비량에 기반한 추천 비율로 설정되었습니다!')
+    // 각 카테고리별 비율 계산
+    const defaultRatios = categories.value.map(cat => 
+      (DEFAULT_BUDGET_AMOUNTS[cat.name] / totalDefaultBudget) * 100
+    )
+    
+    categories.value.forEach((cat, idx) => cat.percentage = Math.round(defaultRatios[idx] * 10) / 10)
+    
+    // 추천 값 저장
+    saveCategoriesData(categories.value)
+    alert('기본 추천 비율로 설정되었습니다!')
   } catch (error) {
     console.error('추천 실패:', error)
     alert('추천 비율을 가져오는 중 오류가 발생했습니다.')
@@ -214,62 +231,19 @@ const handleSliderChange = (changedIndex: number, event: Event) => {
   categories.value[changedIndex].percentage = newValue
   
   if (difference !== 0) {
-    adjustSliderOthers(changedIndex, difference)
+    adjustCategoriesForSlider(categories.value, changedIndex, difference)
   }
   
   // 100% 초과시 재분배
   const total = categories.value.reduce((sum, cat) => sum + cat.percentage, 0)
   if (total > 100) {
-    redistributeSliderExcess(changedIndex, total - 100)
+    redistributeExcessPercentage(categories.value, changedIndex, total - 100)
   }
+  
+  // 변경사항 저장
+  saveCategoriesData(categories.value)
 }
 
-// 슬라이더 조정시 다른 카테고리 처리
-const adjustSliderOthers = (excludeIndex: number, difference: number) => {
-  const others = categories.value.filter((_, idx) => idx !== excludeIndex)
-  const totalOther = others.reduce((sum, cat) => sum + cat.percentage, 0)
-  
-  if (totalOther === 0) return
-  
-  const operation = difference > 0 ? 'decrease' : 'increase'
-  const amount = Math.abs(difference)
-  
-  categories.value.forEach((cat, idx) => {
-    if (idx === excludeIndex) return
-    
-    const ratio = cat.percentage / totalOther
-    const adjustment = Math.round(amount * ratio / 5) * 5
-    
-    if (operation === 'decrease') {
-      cat.percentage = Math.max(0, cat.percentage - adjustment)
-    } else {
-      cat.percentage = Math.min(100, cat.percentage + adjustment)
-    }
-  })
-}
-
-// 초과 퍼센테지 재분배
-const redistributeSliderExcess = (excludeIndex: number, excess: number) => {
-  let remaining = excess
-  
-  for (let i = 0; i < categories.value.length && remaining > 0; i++) {
-    if (i === excludeIndex) continue
-    
-    const cat = categories.value[i]
-    const decrease = Math.min(cat.percentage, Math.ceil(remaining / 5) * 5)
-    
-    if (decrease > 0) {
-      cat.percentage = Math.max(0, cat.percentage - decrease)
-      remaining -= decrease
-    }
-  }
-  
-  if (remaining > 0) {
-    categories.value[excludeIndex].percentage = Math.max(0, 
-      categories.value[excludeIndex].percentage - remaining
-    )
-  }
-}
 
 const handleSaveBudgetClick = async () => {
   if (totalPercentage.value === 0) {
@@ -317,36 +291,36 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.slider::-webkit-slider-thumb {
+.range-slider::-webkit-slider-thumb {
   appearance: none;
-  height: 20px;
-  width: 32px;
-  border-radius: 4px;
+  height: 1.25rem;
+  width: 2rem;
+  border-radius: 0.25rem;
   background: white;
+  cursor: pointer;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   background-image: 
     linear-gradient(to bottom, transparent 25%, #9ca3af 25%, #9ca3af 75%, transparent 75%),
     linear-gradient(to bottom, transparent 25%, #9ca3af 25%, #9ca3af 75%, transparent 75%);
   background-size: 2px 100%, 2px 100%;
   background-position: 40% center, 60% center;
   background-repeat: no-repeat;
-  cursor: pointer;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.slider::-moz-range-thumb {
-  height: 20px;
-  width: 32px;
-  border-radius: 4px;
+.range-slider::-moz-range-thumb {
+  height: 1.25rem;
+  width: 2rem;
+  border-radius: 0.25rem;
   background: white;
+  cursor: pointer;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   background-image: 
     linear-gradient(to bottom, transparent 25%, #9ca3af 25%, #9ca3af 75%, transparent 75%),
     linear-gradient(to bottom, transparent 25%, #9ca3af 25%, #9ca3af 75%, transparent 75%);
   background-size: 2px 100%, 2px 100%;
   background-position: 40% center, 60% center;
   background-repeat: no-repeat;
-  cursor: pointer;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

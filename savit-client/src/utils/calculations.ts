@@ -29,6 +29,11 @@ export const formatCurrency = (amount: number): string => {
   return `${amount.toLocaleString()}원`
 }
 
+// 숫자 포맷팅 (천단위 구분자)
+export const formatNumber = (amount: number): string => {
+  return amount.toLocaleString()
+}
+
 // 통화 포맷팅 (약식)
 export const formatCurrencyShort = (amount: number): string => {
   if (amount >= 10000) {
@@ -161,4 +166,145 @@ export const sortBy = <T>(
       return bStr.localeCompare(aStr)
     }
   })
+}
+
+// ===== 예산 계산 관련 함수들 =====
+
+// 카테고리별 금액 계산
+export const calculateAmount = (percentage: number, totalBudget: number): number => {
+  return Math.round((totalBudget * percentage) / 100)
+}
+
+// 금액으로부터 퍼센테지 계산
+export const calculatePercentageFromAmount = (amount: number, budget: number): number => {
+  const exactPercentage = (amount / budget) * 100
+  return Math.min(100, Math.max(0, exactPercentage))
+}
+
+// 입력값에서 숫자만 추출
+export const extractNumericValue = (event: Event): number => {
+  const target = event.target as HTMLInputElement
+  const inputValue = target.value.replace(/[^\d]/g, '')
+  return parseInt(inputValue) || 0
+}
+
+// 문자열에서 숫자만 추출
+export const extractNumericString = (value: string): string => {
+  return value.replace(/[^\d]/g, '')
+}
+
+// 비율을 100%로 정규화
+export const normalizeRatiosToHundredPercent = (ratios: number[]): number[] => {
+  const total = ratios.reduce((sum, ratio) => sum + ratio, 0)
+  return ratios.map(ratio => (ratio / total) * 100)
+}
+
+// 비율 반올림 및 총합 조정
+export const roundAndAdjustRatios = (ratios: number[]): number[] => {
+  let roundedRatios = ratios.map(ratio => Math.round(ratio * 10) / 10)
+  
+  // 반올림으로 인한 오차 수정 (가장 큰 비율에서 조정)
+  const roundedTotal = roundedRatios.reduce((sum, ratio) => sum + ratio, 0)
+  if (roundedTotal !== 100) {
+    const difference = 100 - roundedTotal
+    const maxIndex = roundedRatios.indexOf(Math.max(...roundedRatios))
+    roundedRatios[maxIndex] = Math.round((roundedRatios[maxIndex] + difference) * 10) / 10
+  }
+  
+  return roundedRatios
+}
+
+// 카테고리 조정 유틸리티
+export interface CategoryAdjustmentOptions {
+  categories: { percentage: number }[]
+  excludeIndex: number
+  excess: number
+}
+
+// 다른 카테고리 비율 조정 (비례 방식)
+export const adjustCategoriesProportionally = (options: CategoryAdjustmentOptions): void => {
+  const { categories, excludeIndex, excess } = options
+  const others = categories.filter((_, idx) => idx !== excludeIndex)
+  const totalOther = others.reduce((sum, cat) => sum + cat.percentage, 0)
+  
+  if (totalOther === 0) return
+  
+  categories.forEach((cat, idx) => {
+    if (idx !== excludeIndex) {
+      const ratio = cat.percentage / totalOther
+      cat.percentage = Math.max(0, cat.percentage - excess * ratio)
+    }
+  })
+}
+
+// 슬라이더 조정시 다른 카테고리 처리
+export const adjustCategoriesForSlider = (
+  categories: { percentage: number }[], 
+  excludeIndex: number, 
+  difference: number
+): void => {
+  const others = categories.filter((_, idx) => idx !== excludeIndex)
+  const totalOther = others.reduce((sum, cat) => sum + cat.percentage, 0)
+  
+  if (totalOther === 0) return
+  
+  const operation = difference > 0 ? 'decrease' : 'increase'
+  const amount = Math.abs(difference)
+  
+  categories.forEach((cat, idx) => {
+    if (idx === excludeIndex) return
+    
+    const ratio = cat.percentage / totalOther
+    const adjustment = Math.round(amount * ratio / 5) * 5
+    
+    if (operation === 'decrease') {
+      cat.percentage = Math.max(0, cat.percentage - adjustment)
+    } else {
+      cat.percentage = Math.min(100, cat.percentage + adjustment)
+    }
+  })
+}
+
+// 초과 비율 재분배
+export const redistributeExcessPercentage = (
+  categories: { percentage: number }[], 
+  excludeIndex: number, 
+  excess: number
+): void => {
+  let remaining = excess
+  
+  for (let i = 0; i < categories.length && remaining > 0; i++) {
+    if (i === excludeIndex) continue
+    
+    const cat = categories[i]
+    const decrease = Math.min(cat.percentage, Math.ceil(remaining / 5) * 5)
+    
+    if (decrease > 0) {
+      cat.percentage = Math.max(0, cat.percentage - decrease)
+      remaining -= decrease
+    }
+  }
+  
+  if (remaining > 0) {
+    categories[excludeIndex].percentage = Math.max(0, 
+      categories[excludeIndex].percentage - remaining
+    )
+  }
+}
+
+// 입력 필드 핸들링 유틸리티
+export const createInputHandlers = (formatFn: (amount: number) => string) => {
+  const handleFocus = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    target.value = extractNumericString(target.value)
+    target.select()
+  }
+
+  const handleBlur = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const amount = parseInt(extractNumericString(target.value)) || 0
+    target.value = formatFn(amount)
+  }
+
+  return { handleFocus, handleBlur }
 }
