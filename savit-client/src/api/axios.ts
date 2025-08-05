@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -43,6 +45,10 @@ apiClient.interceptors.response.use(
           break
         case 401:
           console.error('인증이 필요합니다. 로그인 후 다시 시도해주세요.')
+          // 401 응답 시 로그인 상태 초기화 및 로그인 페이지로 리다이렉트
+          const authStore = useAuthStore()
+          authStore.logout()
+          // router.push('/auth/login')
           break
         case 403:
           console.error('접근 권한이 없습니다.')

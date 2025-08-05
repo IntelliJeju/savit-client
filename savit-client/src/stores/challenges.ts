@@ -47,8 +47,8 @@ export const useChallengeStore = defineStore('challenge', () => {
 
   const getAvailChallengeList = async () => {
     try {
-      //   const res = await request({ method: 'GET', url: '/challenge' })
-      const res = availDummy
+      const res = await request({ method: 'GET', url: '/challenge/available' })
+      console.log(res)
       availChallengeList.value = res
     } catch (err) {
       console.error('getAvailChallengeList error: ', err)
@@ -59,8 +59,8 @@ export const useChallengeStore = defineStore('challenge', () => {
   const getAvailChallengeDetail = async (id: string) => {
     if (!availChallengeDetailMap.value.has(id)) {
       try {
-        // const res = await request({ method: 'GET', url: `/challenges/${id}` })
-        const res = detailDummy
+        const res = await request({ method: 'GET', url: `/challenge/available/${id}` })
+        console.log(res)
         availChallengeDetailMap.value.set(id, res)
       } catch (err) {
         console.error('getAvailChallengeDetail error: ', err)
