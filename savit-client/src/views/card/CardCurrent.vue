@@ -61,7 +61,6 @@
         </div>
 
         <CardComponent>
-          {{ recentTransactions }}
           <div
             v-for="(transaction, index) in recentTransactions"
             :key="index"
