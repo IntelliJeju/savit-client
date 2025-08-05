@@ -73,11 +73,11 @@
                 <div
                   class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray"
                 >
-                  <CategoryIcon
+                  <!-- <CategoryIcon
                     :category="mapCategoryToMainCategory(transaction.category)"
                     :color="'#028174'"
                     :size="20"
-                  />
+                  /> -->
                 </div>
                 <div>
                   <div class="font-medium text-slate-800">{{ transaction.resMemberStoreName }}</div>
