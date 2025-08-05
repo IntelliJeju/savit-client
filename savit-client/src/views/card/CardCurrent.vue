@@ -17,18 +17,15 @@
       />
 
       <!-- 저번 달 대비 변화량 -->
-      <div
-        v-if="cardsList.length > 0 && !isRegistrationCard"
-        class="bg-white rounded-2xl p-5 border border-slate-200 mb-6"
-      >
+      <CardComponent v-if="cardsList.length > 0 && !isRegistrationCard" class="p-5 mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div
               class="w-10 h-10 rounded-xl flex items-center justify-center"
               :class="usageChange >= 0 ? 'bg-app-light-red' : 'bg-app-light-blue'"
             >
-              <v-icon v-if="usageChange >= 0" name="hi-arrow-narrow-up" class="w-6 text-app-red" /> 
-              <v-icon v-else name="hi-arrow-narrow-down" class="w-6 text-app-blue"/>
+              <v-icon v-if="usageChange >= 0" name="hi-arrow-narrow-up" class="w-6 text-app-red" />
+              <v-icon v-else name="hi-arrow-narrow-down" class="w-6 text-app-blue" />
             </div>
             <div>
               <div class="text-sm text-slate-600 mb-1">저번 달 대비</div>
@@ -64,6 +61,7 @@
         </div>
 
         <CardComponent>
+          {{ recentTransactions }}
           <div
             v-for="(transaction, index) in recentTransactions"
             :key="index"
@@ -72,8 +70,10 @@
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray">
-                  <CategoryIcon 
+                <div
+                  class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray"
+                >
+                  <CategoryIcon
                     :category="mapCategoryToMainCategory(transaction.category)"
                     :color="'#028174'"
                     :size="20"
@@ -106,6 +106,9 @@
 import { ref, computed } from 'vue'
 import { useCardsStore } from '@/stores/cards'
 import CardSlider from '@/components/card/CardSlider.vue'
+import CardComponent from '@/components/card/CardComponent.vue'
+import CategoryIcon from '@/components/icon/CategoryIcon.vue'
+import { mapCategoryToMainCategory } from '@/utils/category'
 import { storeToRefs } from 'pinia'
 import now from '@/utils/date.ts'
 
