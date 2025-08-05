@@ -171,7 +171,6 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
 
-
   //challenge
   {
     path: '/challenge',
