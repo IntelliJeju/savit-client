@@ -4,7 +4,7 @@
       <!-- 카드 등록 폼 -->
       <form @submit.prevent="handleRegisterCard" class="space-y-5">
         <!-- 카드 등록 정보 섹션 -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <CardComponent>
           <div class="space-y-4">
             <div>
               <label for="organization" class="block text-sm font-bold text-slate-700 mb-2">카드사</label>
@@ -77,23 +77,23 @@
               />
             </div>
           </div>
-        </div>
+        </CardComponent>
 
         <!-- 등록 버튼 -->
-        <div class>
+        <div class="pb-4">
           <ButtonItem text="카드 등록하기"/>
         </div>
       </form>
 
       <!-- 안내 메시지 -->
-      <div class="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
+      <CardComponent>  
         <div class="flex items-start gap-3">
           <div>
             <p class="text-sm text-slate-700 font-medium mb-1">안전한 정보 보호</p>
             <p class="text-xs text-slate-600">입력하신 모든 정보는 암호화되어 안전하게 보관됩니다.</p>
           </div>
         </div>
-      </div>
+      </CardComponent>
     </div>
   </div>
 </template>
@@ -104,6 +104,7 @@ import { useCardsStore } from '@/stores/cards'
 import { useRouter } from 'vue-router'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import InputField from '@/components/input/InputField.vue'
+import CardComponent from '@/components/card/CardComponent.vue'
 
 const cardsStore = useCardsStore()
 const router = useRouter()
