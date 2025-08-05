@@ -69,42 +69,42 @@ export const useCardsStore = defineStore('cards', () => {
     }
   }
 
-  async function updateCardNickname(cardId: number, nickname: string) {
-    try {
-      const response = await request({
-        method: 'PATCH',
-        url: `/cards/${cardId}/nickname`,
-        data: { nickname },
-      })
+  // async function updateCardNickname(cardId: number, nickname: string) {
+  //   try {
+  //     const response = await request({
+  //       method: 'PATCH',
+  //       url: `/cards/${cardId}/nickname`,
+  //       data: { nickname },
+  //     })
 
-      // 카드 목록에서 별칭 업데이트
-      const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
-      if (cardIndex !== -1) {
-        cards.value[cardIndex].cardNickname = nickname
-      }
+  //     // 카드 목록에서 별칭 업데이트
+  //     const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
+  //     if (cardIndex !== -1) {
+  //       cards.value[cardIndex].cardNickname = nickname
+  //     }
 
-      // localStorage 정리 (서버와 동기화됨)
-      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-      delete savedNicknames[cardId]
-      localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
+  //     // localStorage 정리 (서버와 동기화됨)
+  //     const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+  //     delete savedNicknames[cardId]
+  //     localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
 
-      return response.data
-    } catch (error) {
-      console.error(`카드 ${cardId} 별칭 수정 실패:`, error)
+  //     return response.data
+  //   } catch (error) {
+  //     console.error(`카드 ${cardId} 별칭 수정 실패:`, error)
 
-      // 실패 시 로컬에서 우선 적용 후 localStorage에 저장
-      const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
-      if (cardIndex !== -1) {
-        cards.value[cardIndex].cardNickname = nickname
-      }
+  //     // 실패 시 로컬에서 우선 적용 후 localStorage에 저장
+  //     const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
+  //     if (cardIndex !== -1) {
+  //       cards.value[cardIndex].cardNickname = nickname
+  //     }
 
-      const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-      savedNicknames[cardId] = nickname
-      localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
+  //     const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
+  //     savedNicknames[cardId] = nickname
+  //     localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
 
-      return null
-    }
-  }
+  //     return null
+  //   }
+  // }
 
   // ===== 트랜잭션 관리 함수들 =====
   async function fetchTransactions(cardId: number, method: 'GET' | 'POST' = 'GET') {
@@ -197,7 +197,7 @@ export const useCardsStore = defineStore('cards', () => {
     // 카드 관리
     fetchCards,
     registerCard,
-    updateCardNickname,
+    // updateCardNickname,
 
     // 데이터 관리
     fetchTransactions,
