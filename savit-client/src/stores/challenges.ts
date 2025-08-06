@@ -14,8 +14,7 @@ export const useChallengeStore = defineStore('challenge', () => {
   const availChallengeList = ref<availChallengeList[]>([])
   const availChallengeDetailMap = ref(new Map<number, Challenge>())
   const participatingChallengeList = ref<ParticipatingChallenge[]>([])
-  const participatingChallengeDetailList = ref<ParticipatingChallengeDetail[]>([])
-
+  const participatingChallengeDetailMap = ref(new Map<number, ParticipatingChallengeDetail>())
 
   const fetchAvailChallengeList = async () => {
     try {
@@ -54,20 +53,11 @@ export const useChallengeStore = defineStore('challenge', () => {
 
   const fetchParticipateChallengeDetail = async (id: number) => {
     try {
-      const existingIndex = participatingChallengeDetailList.value.findIndex(
-        item => item.challengeId === id
-      )
-      
       const res = await request({ method: 'GET', url: `/challenge/participating/${id}` })
       console.log(res)
-      
+
       const challengeDetail = { challengeId: id, ...res }
-      
-      if (existingIndex >= 0) {
-        participatingChallengeDetailList.value[existingIndex] = challengeDetail
-      } else {
-        participatingChallengeDetailList.value.push(challengeDetail)
-      }
+      participatingChallengeDetailMap.value.set(id, challengeDetail)
     } catch (err) {
       console.error('fetchParticipateChallengeDetail error: ', err)
       throw err
@@ -94,10 +84,12 @@ export const useChallengeStore = defineStore('challenge', () => {
   const getParticipatingChallengeList = computed(() => participatingChallengeList.value)
 
   const getParticipatingChallengeDetailById = computed(() => (id: number) => {
-    return participatingChallengeDetailList.value.find(item => item.challengeId === id)
+    return participatingChallengeDetailMap.value.get(id)
   })
 
-  const getParticipatingChallengeDetailList = computed(() => participatingChallengeDetailList.value)
+  const getParticipatingChallengeDetailList = computed(() =>
+    Array.from(participatingChallengeDetailMap.value.values()),
+  )
 
   return {
     //fetch
@@ -114,7 +106,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     getParticipatingChallengeDetailList,
 
     //ref
-    participatingChallengeDetailList,
+    participatingChallengeDetailMap,
     availChallengeList,
     loading,
   }
