@@ -7,7 +7,8 @@
           <span class="font-bold">나의 챌린지</span>
         </div>
         <div
-          v-for="challenge in participatingChallengeDetailList"
+          v-for="challenge in participatingChallenges"
+          :key="challenge.challengeId"
           class="my-challenge-item mt-4"
           @click="routeCurrent(challenge.challengeId)"
         >
@@ -87,12 +88,11 @@ const {
   fetchParticipateChallengeDetail,
   // availChallengeDetailMap,
 } = challengeStore
-const {
-  availChallengeList,
-  loading,
-  getParticipatingChallengeList,
-  participatingChallengeDetailList,
-} = storeToRefs(challengeStore)
+const { availChallengeList, loading, getParticipatingChallengeList } = storeToRefs(challengeStore)
+
+const participatingChallenges = computed(() => {
+  return challengeStore.getParticipatingChallengeDetailList
+})
 
 onMounted(async () => {
   await fetchAvailChallengeList()
