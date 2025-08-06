@@ -5,17 +5,47 @@ export interface Challenge {
   startDate: string
   endDate: string
   entryFee: number
-  targetCount: number
-  targetAmount: number
-  type: string
+  targetCount: number | null
+  targetAmount: number | null
+  type: 'COUNT' | 'AMOUNT'
   joined_count: number
 }
 
 // 기존 인터페이스도 유지
 export interface availChallengeList {
-  challengeId: string
+  challengeId: number
   title: string
   startDate: string
   endDate: string
   categoryName: string
+}
+
+export interface ParticipatingChallenge {
+  categoryName: null
+  challengeId: number
+  endDate: string
+  startDate: string
+  title: string
+}
+
+export interface ParticipatingChallengeDetail {
+  challengeId: number
+  endDate: string
+  entryFee: number
+  expectedPrize: number
+  joinedParticipants: number
+  myFee: number
+  participants: participants[]
+  participatingParticipants: number
+  startDate: string
+  targetAmount: number
+  targetCount: number | null
+  title: string
+}
+
+export interface Participants {
+  nickName: string
+  challengeAmount: number
+  challengeCount: number
+  status: 'PARTICIPATING' | 'SUCCESS' | 'FAIL'
 }

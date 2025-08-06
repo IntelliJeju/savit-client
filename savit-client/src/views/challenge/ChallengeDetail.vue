@@ -3,7 +3,9 @@
     <div class="detail-contents overflow-auto flex flex-col gap-4 py-4">
       <div class="detail-info">
         <CardComponent>
-          <div class="detail-info-category"><LabelItem>배달</LabelItem></div>
+          <div class="detail-info-category">
+            <LabelItem>{{ challenge.categoryName }}</LabelItem>
+          </div>
           <div class="detail-info-title mt-4 text-[1.5rem] font-bold">{{ challenge.title }}</div>
           <div class="detail-info-due text-xs text-slate-500 font-medium">
             {{ challenge.startDate }} ~ {{ challenge.endDate }}
@@ -13,7 +15,9 @@
               <div>인원수</div>
               <div class="pt-2">
                 <span class="text-slate-500">100 / </span
-                ><span class="text-app-green text-xl font-semibold">{{ challenge.joined_count }}명</span>
+                ><span class="text-app-green text-xl font-semibold"
+                  >{{ challenge.joined_count }}명</span
+                >
               </div>
             </div>
             <div>
@@ -22,7 +26,9 @@
             </div>
             <div>
               <div>총 예치금</div>
-              <div class="pt-2 text-app-green text-xl font-semibold">{{ (50000).toLocaleString() }}원</div>
+              <div class="pt-2 text-app-green text-xl font-semibold">
+                {{ (50000).toLocaleString() }}원
+              </div>
             </div>
             <div>
               <div>나의 예치금</div>
@@ -69,14 +75,9 @@ const route = useRoute()
 const id = route.params.id as string
 const challengeStore = useChallengeStore()
 
-const { getAvailChallengeDetail, getChallengeById } = challengeStore
+const { getChallengeById } = challengeStore
 const { loading } = storeToRefs(challengeStore)
 const challenge = ref<Challenge>()
-
-onMounted(async () => {
-  await getAvailChallengeDetail(id)
-  challenge.value = getChallengeById(id)
-})
 </script>
 
 <style scoped></style>
