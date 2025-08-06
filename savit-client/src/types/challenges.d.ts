@@ -12,6 +12,7 @@ export interface Challenge {
   type: 'COUNT' | 'AMOUNT'
   totalParticipants: number
   joinedParticipants: number
+  eligibility: number
 }
 
 // 기존 인터페이스도 유지

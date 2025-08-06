@@ -50,7 +50,7 @@
       </div>
     </div>
     <div class="detail-button py-4">
-      <ButtonItem text="챌린지 참여하기" />
+      <ButtonItem text="챌린지 참여하기" :disabled="challenge.eligibility === 0" />
     </div>
   </div>
 </template>
