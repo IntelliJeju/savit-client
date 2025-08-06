@@ -14,20 +14,22 @@
             <div>
               <div>인원수</div>
               <div class="pt-2">
-                <span class="text-slate-500">100 / </span
+                <span class="text-slate-500">{{ challenge.totalParticipants }} / </span
                 ><span class="text-app-green text-xl font-semibold"
-                  >{{ challenge.joined_count }}명</span
+                  >{{ challenge.joinedParticipants }}명</span
                 >
               </div>
             </div>
             <div>
               <div>기간</div>
-              <div class="pt-2 text-app-green text-xl font-semibold">7일</div>
+              <div class="pt-2 text-app-green text-xl font-semibold">
+                {{ challenge.durationWeeks * 7 }}일
+              </div>
             </div>
             <div>
               <div>총 예치금</div>
               <div class="pt-2 text-app-green text-xl font-semibold">
-                {{ (50000).toLocaleString() }}원
+                {{ challenge.entryFee.toLocaleString() }}원
               </div>
             </div>
             <div>
@@ -39,18 +41,10 @@
       </div>
       <div class="detail-rule">
         <card-component>
-          <div class="detail-rule-title text-[1.5rem] font-bold">챌린지 규칙</div>
+          <div class="detail-rule-title text-[1.5rem] font-bold">챌린지 설명</div>
           <div class="detail-rule-info flex items-center gap-2 mt-6 font-normal">
             <div class="w-2 h-2 bg-app-green rounded-full" />
-            7일동안 배달음식을 10회 이하로 주문해야 합니다
-          </div>
-          <div class="detail-rule-info flex items-center gap-2 mt-6 font-normal">
-            <div class="w-2 h-2 bg-app-green rounded-full" />
-            배달 앱 주문 내역으로 자동 인증됩니다
-          </div>
-          <div class="detail-rule-info flex items-center gap-2 mt-6 font-normal">
-            <div class="w-2 h-2 bg-app-green rounded-full" />
-            11회 이상 주문시 실패로 처리됩니다
+            {{ challenge.description }}
           </div>
         </card-component>
       </div>
@@ -66,18 +60,22 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import LabelItem from '@/components/label/LabelItem.vue'
 import { useChallengeStore } from '@/stores/challenges.ts'
-import type { Challenge } from '@/types/challenges.js'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const id = route.params.id as string
+const id = Number(route.params.id)
 const challengeStore = useChallengeStore()
 
-const { getChallengeById } = challengeStore
-const { loading } = storeToRefs(challengeStore)
-const challenge = ref<Challenge>()
+const { fetchAvailChallengeDetail } = challengeStore
+const { loading, getChallengeById } = storeToRefs(challengeStore)
+
+const challenge = computed(() => getChallengeById.value(id))
+
+onMounted(async () => {
+  await fetchAvailChallengeDetail(id)
+})
 </script>
 
 <style scoped></style>

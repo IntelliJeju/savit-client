@@ -1,14 +1,17 @@
 // 개별 챌린지 타입
 export interface Challenge {
   title: string
+  categoryName: string
   description: string
   startDate: string
   endDate: string
   entryFee: number
+  durationWeeks: number
   targetCount: number | null
   targetAmount: number | null
   type: 'COUNT' | 'AMOUNT'
-  joined_count: number
+  totalParticipants: number
+  joinedParticipants: number
 }
 
 // 기존 인터페이스도 유지
