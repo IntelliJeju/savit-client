@@ -4,8 +4,9 @@ import { useApi } from '@/api/useApi'
 
 interface User {
   memberId: string
-  name: string
+  nickname: string
   email: string
+  profileImage: string | null
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -38,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
       // const tempToken = 'temp-kakao-token'
       // const tempUser: User = {
       //   memberId: 'temp-user-123',
-      //   name: '테스트 사용자',
+      //   nickname: '테스트 사용자',
       //   email: 'temp@example.com',
       // }
 

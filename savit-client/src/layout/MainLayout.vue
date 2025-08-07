@@ -1,8 +1,8 @@
 <template>
   <div class="main-layout h-dvh grid" :class="gridRowsClass">
-    <Header v-show="route.meta.showHeader" :show-back-button="route.meta.showBackButton">{{
-      pageTitle
-    }}</Header>
+    <Header v-show="route.meta.showHeader" :show-back-button="route.meta.showBackButton">
+      <ProfileImage v-if="showProfileImage"></ProfileImage>
+      {{ pageTitle }}</Header>
     <div class="main-content bg-[#f5f5f5] overflow-auto px-4"><router-view /></div>
     <div class="footer" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
@@ -15,18 +15,23 @@ import Header from './Header.vue'
 import BottomNavigation from '@/components/navigation/BottomNavigation.vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import ProfileImage from '@/components/user/ProfileImage.vue'
 
 const router = useRouter()
 const route = useRoute()
 
+const showProfileImage = computed(() => {
+  return route.name === 'Dashboard'
+})
+
 const pageTitle = computed(() => {
   const routeName = route.name
-  const user = '테스트'
+  const user = useAuthStore()
 
   switch (routeName) {
     case 'Dashboard':
-      return `${user}님, 안녕하세요!`
-
+      
     default:
       return route.meta.title
   }
