@@ -1,42 +1,78 @@
 <template>
   <div class="p-5 max-w-2xl mx-auto">
-    <h2 class="text-center text-gray-500">카드 사용 현황</h2>
-
-    <div class="flex justify-center items-center h-96 my-5 border-none rounded-lg p-5 bg-gray-50">
+    <div class="flex justify-center items-center h-96 border-none rounded-lg p-5">
       <canvas ref="chartCanvas" class="w-100 h-100 rounded-lg"></canvas>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useCardsStore } from '@/stores/cards'
+// import { useBudgetsStore } from '@/stores/budgets'
+
+interface Props {
+  totalAmount: number
+  totalBudget: number
+}
+
+const props = defineProps<Props>()
+
+const cardsStore = useCardsStore()
 
 const chartCanvas = ref<HTMLCanvasElement | null>(null)
 
 let chartInstance: any = null
 
-const chartData = {
-  labels: ['남은 예산', '카드1', '카드2', '카드3'],
-  datasets: [
-    {
-      data: [10, 20, 30, 40],
-      backgroundColor: ['transparent', '#92DE8B', '#0AB68B', '#028174'],
-      borderWidth: 0,
-      cutout: '65%', // 두께 조절
-      borderRadius: 20,
-      spacing: -50,
-    },
-    {
-      data: [10, 20, 30, 40],
-      backgroundColor: ['#E5E7EB', 'transparent', 'transparent', 'transparent'],
-      borderWidth: 0,
-      cutout: '80%', // 두께 조절
-      borderRadius: 20,
-      spacing: 0,
-      radius: '105%',
-    },
-  ],
+const generateCardColors = (cardCount: number): string[] => {
+  const greenColors = ['#92DE8B', '#0AB68B', '#028174']
+  
+  const colors = Array.from({ length: cardCount }, (_, i) => 
+    i < greenColors.length 
+      ? greenColors[i]
+      : `hsl(${160 + (i - greenColors.length) * 20}, ${70 - (i % 3) * 10}%, ${45 + (i % 2) * 15}%)`
+  )
+  
+  return [...colors, 'transparent']
 }
+
+const chartData = computed(() => {
+  const cards = cardsStore.registeredCards
+  const billingData = cardsStore.currentMonthBilling
+  
+  const labels = cards.map(card => card.cardNickname || card.cardName)
+  const amounts = cards.map(card => {
+    const billing = billingData.find(b => b.cardId === card.cardId)
+    return billing ? billing.amount : 0
+  })
+  
+  const totalAmount = props.totalAmount
+  const totalBudget = props.totalBudget
+  const remainingBudget = Math.max(0, totalBudget - totalAmount)
+  
+  return {
+    labels: [...labels,'남은 예산'],
+    datasets: [
+      {
+        data: [...amounts, remainingBudget],
+        backgroundColor: generateCardColors(cards.length),
+        borderWidth: 0,
+        cutout: '65%',
+        borderRadius: 20,
+      },
+      {
+        data: [...amounts, remainingBudget],
+        backgroundColor: [...new Array(cards.length).fill('transparent'),'#D9D9D9'],
+        borderWidth: 0,
+        cutout: '80%',
+        borderRadius: 20,
+        radius: '105%',
+      },
+    ],
+    totalAmount,
+    totalBudget,
+  }
+})
 
 const chartOptions = {
   responsive: true,
@@ -47,6 +83,9 @@ const chartOptions = {
       labels: {
         padding: 20, // 여백
         usePointStyle: true,
+        filter: function(legendItem: any) {
+          return legendItem.text !== '남은 예산'
+        }
       },
       // onClick: () => {},     // 항목 클릭시 숨김처리가 디폴트라 원치 않으면 onClick 별도 선언
     },
@@ -61,7 +100,7 @@ const chartOptions = {
       },
     },
   },
-  rotation: -35,
+  rotation: 0,
   circumference: 360,
 }
 
@@ -77,13 +116,20 @@ const centerTextPlugin = {
 
     const { x, y } = arc.getProps(['x', 'y'], true)
 
+    const totalAmount = chartData.value.totalAmount
+    const totalBudget = chartData.value.totalBudget
+
     ctx.save()
-    ctx.font = 'bold 1.5rem Pretendard'
+    ctx.font = 'bold 2rem Pretendard'
     ctx.fillStyle = '#333'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    ctx.fillText('사용량 %', x, y)
+    ctx.fillText(`${((totalAmount/totalBudget)*100).toFixed(1).toLocaleString()}%`, x, y - 10)
+    
+    ctx.font = '1rem Pretendard'
+    ctx.fillText('사용률', x, y + 25)
+  
     ctx.restore()
   },
 }
@@ -123,11 +169,22 @@ const initChart = () => {
 
   chartInstance = new window.Chart(chartCanvas.value, {
     type: 'doughnut',
-    data: chartData,
+    data: chartData.value,
     options: chartOptions,
     plugins: [centerTextPlugin],
   })
 }
+
+// 차트 업데이트
+const updateChart = () => {
+  if (chartInstance && chartData.value) {
+    chartInstance.data = chartData.value
+    chartInstance.update()
+  }
+}
+
+// 차트 데이터 변경 감지
+watch(chartData, updateChart, { deep: true })
 
 // 전역 Chart 선언
 declare global {
