@@ -61,9 +61,9 @@
       <button-item
         @click="() => router.push('/challenge/statistics')"
         text="챌린지 통계"
-        variant="purple"
+        variant="primary"
       ></button-item>
-      <button-item text="새 챌린지 개설" variant="primary"></button-item>
+      <!-- <button-item text="새 챌린지 개설" variant="primary"></button-item> -->
     </div>
   </div>
 </template>
