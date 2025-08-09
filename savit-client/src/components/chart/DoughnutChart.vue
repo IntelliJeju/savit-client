@@ -24,14 +24,22 @@ const chartCanvas = ref<HTMLCanvasElement | null>(null)
 
 let chartInstance: any = null
 
-const generateCardColors = (cardCount: number): string[] => {
-  const greenColors = ['#92DE8B', '#0AB68B', '#028174']
+const generateCardColors = (cards: any[]): string[] => {
+  // 카드사별 색상 매핑
+  const cardCompanyColors: { [key: string]: string } = {
+    '국민': '#FFBC00', 
+    '신한': '#0046FF',
+    '하나': '#008485',
+    '비씨': '#FA3246',
+    '기본': '#0AB68B'
+  }
   
-  const colors = Array.from({ length: cardCount }, (_, i) => 
-    i < greenColors.length 
-      ? greenColors[i]
-      : `hsl(${160 + (i - greenColors.length) * 20}, ${70 - (i % 3) * 10}%, ${45 + (i % 2) * 15}%)`
-  )
+  const colors = cards.map(card => {
+    const cardName = card.cardName || ''
+    // 카드명에서 카드사 추출
+    const company = Object.keys(cardCompanyColors).find(comp => cardName.includes(comp))
+    return cardCompanyColors[company || '기본']
+  })
   
   return [...colors, 'transparent']
 }
@@ -55,7 +63,7 @@ const chartData = computed(() => {
     datasets: [
       {
         data: [...amounts, remainingBudget],
-        backgroundColor: generateCardColors(cards.length),
+        backgroundColor: generateCardColors(cards),
         borderWidth: 0,
         cutout: '65%',
         borderRadius: 20,
