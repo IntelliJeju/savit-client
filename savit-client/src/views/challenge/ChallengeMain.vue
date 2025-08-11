@@ -5,6 +5,9 @@
         <div class="my-challenge-header">
           <span class="font-bold">나의 챌린지</span>
         </div>
+        <div v-if="participatingChallenges.length === 0" class="empty-message mt-4 text-center py-8">
+          <span class="text-gray-500">참여중인 챌린지가 없습니다</span>
+        </div>
         <div
           v-for="challenge in participatingChallenges"
           :key="challenge.challengeId"
@@ -39,6 +42,9 @@
       <div class="avail-challenge-container mt-8">
         <div class="avail-challenge-header">
           <span class="text-base font-bold">이번 주 참여 가능 챌린지</span>
+        </div>
+        <div v-if="availChallengeList.length === 0" class="empty-message mt-4 text-center py-8">
+          <span class="text-gray-500">참여 가능한 챌린지가 없습니다</span>
         </div>
         <div
           v-for="item in availChallengeList"
