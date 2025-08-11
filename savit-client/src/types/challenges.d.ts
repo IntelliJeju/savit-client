@@ -53,3 +53,13 @@ export interface Participants {
   challengeCount: number
   status: 'PARTICIPATING' | 'SUCCESS' | 'FAIL'
 }
+
+export interface Statistics {
+  challengeId: number
+  title: string
+  startDate: string
+  endDate: string
+  status: 'SUCCESS' | 'FAIL'
+  my_fee: number
+  prize: number
+}
