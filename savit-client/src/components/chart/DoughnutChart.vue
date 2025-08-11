@@ -1,7 +1,22 @@
 <template>
-  <div class="p-5 max-w-2xl mx-auto">
-    <div class="flex justify-center items-center h-96 border-none rounded-lg p-5">
+  <div class="max-w-2xl mx-auto">
+    <div class="flex justify-center items-center h-96 border-none rounded-lg pt-0 pb-2 px-5">
       <canvas ref="chartCanvas" class="w-100 h-100 rounded-lg"></canvas>
+    </div>
+    <div class="custom-legend-container overflow-x-auto scrollbar-hide">
+      <div class="flex space-x-6 px-2 min-w-max">
+        <div 
+          v-for="(item, index) in legendItems" 
+          :key="index" 
+          class="flex items-center space-x-2 flex-shrink-0"
+        >
+          <div 
+            class="w-3 h-3 rounded-full" 
+            :style="{ backgroundColor: item.color }"
+          ></div>
+          <span class="text-sm text-gray-700 whitespace-nowrap">{{ item.label }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -82,20 +97,22 @@ const chartData = computed(() => {
   }
 })
 
+const legendItems = computed(() => {
+  const cards = cardsStore.registeredCards
+  const colors = generateCardColors(cards)
+  
+  return cards.map((card, index) => ({
+    label: card.cardNickname || card.cardName,
+    color: colors[index]
+  }))
+})
+
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false, // 캔버스 안에 차트 고정 (창 크기에 영향 X)
   plugins: {
     legend: {
-      position: 'bottom' as const,
-      labels: {
-        padding: 20, // 여백
-        usePointStyle: true,
-        filter: function(legendItem: any) {
-          return legendItem.text !== '남은 예산'
-        }
-      },
-      // onClick: () => {},     // 항목 클릭시 숨김처리가 디폴트라 원치 않으면 onClick 별도 선언
+      display: false
     },
     tooltip: {
       callbacks: {
@@ -242,5 +259,19 @@ onMounted(async () => {
 canvas {
   border-radius: 4px;
   border: none;
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-legend-container {
+  -webkit-overflow-scrolling: touch;
 }
 </style>
