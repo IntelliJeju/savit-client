@@ -30,6 +30,7 @@ const ChallengeCurrent = () => import('@/views/challenge/ChallengeCurrent.vue')
 const ChallengeDetail = () => import('@/views/challenge/ChallengeDetail.vue')
 const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.vue')
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
+const PaymentCallback = () => import('@/views/challenge/PaymentCallback.vue')
 
 const routes: Array<RouteRecordRaw> = [
   //auth
@@ -240,6 +241,18 @@ const routes: Array<RouteRecordRaw> = [
     component: ChallengeResult,
     meta: {
       showNavigation: true,
+      requiresAuth: true,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
+    },
+  },
+  {
+    path: '/challenge/payment/callback',
+    name: 'PaymentCallback',
+    component: PaymentCallback,
+    meta: {
+      showNavigation: false,
       requiresAuth: true,
       showBackButton: false,
       showHeader: false,

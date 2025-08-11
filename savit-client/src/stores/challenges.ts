@@ -21,7 +21,6 @@ export const useChallengeStore = defineStore('challenge', () => {
   const fetchAvailChallengeList = async () => {
     try {
       const res = await request({ method: 'GET', url: '/challenge/available' })
-      console.log(res)
       availChallengeList.value = res
     } catch (err) {
       console.error('fetchAvailChallengeList error: ', err)
