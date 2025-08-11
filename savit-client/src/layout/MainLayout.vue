@@ -15,7 +15,6 @@ import Header from './Header.vue'
 import BottomNavigation from '@/components/navigation/BottomNavigation.vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import ProfileImage from '@/components/user/ProfileImage.vue'
 
 const router = useRouter()
@@ -27,7 +26,6 @@ const showProfileImage = computed(() => {
 
 const pageTitle = computed(() => {
   const routeName = route.name
-  const user = useAuthStore()
 
   switch (routeName) {
     case 'Dashboard':
@@ -54,6 +52,10 @@ const gridRowsClass = computed(() => {
 
 const handleChangeTab = (page: string) => {
   router.replace(`/${page}`)
+}
+
+const MyPage = () => {
+  router.push('/auth/mypage')
 }
 </script>
 

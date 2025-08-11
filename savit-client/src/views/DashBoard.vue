@@ -3,7 +3,33 @@
     <div class="py-2">
     </div>
     <div class="flex justify-between items-center text-center">
+      <div class="fixed top-16 inset-x-0 z-50 bg-white border-b shadow-sm">
+        <div class="bg-app-green/30 font-medium">진행 중인 챌린지(1/n)</div>
+        <div class="flex justify-between items-center text-center w-full h-20 mx-auto">
+          <button class="pl-2">
+            <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
+          </button>
+          <div @click="currentChallenge">
+            <div>
+            <span class="my-challenge-title text-xl font-semibold whitespace-nowrap">배달음식 10회 이하 주문</span>
+          </div>
+          <div class="my-challenge-progress ">
+            <div class="mt-1 flex justify-between text-sm font-regular">
+              <span>4일째 진행중</span>
+              <span>{{ Math.floor((30 / 100) * 100) }}%</span>
+            </div>
+            <div class="mt-1">
+              <ProgressBar name="myChallenge" :min-value="0" :max-value="100" :value="30" />
+            </div>
+          </div>
+          </div>
+          <button class="pr-2">
+            <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
+          </button>
+        </div>
+      </div>
       <CardComponent>
+        <div class="py-4"></div>
         <DoughnutChart 
           :total-amount="totalAmount"
           :total-budget="totalBudget"
@@ -30,34 +56,15 @@
             </div>
             <ButtonItem variant="purple" class="w-full min-w-32 h-28 font-semibold" @click="BudgetCheck">
               <div class="text-center">지난 달 보다</div>
-              <div class="text-center">문화/여가에 10%</div>
-              <div class="text-center">더 사용했어요!</div>
+              <div class="text-center">문화 카테고리에</div>
+              <div class="text-center">10% 더</div>
+              <div class="text-center">사용했어요!</div>
             </ButtonItem>
           </div>
         </div>
       </CardComponent>
     </div>
-    <div class="fixed top-16 inset-x-0 z-50 bg-white border-b shadow-sm">
-      <div class="flex justify-center items-center text-center w-full h-20 mx-auto">
-        <button class="px-2">
-          <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
-        </button>
-        <span class="my-challenge-title mt-4 text-2xl font-bold whitespace-nowrap" @click="currentChallenge">배달음식 10회 이하 주문</span>
-        <div class="my-challenge-progress mt-4">
-              <div class="mt-1 flex justify-between">
-                <span class="text-sm font-semibold">4일째 진행중</span>
-                <span class="font-semibold">{{ Math.floor((30 / 100) * 100) }}%</span>
-              </div>
-              <div class="mt-1">
-                <ProgressBar name="myChallenge" :min-value="0" :max-value="100" :value="30" />
-              </div>
-            </div>
-        <button class="px-2">
-          <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
-        </button>
-      </div>
-    </div>
-    <div class="py-20">
+    <div class="py-5">
     </div>
   </div>
 </template>
