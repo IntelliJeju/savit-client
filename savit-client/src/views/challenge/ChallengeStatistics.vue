@@ -55,6 +55,9 @@
         </div>
       </div>
       <div class="info-record-container mt-8">
+        <div v-if="filteredStatistics.length === 0" class="empty-message text-center py-8">
+          <span class="text-gray-500">챌린지 기록이 없습니다</span>
+        </div>
         <div
           v-for="item in filteredStatistics"
           :key="item.challengeId"
