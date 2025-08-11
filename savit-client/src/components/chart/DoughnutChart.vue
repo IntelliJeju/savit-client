@@ -60,13 +60,13 @@ const generateCardColors = (cards: any[]): string[] => {
 }
 
 const chartData = computed(() => {
-  const cards = cardsStore.registeredCards
-  const billingData = cardsStore.currentMonthBilling
+  const cards = cardsStore.cardsList
+  // const billingData = cardsStore.currentMonthBilling
   
-  const labels = cards.map(card => card.cardNickname || card.cardName)
+  const labels = cards.map(card => card.cardName || card.cardName)
   const amounts = cards.map(card => {
-    const billing = billingData.find(b => b.cardId === card.cardId)
-    return billing ? billing.amount : 0
+    const billing = cardsStore.getBillingByCard(card.cardId)
+    return billing.current ? billing.current.amount : 0
   })
   
   const totalAmount = props.totalAmount
@@ -98,11 +98,11 @@ const chartData = computed(() => {
 })
 
 const legendItems = computed(() => {
-  const cards = cardsStore.registeredCards
+  const cards = cardsStore.cardsList
   const colors = generateCardColors(cards)
   
   return cards.map((card, index) => ({
-    label: card.cardNickname || card.cardName,
+    label: card.cardName || card.cardName,
     color: colors[index]
   }))
 })
@@ -117,7 +117,7 @@ const chartOptions = {
     tooltip: {
       callbacks: {
         labelColor: function(context: any) {
-        const colors = generateCardColors(cardsStore.registeredCards)
+        const colors = generateCardColors(cardsStore.cardsList)
         return {
           backgroundColor: colors[context.dataIndex] || '#0AB68B'
         }
