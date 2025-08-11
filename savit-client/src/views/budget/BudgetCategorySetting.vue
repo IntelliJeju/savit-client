@@ -19,6 +19,25 @@
     <!-- 메인 컨텐츠 (상단 여백 추가) -->
     <div class="max-w-4xl mx-auto my-4 px-4 pt-24 pb-8">
       <CardComponent class="mb-20">
+        <div class="mb-4 text-app-dark-gray text-sm flex items-center">
+          <v-icon name="hi-information-circle" class="w-4 mr-2" /> 
+          <span class="text-xs">첫 설정 시 / 추천 버튼 클릭 시 또래 소비 데이터 기반 추천값이 제공됩니다.
+          </span>
+        </div>
+        <div class="mb-6 p-4 bg-app-light-gray rounded-xl">
+          <div class="flex items-center justify-between">
+            <span class="text-app-dark-gray">현재 설정량</span>
+            <div class="flex items-center gap-2">
+              <span :class="percentageClass">{{ totalPercentage.toFixed(1) }}%</span>
+              <ButtonItem 
+                @click="handleRecommendationClick"
+                :disabled="isLoading"
+                class="w-[70px] h-8">
+                {{ isLoading ? '추천 중...' : '추천' }}
+              </ButtonItem>
+            </div>
+          </div>
+        </div>
         <div v-for="(category, index) in categories" :key="index" class="mb-8 last:mb-0">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -55,20 +74,6 @@
                 class="text-lg font-bold text-app-dark-gray text-right bg-transparent w-28 cursor-pointer hover:bg-gray-100 rounded px-2 focus:outline-none"
                 placeholder="0"
               />
-            </div>
-          </div>
-        </div>
-        <div class="mt-6 p-4 bg-app-light-gray rounded-xl">
-          <div class="flex items-center justify-between">
-            <span class="text-app-dark-gray">현재 설정량</span>
-            <div class="flex items-center gap-2">
-              <span :class="percentageClass">{{ totalPercentage.toFixed(1) }}%</span>
-              <ButtonItem 
-                @click="handleRecommendationClick"
-                :disabled="isLoading"
-                class="w-[70px] h-8">
-                {{ isLoading ? '추천 중...' : '추천' }}
-              </ButtonItem>
             </div>
           </div>
         </div>
@@ -109,9 +114,11 @@ import CardComponent from '@/components/card/CardComponent.vue'
 const RECOMMENDATION_API_DELAY = 1000
 
 const createDefaultCategoryData = (defaultAmounts: Record<string, number>, categoryOrder: string[]) => {
+  const totalDefaultBudget = calculateDefaultTotalBudget(defaultAmounts)
+  
   return categoryOrder.map(category => ({
     name: category,
-    percentage: 0,
+    percentage: Math.round(((defaultAmounts[category] || 0) / totalDefaultBudget) * 100 * 10) / 10,
     lastMonthSpent: defaultAmounts[category] || 0
   }))
 }
