@@ -10,6 +10,7 @@ const DashBoard = () => import('@/views/DashBoard.vue')
 // Auth
 const Login = () => import('@/views/user/Login.vue')
 const LoginCallback = () => import('@/views/user/LoginCallback.vue')
+const UserPage = () => import('@/views/user/UserPage.vue')
 
 // Card
 const CardCurrent = () => import('@/views/card/CardCurrent.vue')
@@ -48,6 +49,19 @@ const routes: Array<RouteRecordRaw> = [
     path: '/auth/login/callback',
     name: 'LoginCallback',
     component: LoginCallback,
+    meta: {
+      showNavigation: false,
+      requiresAuth: false,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
+    },
+  },
+
+  {
+    path: '/auth/mypage',
+    name: 'Userpage',
+    component: UserPage,
     meta: {
       showNavigation: false,
       requiresAuth: false,

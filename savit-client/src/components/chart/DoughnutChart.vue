@@ -3,8 +3,8 @@
     <div class="flex justify-center items-center h-96 border-none rounded-lg pt-0 pb-2 px-5">
       <canvas ref="chartCanvas" class="w-100 h-100 rounded-lg"></canvas>
     </div>
-    <div class="custom-legend-container overflow-x-auto scrollbar-hide">
-      <div class="flex space-x-6 px-2 min-w-max">
+    <div class="custom-legend-container overflow-x-auto scrollbar-hide p-4">
+      <div class="flex justify-center space-x-6 px-2 min-w-max">
         <div 
           v-for="(item, index) in legendItems" 
           :key="index" 
@@ -112,10 +112,16 @@ const chartOptions = {
   maintainAspectRatio: false, // 캔버스 안에 차트 고정 (창 크기에 영향 X)
   plugins: {
     legend: {
-      display: false
+      display: false,
     },
     tooltip: {
       callbacks: {
+        labelColor: function(context: any) {
+        const colors = generateCardColors(cardsStore.registeredCards)
+        return {
+          backgroundColor: colors[context.dataIndex] || '#0AB68B'
+        }
+      },
         // 백분율 표시
         label: function (context: any) {
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)

@@ -1,5 +1,5 @@
 <template>
-  <div class="text-[1.5rem] inline-flex items-center">
+  <div class="text-[1.5rem] inline-flex items-center" @click="MyPage">
     <img
       v-if="profileImageUrl"
       :src="profileImageUrl"
@@ -21,6 +21,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import router from '@/router';
 
 // Props 정의
 interface Props {
@@ -55,6 +56,11 @@ const userProfile = computed(() => {
   // 기본 버튼
   return 'bg-app-purple'
 })
+
+const MyPage = () => {
+  router.push('/auth/mypage')
+}
+
 </script>
 
 <style scoped></style>
