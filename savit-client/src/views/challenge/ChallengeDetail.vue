@@ -50,7 +50,11 @@
       </div>
     </div>
     <div class="detail-button py-4">
-      <ButtonItem text="챌린지 참여하기" :disabled="challenge.eligibility === 0" />
+      <ButtonItem
+        text="챌린지 참여하기"
+        :disabled="challenge.eligibility === 1 || isProcessingPayment"
+        @click="handleJoinChallenge"
+      />
     </div>
   </div>
 </template>
@@ -60,18 +64,80 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import LabelItem from '@/components/label/LabelItem.vue'
 import { useChallengeStore } from '@/stores/challenges.ts'
+import {
+  requestPayment,
+  processPaymentCompletion,
+  completeChallenge,
+  generateMerchantUid,
+} from '@/services/payment'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const id = Number(route.params.id)
 const challengeStore = useChallengeStore()
+const isProcessingPayment = ref(false)
 
 const { fetchAvailChallengeDetail } = challengeStore
 const { loading, getChallengeById } = storeToRefs(challengeStore)
 
 const challenge = computed(() => getChallengeById.value(id))
+
+const handleJoinChallenge = async () => {
+  if (!challenge.value) return
+
+  try {
+    isProcessingPayment.value = true
+
+    // SDK 로드 상태 확인
+    console.log('IMP 객체 확인:', window.IMP)
+    if (!window.IMP) {
+      alert('결제 시스템을 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+      return
+    }
+
+    // 결제 데이터 준비
+    const paymentData = {
+      pg: 'kakaopay.TC0ONETIME', // PG사 설정
+      pay_method: 'card', // 결제 수단
+      merchant_uid: generateMerchantUid(id), // 고유 주문번호
+      name: `${challenge.value.title} 참가비`, // 결제명
+      amount: 10, // 결제 금액
+      buyer_name: '사용자', // 실제 사용자 정보로 변경
+      buyer_email: 'user@example.com', // 실제 사용자 이메일로 변경
+      m_redirect_url: `${window.location.origin}/challenge/payment/callback`, // 필수: 모바일 결제 완료 후 리디렉션 URL
+      custom_data: {
+        challengeId: 2,
+        userId: 1,
+      },
+    }
+
+    console.log('결제 요청 데이터:', paymentData)
+
+    // 결제 요청
+    const paymentResult = await requestPayment(paymentData)
+
+    // 결제 완료 처리 (웹훅 우선, fallback으로 verify)
+    await processPaymentCompletion(paymentResult.imp_uid, paymentResult.merchant_uid)
+
+    // 챌린지 참가 처리
+    await completeChallenge(id, {
+      imp_uid: paymentResult.imp_uid,
+      merchant_uid: paymentResult.merchant_uid,
+      paid_amount: paymentResult.paid_amount,
+    })
+
+    alert('챌린지 참가가 완료되었습니다!')
+    router.push('/challenge/main')
+  } catch (error) {
+    console.error('결제 실패:', error)
+    alert(error instanceof Error ? error.message : '결제에 실패했습니다.')
+  } finally {
+    isProcessingPayment.value = false
+  }
+}
 
 onMounted(async () => {
   await fetchAvailChallengeDetail(id)

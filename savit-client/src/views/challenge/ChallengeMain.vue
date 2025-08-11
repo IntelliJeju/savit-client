@@ -5,7 +5,10 @@
         <div class="my-challenge-header">
           <span class="font-bold">나의 챌린지</span>
         </div>
-        <div v-if="participatingChallenges.length === 0" class="empty-message mt-4 text-center py-8">
+        <div
+          v-if="participatingChallenges.length === 0"
+          class="empty-message mt-4 text-center py-8"
+        >
           <span class="text-gray-500">참여중인 챌린지가 없습니다</span>
         </div>
         <div
@@ -53,10 +56,12 @@
           @click="routeDetail(item.challengeId)"
         >
           <card-component>
-            <div class="avail-challenge-label">
-              <label-item>{{ item.categoryName }}</label-item>
+            <div class="avail-challenge-title flex justify-between font-semibold">
+              <div class="text-xl">{{ item.title }}</div>
+              <div class="avail-challenge-label">
+                <label-item>{{ item.categoryName }}</label-item>
+              </div>
             </div>
-            <div class="avail-challenge-title mt-2 text-xl font-semibold">{{ item.title }}</div>
             <div class="avail-challenge-due">
               <span class="text-xs text-slate-500">{{ item.startDate }}~{{ item.endDate }}</span>
             </div>
@@ -94,10 +99,8 @@ const {
   fetchParticipateChallenges,
   fetchParticipateChallengeDetail,
   fetchChallengeStatistics,
-  // availChallengeDetailMap,
 } = challengeStore
-const { availChallengeList, loading, getParticipatingChallengeList, getChallengeStatistics } =
-  storeToRefs(challengeStore)
+const { availChallengeList, loading, getParticipatingChallengeList } = storeToRefs(challengeStore)
 
 const participatingChallenges = computed(() => {
   return challengeStore.getParticipatingChallengeDetailList
