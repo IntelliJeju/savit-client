@@ -13,10 +13,12 @@
           @click="routeCurrent(challenge.challengeId)"
         >
           <card-component>
-            <div class="my-challenge-label">
-              <label-item>진행중</label-item>
+            <div class="my-challenge-title flex gap-2 items-center mt-2 font-bold">
+              <div class="my-challenge-label">
+                <label-item>진행중</label-item>
+              </div>
+              <div class="text-2xl">{{ challenge.title }}</div>
             </div>
-            <div class="my-challenge-title mt-4 text-2xl font-bold">{{ challenge.title }}</div>
             <div class="my-challenge-progress mt-4">
               <div class="text-xs font-medium text-slate-600">
                 {{ Number(now.day) - Number(new Date(challenge.startDate).getDate()) + 1 }}일째
