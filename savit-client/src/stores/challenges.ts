@@ -6,6 +6,7 @@ import type {
   Challenge,
   ParticipatingChallenge,
   ParticipatingChallengeDetail,
+  Statistics,
 } from '@/types/challenges'
 
 export const useChallengeStore = defineStore('challenge', () => {
@@ -15,6 +16,7 @@ export const useChallengeStore = defineStore('challenge', () => {
   const availChallengeDetailMap = ref(new Map<number, Challenge>())
   const participatingChallengeList = ref<ParticipatingChallenge[]>([])
   const participatingChallengeDetailMap = ref(new Map<number, ParticipatingChallengeDetail>())
+  const challengeStatistics = ref<Statistics[]>([])
 
   const fetchAvailChallengeList = async () => {
     try {
@@ -64,6 +66,17 @@ export const useChallengeStore = defineStore('challenge', () => {
     }
   }
 
+  const fetchChallengeStatistics = async () => {
+    try {
+      const res = await request({ method: 'GET', url: '/challenge/stats' })
+      console.log(res)
+      challengeStatistics.value = res
+    } catch (err) {
+      console.error('fetchChallengeStatistics error: ', err)
+      throw err
+    }
+  }
+
   const joinChallenge = async (id: number) => {
     try {
       //   const res = await request({ method: 'POST', url: `/challenges/${id}/join` })
@@ -91,12 +104,15 @@ export const useChallengeStore = defineStore('challenge', () => {
     Array.from(participatingChallengeDetailMap.value.values()),
   )
 
+  const getChallengeStatistics = computed(() => challengeStatistics.value)
+
   return {
     //fetch
     fetchAvailChallengeList,
     fetchAvailChallengeDetail,
     fetchParticipateChallenges,
     fetchParticipateChallengeDetail,
+    fetchChallengeStatistics,
     joinChallenge,
 
     //computed
@@ -104,6 +120,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     getParticipatingChallengeList,
     getParticipatingChallengeDetailById,
     getParticipatingChallengeDetailList,
+    getChallengeStatistics,
 
     //ref
     participatingChallengeDetailMap,

@@ -88,9 +88,11 @@ const {
   fetchAvailChallengeDetail,
   fetchParticipateChallenges,
   fetchParticipateChallengeDetail,
+  fetchChallengeStatistics,
   // availChallengeDetailMap,
 } = challengeStore
-const { availChallengeList, loading, getParticipatingChallengeList } = storeToRefs(challengeStore)
+const { availChallengeList, loading, getParticipatingChallengeList, getChallengeStatistics } =
+  storeToRefs(challengeStore)
 
 const participatingChallenges = computed(() => {
   return challengeStore.getParticipatingChallengeDetailList
@@ -99,6 +101,7 @@ const participatingChallenges = computed(() => {
 onMounted(async () => {
   await fetchAvailChallengeList()
   await fetchParticipateChallenges()
+  await fetchChallengeStatistics()
   const promissesAvail = availChallengeList.value.map((challenge) => {
     fetchAvailChallengeDetail(challenge.challengeId)
   })
