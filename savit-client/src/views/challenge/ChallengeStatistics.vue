@@ -1,6 +1,5 @@
 <template>
   <div class="info-page py-6">
-    {{ getChallengeStatistics }}
     <CardComponent
       class="info-success bg-gradient-to-tr from-[#2BDDAE] to-[#10B981] text-white p-6"
     >
@@ -58,7 +57,9 @@
       <div class="info-record-container mt-8">
         <div
           v-for="item in filteredStatistics"
+          :key="item.challengeId"
           class="info-record-item flex gap-2 items-center py-4 border-b border-[#F1F3F4] last:border-0 last:pb-0"
+          @click="() => router.push(`/challenge/result/${item.challengeId}`)"
         >
           <div class="info-item-logo">
             <div class="w-[2rem] h-[2rem] bg-black rounded-full"></div>
@@ -94,6 +95,9 @@ import now from '@/utils/date.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const challengeStore = useChallengeStore()
 
