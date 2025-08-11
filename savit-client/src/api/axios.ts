@@ -16,8 +16,13 @@ apiClient.interceptors.request.use(
   (config) => {
     // 로컬 스토리지에서 토큰 가져오기
     const token = localStorage.getItem('accessToken')
+    const refreshToken = localStorage.getItem('refreshToken')
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    if (refreshToken) {
+      config.headers['Refresh-Token'] = refreshToken
     }
     return config
   },
