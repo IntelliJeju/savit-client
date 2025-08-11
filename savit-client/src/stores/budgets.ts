@@ -306,7 +306,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     const totalSpent = Object.values(spendingData).reduce((sum, amount) => sum + amount, 0)
     
     const monthBudget = monthlyBudgets.value.find(b => b.month === monthStr)
-    const totalBudget = monthBudget?.totalBudget || await getDefaultTotalBudget()
+    const totalBudget = monthBudget?.totalBudget || 0
     
     return { month: monthStr, monthName, totalSpent, totalBudget }
   }

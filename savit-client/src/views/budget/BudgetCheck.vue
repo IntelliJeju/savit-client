@@ -8,7 +8,7 @@
     <div v-else-if="!budgetSummary" class="text-center py-10 text-app-dark-gray">
       <p>설정된 예산이 없습니다.</p>
     </div>
-    <CardComponent>
+    <CardComponent v-else>
       <div 
         v-for="mainCategory in mainCategories" 
         :key="mainCategory.mainCategory"
