@@ -3,7 +3,6 @@
     <div class="content-area pt-6 overflow-y-auto overflow-x-hidden pb-3">
       <div class="my-challenge-container">
         <div class="my-challenge-header">
-          <button @click="() => router.push('/challenge/result/1')">결과</button>
           <span class="font-bold">나의 챌린지</span>
         </div>
         <div
@@ -13,11 +12,11 @@
           @click="routeCurrent(challenge.challengeId)"
         >
           <card-component>
-            <div class="my-challenge-title flex gap-2 items-center mt-2 font-bold">
+            <div class="my-challenge-title flex justify-between gap-2 items-center font-bold">
+              <div class="text-2xl">{{ challenge.title }}</div>
               <div class="my-challenge-label">
                 <label-item>진행중</label-item>
               </div>
-              <div class="text-2xl">{{ challenge.title }}</div>
             </div>
             <div class="my-challenge-progress mt-4">
               <div class="text-xs font-medium text-slate-600">

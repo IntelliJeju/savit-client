@@ -29,20 +29,20 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 interface Props {
-  resultType: 'success' | 'fail'
+  resultType: 'SUCCESS' | 'FAIL'
 }
 
 const router = useRouter()
 const props = defineProps<Props>()
 
 const backgroundClass = computed(() => {
-  return props.resultType === 'success'
+  return props.resultType === 'SUCCESS'
     ? 'bg-gradient-to-tr from-[#0AB68B] to-[#65D6B9]'
     : 'bg-gradient-to-tr from-[#6C5CE7] to-[#968BED]'
 })
 
 const titleText = computed(() => {
-  return props.resultType === 'success' ? '챌린지 성공 !!' : '챌린지 실패..'
+  return props.resultType === 'SUCCESS' ? '챌린지 성공 !!' : '챌린지 실패..'
 })
 </script>
 

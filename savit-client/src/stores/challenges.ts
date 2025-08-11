@@ -106,6 +106,11 @@ export const useChallengeStore = defineStore('challenge', () => {
 
   const getChallengeStatistics = computed(() => challengeStatistics.value)
 
+  const getChallengeStatisticsById = computed(
+    () => (id: number) =>
+      challengeStatistics.value.filter((challenge) => challenge.challengeId === id)[0],
+  )
+
   return {
     //fetch
     fetchAvailChallengeList,
@@ -121,6 +126,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     getParticipatingChallengeDetailById,
     getParticipatingChallengeDetailList,
     getChallengeStatistics,
+    getChallengeStatisticsById,
 
     //ref
     participatingChallengeDetailMap,

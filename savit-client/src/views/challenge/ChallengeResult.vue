@@ -1,10 +1,10 @@
 <template>
   <div>
-    <ChallengeResultLayout result-type="success">
+    <ChallengeResultLayout :result-type="challenge.status">
       <div class="result-container bg-[#00000030] rounded-lg p-10">
         <div class="result-header flex flex-col items-center gap-2">
-          <span class="text-[1.75rem] font-bold">배달음식 10회 이하 주문</span>
-          <span class="text-[1.25rem]">25.07.01~25.07.13</span>
+          <span class="text-[1.75rem] font-bold">{{ challenge.title }}</span>
+          <span class="text-[1.25rem]">{{ challenge.startDate }}~{{ challenge.endDate }}</span>
         </div>
         <div class="divider h-[1px] w-auto bg-white my-4" />
         <div class="result-count flex justify-around">
@@ -34,7 +34,7 @@
           </div>
           <div class="flex justify-between items-center">
             <span>나의 순수익</span
-            ><span class="text-[1.75rem] font-bold">{{ (15000).toLocaleString() }}원</span>
+            ><span class="text-[1.75rem] font-bold">{{ challenge.prize.toLocaleString() }}원</span>
           </div>
         </div>
       </div>
@@ -55,13 +55,28 @@
 
 <script setup lang="ts">
 import ChallengeResultLayout from '@/components/challenge/ChallengeResultLayout.vue'
+import { useChallengeStore } from '@/stores/challenges.ts'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const challengeStore = useChallengeStore()
+
+const id = route.params.id
+
+const { getChallengeStatisticsById } = storeToRefs(challengeStore)
+
+const challenge = computed(() => {
+  return getChallengeStatisticsById.value(Number(id))
+})
 
 const ment = {
   title: '💡 배달 절약 팁',
   content: [
     {
       subtitle: '🏠 집에서 요리',
-      body: '간단한 요리 레시피를 배워 배알 욕구를 줄여보세요.',
+      body: '간단한 요리 레시피를 배워 배달 욕구를 줄여보세요.',
     },
     {
       subtitle: '📱 배달 앱 삭제',
