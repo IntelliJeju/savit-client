@@ -88,13 +88,13 @@ const cardsStore = useCardsStore()
 // const budgetsStore = useBudgetsStore()
 
 const totalAmount = computed(() => {
-  const cards = cardsStore.registeredCards
-  const billingData = cardsStore.currentMonthBilling
+  const cards = cardsStore.cardsList
+  // const billingData = cardsStore.currentMonthBilling
   const amounts = cards.map(card => {
-    const billing = billingData.find(b => b.cardId === card.cardId)
-    return billing ? billing.amount : 0
+    const billing = cardsStore.getBillingByCard(card.cardId)
+    return billing.current ? billing.current.amount : 0
   })
-  return amounts.reduce((sum, amount) => sum + amount, 0)
+  return amounts.reduce((sum: number, amount:number) => sum + amount, 0)
 })
 
 const totalBudget = computed(() => 1000000)
