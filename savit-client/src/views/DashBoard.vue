@@ -32,7 +32,7 @@
                 </div>
                 <div class="my-challenge-progress">
                   <div class="mt-1 flex justify-between text-sm font-regular">
-                    <span>{{ challenge.daysProgress }}일째 진행중</span>
+                    <span>{{ calculateDaysProgress(challenge.startDate) }}일째 진행중</span>
                     <span>{{ Math.floor(challenge.progress) }}%</span>
                   </div>
                   <div class="mt-1">
@@ -127,19 +127,14 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 import router from '@/router'
 import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import { storeToRefs } from 'pinia'
-import type { ParticipatingChallenge, ParticipatingChallengeDetail } from '@/types/challenges'
-// import { useBudgetsStore } from '@/stores/budgets'
-// import type { MainCategory } from '@/stores/budgets'
-
-// const budgetsStore = useBudgetsStore()
-
-// const budgetSummary = computed(() => budgetsStore.currentBudgetSummary)
+import { calculateDaysProgress, calculateProgress } from '@/utils/common.ts'
 
 const cardsStore = useCardsStore()
 const challengeStore = useChallengeStore()
 
 const { cardsList } = storeToRefs(cardsStore)
-const { getParticipatingChallengeList, getParticipatingChallengeDetailById } = storeToRefs(challengeStore)
+const { getParticipatingChallengeList, getParticipatingChallengeDetailById } =
+  storeToRefs(challengeStore)
 
 // 챌린지 슬라이드
 const currentChallengeIndex = ref(0)
@@ -150,65 +145,20 @@ const totalAmount = computed(() => {
 })
 
 const totalBudget = computed(() => 1000000)
-// const totalBudget = budgetStore.budget
 
 const BudgetCheck = () => {
   router.push('/budget')
 }
 
-// 진행 일수 계산 함수
-const calculateDaysProgress = (startDate: string): number => {
-  const start = new Date(startDate)
-  const today = new Date()
-  const diffTime = today.getTime() - start.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return Math.max(1, diffDays)
-}
-
-// 진행률 계산 함수
-const calculateProgress = (challenge: ParticipatingChallenge, detail?: ParticipatingChallengeDetail): number => {
-  if (!detail) return 0
-  
-  const startDate = new Date(challenge.startDate)
-  const endDate = new Date(challenge.endDate)
-  const today = new Date()
-  
-  const totalDuration = endDate.getTime() - startDate.getTime()
-  const currentDuration = today.getTime() - startDate.getTime()
-  
-  const timeProgress = Math.min(100, Math.max(0, (currentDuration / totalDuration) * 100))
-  
-  return Math.round(timeProgress)
-}
-
 // 챌린지 슬라이드 기능
 const participatingChallenges = computed(() => {
   const challenges = getParticipatingChallengeList.value
-  
-  if (challenges.length === 0) {
-    // 데이터가 없을 때 기본 샘플 데이터
-    return [
-      {
-        challengeId: 1,
-        title: '배달음식 10회 이하 주문',
-        startDate: '2024-01-01',
-        endDate: '2024-01-31',
-        categoryName: '음식',
-        daysProgress: 4,
-        progress: 30
-      }
-    ]
-  }
-  
-  return challenges.map(challenge => {
-    const detail = getParticipatingChallengeDetailById.value(challenge.challengeId)
-    const daysProgress = calculateDaysProgress(challenge.startDate)
-    const progress = calculateProgress(challenge, detail)
-    
+  return challenges.map((challenge) => {
+    const progress = calculateProgress(challenge.startDate, challenge.endDate)
+
     return {
       ...challenge,
-      daysProgress,
-      progress
+      progress,
     }
   })
 })
