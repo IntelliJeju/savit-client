@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-100 bg-white flex flex-col items-center justify-center">
+  <div class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
     <!-- 로고/브랜드명 -->
     <div class="mb-8">
       <div class="text-4xl font-bold text-app-green mb-2">Savit</div>

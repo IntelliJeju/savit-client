@@ -31,6 +31,9 @@ const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
 const PaymentCallback = () => import('@/views/challenge/PaymentCallback.vue')
 
+// Error
+const ServerError = () => import('@/views/error/ServerError.vue')
+
 const routes: Array<RouteRecordRaw> = [
   //auth
   {
@@ -258,6 +261,21 @@ const routes: Array<RouteRecordRaw> = [
       title: '',
     },
   },
+  
+  // Error pages
+  {
+    path: '/error/server',
+    name: 'ServerError',
+    component: ServerError,
+    meta: {
+      requiresAuth: false,
+      showNavigation: false,
+      showBackButton: false,
+      showHeader: false,
+      title: '서버 오류',
+    },
+  },
+  
   // 404 페이지 - 존재하지 않는 모든 경로를 /home으로 리다이렉트
   {
     path: '/:pathMatch(.*)*',
