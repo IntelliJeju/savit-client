@@ -1,13 +1,19 @@
 <template>
   <Teleport to="#header-content">
-    <ProfileImage />
+    <div class="flex items-center gap-2">
+      <ProfileImage />
+      <div>
+        <span class="text-app-green">{{ getUser?.nickname }}</span
+        >님 안녕하세요!
+      </div>
+    </div>
   </Teleport>
 
-  <div class="max-w-4xl mx-auto min-h-screen px-4">
-    <div class="py-2"></div>
-    <div class="flex justify-between items-center text-center">
-      <div class="fixed top-16 inset-x-0 z-50 bg-white border-b shadow-sm">
-        <div class="bg-app-green/30 font-medium">진행 중인 챌린지</div>
+  <div class="max-w-4xl mx-auto min-h-screen text-center">
+    <!-- 진행중인 챌린지 (fixed) -->
+    <div class="fixed top-16 inset-x-0 z-50 bg-white border-b shadow-sm">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center bg-app-green/30 font-medium">진행 중인 챌린지</div>
         <div class="flex justify-between items-center text-center w-full h-20 mx-auto">
           <button
             class="pl-2"
@@ -72,8 +78,11 @@
           ></div>
         </div>
       </div>
+    </div>
+
+    <!-- 메인 콘텐츠 (상단 여백 추가) -->
+    <div class="pt-32">
       <CardComponent>
-        <div class="py-4"></div>
         <DoughnutChart :cards-list="cardsList" :total-budget="totalBudget" />
         <div class="text-[2rem] font-semibold whitespace-nowrap">
           {{ totalAmount.toLocaleString() }} 원
@@ -116,8 +125,9 @@
           </div>
         </div>
       </CardComponent>
+
+      <div class="py-5"></div>
     </div>
-    <div class="py-5"></div>
   </div>
 </template>
 
