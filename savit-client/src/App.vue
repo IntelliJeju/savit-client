@@ -1,12 +1,14 @@
 <template>
   <div>
+    <SplashScreen v-if="isLoading" />
     <MainLayout />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import MainLayout from './layout/MainLayout.vue'
+import SplashScreen from './components/loading/SplashScreen.vue'
 import { useAuthStore } from './stores/auth.ts'
 import { useCardsStore } from './stores/cards.ts'
 import { useChallengeStore } from './stores/challenges.ts'
@@ -19,10 +21,11 @@ const challengeStore = useChallengeStore()
 
 //유저
 const { fetchUserInfo } = authStore
+const { loading: authLoading } = storeToRefs(authStore)
 
 //카드
 const { fetchCards, fetchTransactions } = cardsStore
-const { cardsList } = storeToRefs(cardsStore)
+const { cardsList, loading: cardsLoading } = storeToRefs(cardsStore)
 
 //챌린지
 const {
@@ -32,7 +35,16 @@ const {
   fetchParticipateChallengeDetail,
   fetchChallengeStatistics,
 } = challengeStore
-const { availChallengeList, getParticipatingChallengeList } = storeToRefs(challengeStore)
+const {
+  availChallengeList,
+  getParticipatingChallengeList,
+  loading: challengeLoading,
+} = storeToRefs(challengeStore)
+
+// 전체 로딩 상태 (모든 store의 로딩 상태를 합침)
+const isLoading = computed(() => {
+  return authLoading.value || cardsLoading.value || challengeLoading.value
+})
 
 onMounted(async () => {
   authStore.restoreAuthentication()
