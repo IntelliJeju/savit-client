@@ -4,7 +4,7 @@ import { useApi } from '@/api/useApi'
 import type { User } from '@/types/user'
 
 export const useAuthStore = defineStore('auth', () => {
-  const { request } = useApi()
+  const { request, loading } = useApi()
 
   const isAuthenticated = ref(false)
   const user = ref<User | null>()
@@ -81,5 +81,6 @@ export const useAuthStore = defineStore('auth', () => {
     setJWTToken,
     logout,
     restoreAuthentication,
+    loading,
   }
 })
