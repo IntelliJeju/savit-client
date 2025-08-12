@@ -23,17 +23,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useCardsStore } from '@/stores/cards'
-// import { useBudgetsStore } from '@/stores/budgets'
+import type { Card } from '@/types/card'
 
 interface Props {
-  totalAmount: number
-  totalBudget: number
+  cardsList: Card[]
+  totalBudget?: number
 }
 
-const props = defineProps<Props>()
-
-const cardsStore = useCardsStore()
+const props = withDefaults(defineProps<Props>(), {
+  totalBudget: 1000000
+})
 
 const chartCanvas = ref<HTMLCanvasElement | null>(null)
 
@@ -59,19 +58,17 @@ const generateCardColors = (cards: any[]): string[] => {
   return [...colors, 'transparent']
 }
 
+const totalAmount = computed(() => {
+  return props.cardsList.reduce((acc, card) => acc + card.usageAmount, 0)
+})
+
 const chartData = computed(() => {
-  const cards = cardsStore.cardsList
-  // const billingData = cardsStore.currentMonthBilling
+  const cards = props.cardsList
   
-  const labels = cards.map(card => card.cardName || card.cardName)
-  const amounts = cards.map(card => {
-    const billing = cardsStore.getBillingByCard(card.cardId)
-    return billing.current ? billing.current.amount : 0
-  })
+  const labels = cards.map(card => card.cardName)
+  const amounts = cards.map(card => card.usageAmount)
   
-  const totalAmount = props.totalAmount
-  const totalBudget = props.totalBudget
-  const remainingBudget = Math.max(0, totalBudget - totalAmount)
+  const remainingBudget = Math.max(0, props.totalBudget - totalAmount.value)
   
   return {
     labels: [...labels,'남은 예산'],
@@ -92,17 +89,17 @@ const chartData = computed(() => {
         radius: '105%',
       },
     ],
-    totalAmount,
-    totalBudget,
+    totalAmount: totalAmount.value,
+    totalBudget: props.totalBudget,
   }
 })
 
 const legendItems = computed(() => {
-  const cards = cardsStore.cardsList
+  const cards = props.cardsList
   const colors = generateCardColors(cards)
   
   return cards.map((card, index) => ({
-    label: card.cardName || card.cardName,
+    label: card.cardName,
     color: colors[index]
   }))
 })
@@ -117,7 +114,7 @@ const chartOptions = {
     tooltip: {
       callbacks: {
         labelColor: function(context: any) {
-        const colors = generateCardColors(cardsStore.cardsList)
+        const colors = generateCardColors(props.cardsList)
         return {
           backgroundColor: colors[context.dataIndex] || '#0AB68B'
         }
@@ -147,8 +144,8 @@ const centerTextPlugin = {
 
     const { x, y } = arc.getProps(['x', 'y'], true)
 
-    const totalAmount = chartData.value.totalAmount
-    const totalBudget = chartData.value.totalBudget
+    const currentTotalAmount = totalAmount.value
+    const currentTotalBudget = props.totalBudget
 
     ctx.save()
     ctx.font = 'bold 2rem Pretendard'
@@ -156,7 +153,7 @@ const centerTextPlugin = {
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    ctx.fillText(`${((totalAmount/totalBudget)*100).toFixed(1).toLocaleString()}%`, x, y - 10)
+    ctx.fillText(`${((currentTotalAmount/currentTotalBudget)*100).toFixed(1).toLocaleString()}%`, x, y - 10)
     
     ctx.font = '1rem Pretendard'
     ctx.fillText('사용률', x, y + 25)
