@@ -128,13 +128,15 @@ import router from '@/router'
 import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import { storeToRefs } from 'pinia'
 import { calculateDaysProgress, calculateProgress } from '@/utils/common.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 
+const authStore = useAuthStore()
 const cardsStore = useCardsStore()
 const challengeStore = useChallengeStore()
 
+const { getUser } = storeToRefs(authStore)
 const { cardsList } = storeToRefs(cardsStore)
-const { getParticipatingChallengeList, getParticipatingChallengeDetailById } =
-  storeToRefs(challengeStore)
+const { getParticipatingChallengeList } = storeToRefs(challengeStore)
 
 // 챌린지 슬라이드
 const currentChallengeIndex = ref(0)

@@ -14,14 +14,16 @@
     >
       {{ nickname.charAt(0) }}
     </div>
-    <span class="text-app-dark-green font-bold p-2">{{ nickname }}</span>님, 안녕하세요!
+    <span class="text-app-dark-green font-bold p-2">{{ nickname }}</span
+    >님, 안녕하세요!
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import router from '@/router';
+import router from '@/router'
+import { storeToRefs } from 'pinia'
 
 // Props 정의
 interface Props {
@@ -41,12 +43,14 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore()
 
+const { getUser } = storeToRefs(authStore)
+
 const nickname = computed(() => {
-  return props.text || authStore.currentUser?.nickname || '유저01'
+  return props.text || getUser.value?.nickname || '유저01'
 })
 
 const profileImageUrl = computed(() => {
-  return authStore.currentUser?.profileImage
+  return getUser.value?.profileImage
 })
 
 const userProfile = computed(() => {
@@ -60,7 +64,6 @@ const userProfile = computed(() => {
 const MyPage = () => {
   router.push('/auth/mypage')
 }
-
 </script>
 
 <style scoped></style>
