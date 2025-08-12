@@ -1,16 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-
-interface User {
-  memberId: string
-  nickname: string
-  email: string
-  profileImage: string | null
-}
+import { useApi } from '@/api/useApi'
+import type { User } from '@/types/user'
 
 export const useAuthStore = defineStore('auth', () => {
+  const { request } = useApi()
+
   const isAuthenticated = ref(false)
-  const user = ref<User | null>(null)
+  const user = ref<User | null>()
   const accessToken = ref<string | null>(null)
   const refreshToken = ref<string | null>(null)
 
@@ -27,23 +24,13 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = true
   }
 
-  function kakaoLogin(token: string) {
+  const fetchUserInfo = async () => {
     try {
-      // const tempToken = 'temp-kakao-token'
-      // const tempUser: User = {
-      //   memberId: 'temp-user-123',
-      //   nickname: '테스트 사용자',
-      //   email: 'temp@example.com',
-      // }
-
-      accessToken.value = token
-      isAuthenticated.value = true
-
-      localStorage.setItem('accessToken', token)
-      console.log('카카오 로그인 성공!')
-    } catch (error) {
-      console.error('카카오 로그인 실패:', error)
-      throw error
+      const res = await request({ method: 'GET', url: '/profile' })
+      user.value = res
+    } catch (err) {
+      console.error('fetchUserInfo error: ', err)
+      throw err
     }
   }
 
@@ -77,13 +64,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const getUser = computed(() => {
+    return user.value
+  })
+
   return {
+    //fetch
+    fetchUserInfo,
+
+    //computed
+    getUser,
     isAuthenticated,
     user,
     accessToken,
     isLoggedIn,
     setJWTToken,
-    kakaoLogin,
     logout,
     restoreAuthentication,
   }

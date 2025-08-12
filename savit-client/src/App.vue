@@ -17,6 +17,9 @@ const authStore = useAuthStore()
 const cardsStore = useCardsStore()
 const challengeStore = useChallengeStore()
 
+//유저
+const { fetchUserInfo } = authStore
+
 //카드
 const { fetchCards, fetchTransactions } = cardsStore
 const { cardsList } = storeToRefs(cardsStore)
@@ -35,6 +38,7 @@ onMounted(async () => {
   authStore.restoreAuthentication()
   if (authStore.isLoggedIn) {
     //유저
+    await fetchUserInfo()
 
     //카드
     await fetchCards()
