@@ -293,27 +293,6 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  // 인증된 사용자의 경우 카드 데이터 자동 로드
-  if (to.meta.requiresAuth && authStore.isLoggedIn) {
-    const { useCardsStore } = await import('@/stores/cards')
-    const cardsStore = useCardsStore()
-
-    await cardsStore.fetchTransactions(1, 'GET')
-
-    // 카드 데이터가 없으면 불러오기
-    if (cardsStore.cardsList.length === 0) {
-      try {
-        const cards = await cardsStore.fetchCards()
-
-        const promises = cards.map((card: Card) => cardsStore.fetchTransactions(card.cardId, 'GET'))
-        await Promise.allSettled(promises)
-      } catch (error) {
-        console.error('카드 데이터 로드 실패:', error)
-        // 에러가 발생해도 페이지 이동은 계속 진행
-      }
-    }
-  }
-
   next()
 })
 
