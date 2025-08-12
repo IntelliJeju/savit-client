@@ -7,7 +7,7 @@
       class="h-10 w-10 rounded-3xl object-cover border-2"
       :class="userProfile"
     />
-    <div
+    <!-- <div
       v-else
       class="text-[1.2rem] h-10 w-10 rounded-3xl flex justify-center items-center pointer-events-none border-none font-bold text-center text-white"
       :class="userProfile"
@@ -15,7 +15,7 @@
       {{ nickname.charAt(0) }}
     </div>
     <span class="text-app-dark-green font-bold p-2">{{ nickname }}</span
-    >님, 안녕하세요!
+    >님, 안녕하세요! -->
   </div>
 </template>
 
