@@ -87,40 +87,16 @@ import LabelItem from '@/components/label/LabelItem.vue'
 import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import now from '@/utils/date.ts'
 
 const challengeStore = useChallengeStore()
 
-const {
-  fetchAvailChallengeList,
-  fetchAvailChallengeDetail,
-  fetchParticipateChallenges,
-  fetchParticipateChallengeDetail,
-  fetchChallengeStatistics,
-} = challengeStore
-const { availChallengeList, loading, getParticipatingChallengeList } = storeToRefs(challengeStore)
+const { availChallengeList, loading } = storeToRefs(challengeStore)
 
 const participatingChallenges = computed(() => {
   return challengeStore.getParticipatingChallengeDetailList
-})
-
-onMounted(async () => {
-  await fetchAvailChallengeList()
-  await fetchParticipateChallenges()
-  await fetchChallengeStatistics()
-  const promissesAvail = availChallengeList.value.map((challenge) => {
-    fetchAvailChallengeDetail(challenge.challengeId)
-  })
-
-  await Promise.allSettled(promissesAvail)
-
-  const promissesParticipant = getParticipatingChallengeList.value.map((challenge) => {
-    fetchParticipateChallengeDetail(challenge.challengeId)
-  })
-
-  await Promise.allSettled(promissesParticipant)
 })
 
 const routeDetail = (id: number) => {

@@ -124,27 +124,27 @@ export const useCardsStore = defineStore('cards', () => {
     }
   }
 
-  // ===== 청구서 관리 함수들 =====
-  async function fetchBillingInfo(cardId: number) {
-    try {
-      const response = await request({
-        method: 'GET',
-        url: `/cards/${cardId}/billing`,
-      })
+  // // ===== 청구서 관리 함수들 =====
+  // async function fetchBillingInfo(cardId: number) {
+  //   try {
+  //     const response = await request({
+  //       method: 'GET',
+  //       url: `/cards/${cardId}/billing`,
+  //     })
 
-      const billingData = response.data
-      billing.value[cardId] = {
-        current: billingData.currentMonth || null,
-        last: billingData.lastMonth || null,
-      }
+  //     const billingData = response.data
+  //     billing.value[cardId] = {
+  //       current: billingData.currentMonth || null,
+  //       last: billingData.lastMonth || null,
+  //     }
 
-      return billing.value[cardId]
-    } catch (error) {
-      console.error(`카드 ${cardId} 청구정보 조회 실패:`, error)
-      billing.value[cardId] = { current: null, last: null }
-      throw error
-    }
-  }
+  //     return billing.value[cardId]
+  //   } catch (error) {
+  //     console.error(`카드 ${cardId} 청구정보 조회 실패:`, error)
+  //     billing.value[cardId] = { current: null, last: null }
+  //     throw error
+  //   }
+  // }
 
   // ===== 유틸리티 함수들 =====
   async function syncPendingNicknames() {
@@ -201,7 +201,7 @@ export const useCardsStore = defineStore('cards', () => {
 
     // 데이터 관리
     fetchTransactions,
-    fetchBillingInfo,
+    // fetchBillingInfo,
 
     // 유틸리티
     syncPendingNicknames,

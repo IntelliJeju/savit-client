@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { useApi } from '@/api/useApi'
 
 interface User {
   memberId: string
@@ -10,8 +9,6 @@ interface User {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const { request } = useApi()
-
   const isAuthenticated = ref(false)
   const user = ref<User | null>(null)
   const accessToken = ref<string | null>(null)
