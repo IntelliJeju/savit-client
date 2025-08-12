@@ -15,7 +15,6 @@ const authStore = useAuthStore()
 const { setJWTToken } = authStore
 
 onMounted(async () => {
-  console.log(route)
   const access = route.query.accessToken as string
   const refresh = route.query.refreshToken as string
   setJWTToken(access, refresh)
