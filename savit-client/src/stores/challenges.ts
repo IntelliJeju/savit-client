@@ -12,12 +12,14 @@ import type {
 export const useChallengeStore = defineStore('challenge', () => {
   const { request, loading } = useApi()
 
+  //data
   const availChallengeList = ref<availChallengeList[]>([])
-  const availChallengeDetailMap = ref(new Map<number, Challenge>())
+  const availChallengeDetailList = ref(new Map<number, Challenge>())
   const participatingChallengeList = ref<ParticipatingChallenge[]>([])
-  const participatingChallengeDetailMap = ref(new Map<number, ParticipatingChallengeDetail>())
+  const participatingChallengeDetailList = ref(new Map<number, ParticipatingChallengeDetail>())
   const challengeStatistics = ref<Statistics[]>([])
 
+  //fetch
   const fetchAvailChallengeList = async () => {
     try {
       const res = await request({ method: 'GET', url: '/challenge/available' })
@@ -29,11 +31,11 @@ export const useChallengeStore = defineStore('challenge', () => {
   }
 
   const fetchAvailChallengeDetail = async (id: number) => {
-    if (!availChallengeDetailMap.value.has(id)) {
+    if (!availChallengeDetailList.value.has(id)) {
       try {
         const res = await request({ method: 'GET', url: `/challenge/available/${id}` })
         console.log(res)
-        availChallengeDetailMap.value.set(id, res)
+        availChallengeDetailList.value.set(id, res)
       } catch (err) {
         console.error('fetchAvailChallengeDetail error: ', err)
         throw err
@@ -58,7 +60,7 @@ export const useChallengeStore = defineStore('challenge', () => {
       console.log(res)
 
       const challengeDetail = { challengeId: id, ...res }
-      participatingChallengeDetailMap.value.set(id, challengeDetail)
+      participatingChallengeDetailList.value.set(id, challengeDetail)
     } catch (err) {
       console.error('fetchParticipateChallengeDetail error: ', err)
       throw err
@@ -89,18 +91,21 @@ export const useChallengeStore = defineStore('challenge', () => {
     }
   }
 
+  //computed
   const getChallengeById = computed(() => (id: number) => {
-    return availChallengeDetailMap.value.get(id)
+    return availChallengeDetailList.value.get(id)
   })
 
-  const getParticipatingChallengeList = computed(() => participatingChallengeList.value)
+  const getParticipatingChallengeList = computed(() => {
+    return participatingChallengeList.value
+  })
 
   const getParticipatingChallengeDetailById = computed(() => (id: number) => {
-    return participatingChallengeDetailMap.value.get(id)
+    return participatingChallengeDetailList.value.get(id)
   })
 
   const getParticipatingChallengeDetailList = computed(() =>
-    Array.from(participatingChallengeDetailMap.value.values()),
+    Array.from(participatingChallengeDetailList.value.values()),
   )
 
   const getChallengeStatistics = computed(() => challengeStatistics.value)
@@ -128,7 +133,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     getChallengeStatisticsById,
 
     //ref
-    participatingChallengeDetailMap,
+    participatingChallengeDetailList,
     availChallengeList,
     loading,
   }
