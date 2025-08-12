@@ -108,8 +108,8 @@ export const checkPaymentStatus = async (merchantUid: string, maxRetries = 5, re
       })
       
       // 웹훅이 처리되어 상태가 업데이트된 경우
-      if (response.status && response.status !== 'pending') {
-        return response
+      if (response.data?.status && response.data.status !== 'pending') {
+        return response.data
       }
       
       // 마지막 시도가 아니면 대기
@@ -196,9 +196,12 @@ export const completeChallenge = async (challengeId: number, paymentData: any) =
     console.error('챌린지 참가 실패:', error)
     
     // 이미 웹훅으로 처리되었을 가능성 확인
-    if (error.response?.status === 409) {
-      console.log('이미 웹훅으로 처리된 결제입니다.')
-      return { success: true, message: '이미 처리된 결제입니다.' }
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { status?: number } }
+      if (axiosError.response?.status === 409) {
+        console.log('이미 웹훅으로 처리된 결제입니다.')
+        return { success: true, message: '이미 처리된 결제입니다.' }
+      }
     }
     
     throw error

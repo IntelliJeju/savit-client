@@ -165,7 +165,7 @@ const getParticipantProgress = (participant: Participants) => {
 
 //실시간 타이머
 const currentTime = ref(Date.now())
-let timerInterval: NodeJS.Timeout | null = null
+let timerInterval: number | null = null
 
 const formatTime = (milliseconds: number): string => {
   if (milliseconds <= 0) return '종료됨'
