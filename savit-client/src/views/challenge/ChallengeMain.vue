@@ -6,13 +6,13 @@
           <span class="font-bold">나의 챌린지</span>
         </div>
         <div
-          v-if="participatingChallenges.length === 0"
+          v-if="getParticipatingChallengeList.length === 0"
           class="empty-message mt-4 text-center py-8"
         >
           <span class="text-gray-500">참여중인 챌린지가 없습니다</span>
         </div>
         <div
-          v-for="challenge in participatingChallenges"
+          v-for="challenge in getParticipatingChallengeList"
           :key="challenge.challengeId"
           class="my-challenge-item mt-4"
           @click="routeCurrent(challenge.challengeId)"
@@ -87,17 +87,12 @@ import LabelItem from '@/components/label/LabelItem.vue'
 import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
-import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import now from '@/utils/date.ts'
 
 const challengeStore = useChallengeStore()
 
-const { availChallengeList, loading } = storeToRefs(challengeStore)
-
-const participatingChallenges = computed(() => {
-  return challengeStore.getParticipatingChallengeDetailList
-})
+const { availChallengeList, loading, getParticipatingChallengeList } = storeToRefs(challengeStore)
 
 const routeDetail = (id: number) => {
   router.push(`/challenge/detail/${id}`)
