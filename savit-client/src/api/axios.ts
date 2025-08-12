@@ -63,6 +63,8 @@ apiClient.interceptors.response.use(
           break
         case 500:
           console.error('서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+          // 500 에러 시 서버 오류 페이지로 리다이렉트
+          router.push('/error/server')
           break
         default:
           console.error('예상치 못한 오류가 발생했습니다.')
@@ -70,6 +72,8 @@ apiClient.interceptors.response.use(
     } else {
       console.error('🚨 네트워크 오류:', error.message)
       console.error('네트워크 연결을 확인해주세요.')
+      // 네트워크 오류도 서버 오류 페이지로 리다이렉트
+      router.push('/error/server')
     }
 
     // 에러를 던져서 각 API 함수에서도 추가 처리가 가능하도록 함
