@@ -1,8 +1,9 @@
 <template>
   <button
-    class="cursor-pointer border-none rounded-lg text-[1rem] text-center text-[#FFFFFF] h-12 w-[100%]"
+    class="border-none rounded-lg text-[1rem] text-center h-12 w-[100%]"
     :class="buttonClasses"
     @click="handleClick"
+    :disabled="disabled"
   >
     <slot>{{ text }}</slot>
   </button>
@@ -15,6 +16,7 @@ import { computed } from 'vue'
 interface Props {
   variant?: 'primary' | 'dark' | 'warn' | 'purple'
   text?: string
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,19 +35,26 @@ const handleClick = (event: MouseEvent) => {
 }
 
 const buttonClasses = computed(() => {
-  // 어두운 기본 버튼
+  // disabled 상태일 때
+  if (props.disabled) {
+    return 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+  }
+
+  // 활성 상태 스타일
+  const baseClasses = 'text-white cursor-pointer transition-colors duration-200'
+  
   switch (props.variant) {
     case 'dark':
-      return 'bg-app-dark-gray active:bg-[#1B2631]'
+      return `${baseClasses} bg-app-dark-gray hover:bg-[#1B2631] active:bg-[#1B2631]`
 
     case 'warn':
-      return 'bg-app-red active:bg-[#C0392B]'
+      return `${baseClasses} bg-app-red hover:bg-[#C0392B] active:bg-[#C0392B]`
 
     case 'purple':
-      return 'bg-app-purple active:bg-[#6B5B95]'
+      return `${baseClasses} bg-app-purple hover:bg-[#6B5B95] active:bg-[#6B5B95]`
 
     default:
-      return 'bg-app-green active:bg-[#16A085]'
+      return `${baseClasses} bg-app-green hover:bg-[#16A085] active:bg-[#16A085]`
   }
 })
 </script>

@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -14,8 +16,13 @@ apiClient.interceptors.request.use(
   (config) => {
     // 로컬 스토리지에서 토큰 가져오기
     const token = localStorage.getItem('accessToken')
+    const refreshToken = localStorage.getItem('refreshToken')
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    if (refreshToken) {
+      config.headers['Refresh-Token'] = refreshToken
     }
     return config
   },
@@ -43,6 +50,10 @@ apiClient.interceptors.response.use(
           break
         case 401:
           console.error('인증이 필요합니다. 로그인 후 다시 시도해주세요.')
+          // 401 응답 시 로그인 상태 초기화 및 로그인 페이지로 리다이렉트
+          const authStore = useAuthStore()
+          authStore.logout()
+          // router.push('/auth/login')
           break
         case 403:
           console.error('접근 권한이 없습니다.')
@@ -52,6 +63,8 @@ apiClient.interceptors.response.use(
           break
         case 500:
           console.error('서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+          // 500 에러 시 서버 오류 페이지로 리다이렉트
+          router.push('/error/server')
           break
         default:
           console.error('예상치 못한 오류가 발생했습니다.')
@@ -59,6 +72,8 @@ apiClient.interceptors.response.use(
     } else {
       console.error('🚨 네트워크 오류:', error.message)
       console.error('네트워크 연결을 확인해주세요.')
+      // 네트워크 오류도 서버 오류 페이지로 리다이렉트
+      router.push('/error/server')
     }
 
     // 에러를 던져서 각 API 함수에서도 추가 처리가 가능하도록 함

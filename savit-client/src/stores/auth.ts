@@ -1,27 +1,18 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
-
-interface User {
-  memberId: string
-  name: string
-  email: string
-}
+import type { User } from '@/types/user'
 
 export const useAuthStore = defineStore('auth', () => {
-  const { request } = useApi()
+  const { request, loading } = useApi()
 
   const isAuthenticated = ref(false)
-  const user = ref<User | null>(null)
+  const user = ref<User | null>()
   const accessToken = ref<string | null>(null)
   const refreshToken = ref<string | null>(null)
 
   const isLoggedIn = computed(() => {
     return isAuthenticated.value && !!accessToken.value
-  })
-
-  const currentUser = computed(() => {
-    return user.value
   })
 
   function setJWTToken(access: string, refresh: string) {
@@ -33,23 +24,13 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = true
   }
 
-  function kakaoLogin(token: string) {
+  const fetchUserInfo = async () => {
     try {
-      // const tempToken = 'temp-kakao-token'
-      // const tempUser: User = {
-      //   memberId: 'temp-user-123',
-      //   name: '테스트 사용자',
-      //   email: 'temp@example.com',
-      // }
-
-      accessToken.value = token
-      isAuthenticated.value = true
-
-      localStorage.setItem('accessToken', token)
-      console.log('카카오 로그인 성공!')
-    } catch (error) {
-      console.error('카카오 로그인 실패:', error)
-      throw error
+      const res = await request({ method: 'GET', url: '/profile' })
+      user.value = res
+    } catch (err) {
+      console.error('fetchUserInfo error: ', err)
+      throw err
     }
   }
 
@@ -57,8 +38,10 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = false
     user.value = null
     accessToken.value = null
+    refreshToken.value = null
 
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('authUser')
 
     console.log('로그아웃 되었습니다.')
@@ -81,15 +64,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const getUser = computed(() => {
+    return user.value
+  })
+
   return {
+    //fetch
+    fetchUserInfo,
+
+    //computed
+    getUser,
     isAuthenticated,
     user,
     accessToken,
     isLoggedIn,
-    currentUser,
     setJWTToken,
-    kakaoLogin,
     logout,
     restoreAuthentication,
+    loading,
   }
 })

@@ -9,15 +9,19 @@ const DashBoard = () => import('@/views/DashBoard.vue')
 // Auth
 const Login = () => import('@/views/user/Login.vue')
 const LoginCallback = () => import('@/views/user/LoginCallback.vue')
+const UserPage = () => import('@/views/user/UserPage.vue')
 
 // Card
 const CardCurrent = () => import('@/views/card/CardCurrent.vue')
 const CardRegister = () => import('@/views/card/CardRegister.vue')
+const RegisterCallback = () => import('@/views/card/RegisterCallback.vue')
 const CardUsage = () => import('@/views/card/CardUsage.vue')
 
 // Budget
 const BudgetCheck = () => import('@/views/budget/BudgetCheck.vue')
 const BudgetSetting = () => import('@/views/budget/BudgetSetting.vue')
+const BudgetChoice = () => import('@/views/budget/BudgetChoice.vue')
+const BudgetCategorySetting = () => import('@/views/budget/BudgetCategorySetting.vue')
 
 // Challenge
 const ChallengeMain = () => import('@/views/challenge/ChallengeMain.vue')
@@ -25,6 +29,10 @@ const ChallengeCurrent = () => import('@/views/challenge/ChallengeCurrent.vue')
 const ChallengeDetail = () => import('@/views/challenge/ChallengeDetail.vue')
 const ChallengeStatistics = () => import('@/views/challenge/ChallengeStatistics.vue')
 const ChallengeResult = () => import('@/views/challenge/ChallengeResult.vue')
+const PaymentCallback = () => import('@/views/challenge/PaymentCallback.vue')
+
+// Error
+const ServerError = () => import('@/views/error/ServerError.vue')
 
 const routes: Array<RouteRecordRaw> = [
   //auth
@@ -44,6 +52,19 @@ const routes: Array<RouteRecordRaw> = [
     path: '/auth/login/callback',
     name: 'LoginCallback',
     component: LoginCallback,
+    meta: {
+      showNavigation: false,
+      requiresAuth: false,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
+    },
+  },
+
+  {
+    path: '/auth/mypage',
+    name: 'Userpage',
+    component: UserPage,
     meta: {
       showNavigation: false,
       requiresAuth: false,
@@ -93,6 +114,18 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/card/register/callback',
+    name: 'RegisterCallback',
+    component: RegisterCallback,
+    meta: {
+      showNavigation: false,
+      requiresAuth: true,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
+    },
+  },
+  {
     path: '/card/usage',
     name: 'CardUsage',
     component: CardUsage,
@@ -115,13 +148,37 @@ const routes: Array<RouteRecordRaw> = [
       requiresAuth: true,
       showBackButton: false,
       showHeader: true,
-      title: '카테고리별 지출',
+      title: '카테고리별 지출내역',
     },
   },
   {
-    path: '/budget/setting',
+    path: '/budget/choice',
+    name: 'BudgetChoice',
+    component: BudgetChoice,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showHeader: true,
+      title: '예산 타입 선택',
+    },
+  },
+  {
+    path: '/budget/all',
     name: 'BudgetSetting',
     component: BudgetSetting,
+    meta: {
+      showNavigation: true,
+      requiresAuth: true,
+      showBackButton: true,
+      showHeader: true,
+      title: '전체 예산 설정',
+    },
+  },
+  {
+    path: '/budget/categories/list',
+    name: 'BudgetCategorySetting',
+    component: BudgetCategorySetting,
     meta: {
       showNavigation: true,
       requiresAuth: true,
@@ -192,6 +249,33 @@ const routes: Array<RouteRecordRaw> = [
       title: '',
     },
   },
+  {
+    path: '/challenge/payment/callback',
+    name: 'PaymentCallback',
+    component: PaymentCallback,
+    meta: {
+      showNavigation: false,
+      requiresAuth: true,
+      showBackButton: false,
+      showHeader: false,
+      title: '',
+    },
+  },
+  
+  // Error pages
+  {
+    path: '/error/server',
+    name: 'ServerError',
+    component: ServerError,
+    meta: {
+      requiresAuth: false,
+      showNavigation: false,
+      showBackButton: false,
+      showHeader: false,
+      title: '서버 오류',
+    },
+  },
+  
   // 404 페이지 - 존재하지 않는 모든 경로를 /home으로 리다이렉트
   {
     path: '/:pathMatch(.*)*',
@@ -205,16 +289,8 @@ const router = createRouter({
 })
 
 // 기본값 설정
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  const isLocalhost =
-    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-
-  // localhost에서는 인증 체크 건너뛰기
-  if (isLocalhost) {
-    next()
-    return
-  }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next('/auth/login')

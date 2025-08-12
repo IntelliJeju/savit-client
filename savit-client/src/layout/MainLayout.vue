@@ -1,9 +1,13 @@
 <template>
   <div class="main-layout h-dvh grid" :class="gridRowsClass">
-    <Header v-show="route.meta.showHeader" :show-back-button="route.meta.showBackButton">{{
-      pageTitle
-    }}</Header>
-    <div class="main-content bg-[#f5f5f5] overflow-auto px-4"><router-view /></div>
+    <Header v-show="route.meta.showHeader" :show-back-button="route.meta.showBackButton">
+      <div id="header-content">
+        <!-- 각 페이지에서 Teleport로 내용 삽입 -->
+      </div>
+    </Header>
+    <div class="main-content bg-[#f5f5f5] overflow-auto px-4">
+      <router-view />
+    </div>
     <div class="footer" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
@@ -19,18 +23,7 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-const pageTitle = computed(() => {
-  const routeName = route.name
-  const user = '테스트'
-
-  switch (routeName) {
-    case 'Dashboard':
-      return `${user}님, 안녕하세요!`
-
-    default:
-      return route.meta.title
-  }
-})
+// 기본 헤더 로직 제거됨 - 각 페이지에서 Teleport로 관리
 
 const gridRowsClass = computed(() => {
   const hasHeader = route.meta.showHeader
@@ -49,6 +42,10 @@ const gridRowsClass = computed(() => {
 
 const handleChangeTab = (page: string) => {
   router.replace(`/${page}`)
+}
+
+const MyPage = () => {
+  router.push('/auth/mypage')
 }
 </script>
 

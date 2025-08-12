@@ -1,57 +1,124 @@
 <template>
-  <div class="p-5 max-w-2xl mx-auto">
-    <h2 class="text-center text-gray-500">카드 사용 현황</h2>
-
-    <div class="flex justify-center items-center h-96 my-5 border-none rounded-lg p-5 bg-gray-50">
+  <div class="max-w-2xl mx-auto">
+    <div class="flex justify-center items-center h-96 border-none rounded-lg pt-0 pb-2 px-5">
       <canvas ref="chartCanvas" class="w-100 h-100 rounded-lg"></canvas>
+    </div>
+    <div class="custom-legend-container overflow-x-auto scrollbar-hide p-4">
+      <div class="flex justify-center space-x-6 px-2 min-w-max">
+        <div 
+          v-for="(item, index) in legendItems" 
+          :key="index" 
+          class="flex items-center space-x-2 flex-shrink-0"
+        >
+          <div 
+            class="w-3 h-3 rounded-full" 
+            :style="{ backgroundColor: item.color }"
+          ></div>
+          <span class="text-sm text-gray-700 whitespace-nowrap">{{ item.label }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import type { Card } from '@/types/card'
+
+interface Props {
+  cardsList: Card[]
+  totalBudget?: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  totalBudget: 1000000
+})
 
 const chartCanvas = ref<HTMLCanvasElement | null>(null)
 
 let chartInstance: any = null
 
-const chartData = {
-  labels: ['남은 예산', '카드1', '카드2', '카드3'],
-  datasets: [
-    {
-      data: [10, 20, 30, 40],
-      backgroundColor: ['transparent', '#92DE8B', '#0AB68B', '#028174'],
-      borderWidth: 0,
-      cutout: '65%', // 두께 조절
-      borderRadius: 20,
-      spacing: -50,
-    },
-    {
-      data: [10, 20, 30, 40],
-      backgroundColor: ['#E5E7EB', 'transparent', 'transparent', 'transparent'],
-      borderWidth: 0,
-      cutout: '80%', // 두께 조절
-      borderRadius: 20,
-      spacing: 0,
-      radius: '105%',
-    },
-  ],
+const generateCardColors = (cards: any[]): string[] => {
+  // 카드사별 색상 매핑
+  const cardCompanyColors: { [key: string]: string } = {
+    '국민': '#FFBC00', 
+    '신한': '#0046FF',
+    '하나': '#008485',
+    '비씨': '#FA3246',
+    '기본': '#0AB68B'
+  }
+  
+  const colors = cards.map(card => {
+    const cardName = card.cardName || ''
+    // 카드명에서 카드사 추출
+    const company = Object.keys(cardCompanyColors).find(comp => cardName.includes(comp))
+    return cardCompanyColors[company || '기본']
+  })
+  
+  return [...colors, 'transparent']
 }
+
+const totalAmount = computed(() => {
+  return props.cardsList.reduce((acc, card) => acc + card.usageAmount, 0)
+})
+
+const chartData = computed(() => {
+  const cards = props.cardsList
+  
+  const labels = cards.map(card => card.cardName)
+  const amounts = cards.map(card => card.usageAmount)
+  
+  const remainingBudget = Math.max(0, props.totalBudget - totalAmount.value)
+  
+  return {
+    labels: [...labels,'남은 예산'],
+    datasets: [
+      {
+        data: [...amounts, remainingBudget],
+        backgroundColor: generateCardColors(cards),
+        borderWidth: 0,
+        cutout: '65%',
+        borderRadius: 20,
+      },
+      {
+        data: [...amounts, remainingBudget],
+        backgroundColor: [...new Array(cards.length).fill('transparent'),'#D9D9D9'],
+        borderWidth: 0,
+        cutout: '80%',
+        borderRadius: 20,
+        radius: '105%',
+      },
+    ],
+    totalAmount: totalAmount.value,
+    totalBudget: props.totalBudget,
+  }
+})
+
+const legendItems = computed(() => {
+  const cards = props.cardsList
+  const colors = generateCardColors(cards)
+  
+  return cards.map((card, index) => ({
+    label: card.cardName,
+    color: colors[index]
+  }))
+})
 
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false, // 캔버스 안에 차트 고정 (창 크기에 영향 X)
   plugins: {
     legend: {
-      position: 'bottom' as const,
-      labels: {
-        padding: 20, // 여백
-        usePointStyle: true,
-      },
-      // onClick: () => {},     // 항목 클릭시 숨김처리가 디폴트라 원치 않으면 onClick 별도 선언
+      display: false,
     },
     tooltip: {
       callbacks: {
+        labelColor: function(context: any) {
+        const colors = generateCardColors(props.cardsList)
+        return {
+          backgroundColor: colors[context.dataIndex] || '#0AB68B'
+        }
+      },
         // 백분율 표시
         label: function (context: any) {
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
@@ -61,7 +128,7 @@ const chartOptions = {
       },
     },
   },
-  rotation: -35,
+  rotation: 0,
   circumference: 360,
 }
 
@@ -77,13 +144,20 @@ const centerTextPlugin = {
 
     const { x, y } = arc.getProps(['x', 'y'], true)
 
+    const currentTotalAmount = totalAmount.value
+    const currentTotalBudget = props.totalBudget
+
     ctx.save()
-    ctx.font = 'bold 1.5rem Pretendard'
+    ctx.font = 'bold 2rem Pretendard'
     ctx.fillStyle = '#333'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    ctx.fillText('사용량 %', x, y)
+    ctx.fillText(`${((currentTotalAmount/currentTotalBudget)*100).toFixed(1).toLocaleString()}%`, x, y - 10)
+    
+    ctx.font = '1rem Pretendard'
+    ctx.fillText('사용률', x, y + 25)
+  
     ctx.restore()
   },
 }
@@ -123,11 +197,22 @@ const initChart = () => {
 
   chartInstance = new window.Chart(chartCanvas.value, {
     type: 'doughnut',
-    data: chartData,
+    data: chartData.value,
     options: chartOptions,
     plugins: [centerTextPlugin],
   })
 }
+
+// 차트 업데이트
+const updateChart = () => {
+  if (chartInstance && chartData.value) {
+    chartInstance.data = chartData.value
+    chartInstance.update()
+  }
+}
+
+// 차트 데이터 변경 감지
+watch(chartData, updateChart, { deep: true })
 
 // 전역 Chart 선언
 declare global {
@@ -177,5 +262,19 @@ onMounted(async () => {
 canvas {
   border-radius: 4px;
   border: none;
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-legend-container {
+  -webkit-overflow-scrolling: touch;
 }
 </style>

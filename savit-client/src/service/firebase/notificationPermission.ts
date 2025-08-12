@@ -25,7 +25,7 @@ import { registerServiceWorker } from './registerServiceWorker' // Service Worke
  *
  * @example
  * // Vue 컴포넌트에서 버튼 클릭 시 호출
- * import { handleAllowNotification } from './service/notificationPermission'
+ * import { handleAllowNotification } from './service/firebase/notificationPermission'
  *
  * const enableNotifications = () => {
  *   handleAllowNotification()
@@ -59,10 +59,10 @@ export async function handleAllowNotification(): Promise<void> {
 
       if (token) {
         // 🧪 테스트용: 토큰을 콘솔에 출력
-        console.log('✅ FCM 토큰 생성 성공!');
-        console.log('📱 FCM Token:', token);
-        console.log('📏 토큰 길이:', token.length);
-        
+        console.log('✅ FCM 토큰 생성 성공!')
+        console.log('📱 FCM Token:', token)
+        console.log('📏 토큰 길이:', token.length)
+
         // 토큰 생성 성공 시 서버로 전송
         // 서버는 이 토큰을 저장하여 나중에 해당 사용자에게 푸시 알림을 보낼 수 있습니다
         sendTokenToServer(token)

@@ -1,75 +1,84 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
-import type { availChallengeList, Challenge } from '@/types/challenges'
+import type {
+  availChallengeList,
+  Challenge,
+  ParticipatingChallenge,
+  ParticipatingChallengeDetail,
+  Statistics,
+} from '@/types/challenges'
 
 export const useChallengeStore = defineStore('challenge', () => {
   const { request, loading } = useApi()
 
+  //data
   const availChallengeList = ref<availChallengeList[]>([])
-  const availChallengeDetailMap = ref(new Map<string, Challenge>())
+  const availChallengeDetailList = ref(new Map<number, Challenge>())
+  const participatingChallengeList = ref<ParticipatingChallenge[]>([])
+  const participatingChallengeDetailList = ref(new Map<number, ParticipatingChallengeDetail>())
+  const challengeStatistics = ref<Statistics[]>([])
 
-  const availDummy = [
-    {
-      id: '1',
-      title: '카페 월 10회 이하 챌린지',
-      startDate: '2025-08-01',
-      endDate: '2025-08-31',
-      categoryName: '카페',
-    },
-    {
-      id: '2',
-      title: '배달음식 월 5회 이하 챌린지',
-      startDate: '2025-08-01',
-      endDate: '2025-08-31',
-      categoryName: '배달',
-    },
-    {
-      id: '3',
-      title: '쇼핑 월 20만원 이하 챌린지',
-      startDate: '2025-08-01',
-      endDate: '2025-08-31',
-      categoryName: '쇼핑',
-    },
-  ]
-
-  const detailDummy = {
-    title: '커피 끊기 챌린지',
-    description: '한 달간 커피값 줄이기',
-    startDate: '2025-08-01',
-    endDate: '2025-08-31',
-    entryFee: 5000,
-    targetCount: 20,
-    targetAmount: 0,
-    type: 'COUNT', // COUNT / AMOUNT
-    joined_count: 100,
-  }
-
-  const getAvailChallengeList = async () => {
+  //fetch
+  const fetchAvailChallengeList = async () => {
     try {
-      //   const res = await request({ method: 'GET', url: '/challenge' })
-      const res = availDummy
+      const res = await request({ method: 'GET', url: '/challenge/available' })
       availChallengeList.value = res
     } catch (err) {
-      console.error('getAvailChallengeList error: ', err)
+      console.error('fetchAvailChallengeList error: ', err)
       throw err
     }
   }
 
-  const getAvailChallengeDetail = async (id: string) => {
-    if (!availChallengeDetailMap.value.has(id)) {
+  const fetchAvailChallengeDetail = async (id: number) => {
+    if (!availChallengeDetailList.value.has(id)) {
       try {
-        // const res = await request({ method: 'GET', url: `/challenges/${id}` })
-        const res = detailDummy
-        availChallengeDetailMap.value.set(id, res)
+        const res = await request({ method: 'GET', url: `/challenge/available/${id}` })
+        console.log(res)
+        availChallengeDetailList.value.set(id, res)
       } catch (err) {
-        console.error('getAvailChallengeDetail error: ', err)
+        console.error('fetchAvailChallengeDetail error: ', err)
         throw err
       }
     }
   }
 
-  const joinChallenge = async (id: string) => {
+  const fetchParticipateChallenges = async () => {
+    try {
+      const res = await request({ method: 'GET', url: '/challenge/participating' })
+      console.log(res)
+      participatingChallengeList.value = res
+    } catch (err) {
+      console.error('fetchParticipateChallenges error: ', err)
+      throw err
+    }
+  }
+
+  const fetchParticipateChallengeDetail = async (id: number) => {
+    try {
+      const res = await request({ method: 'GET', url: `/challenge/participating/${id}` })
+      console.log(res)
+
+      const challengeDetail = { challengeId: id, ...res }
+      participatingChallengeDetailList.value.set(id, challengeDetail)
+    } catch (err) {
+      console.error('fetchParticipateChallengeDetail error: ', err)
+      throw err
+    }
+  }
+
+  const fetchChallengeStatistics = async () => {
+    try {
+      const res = await request({ method: 'GET', url: '/challenge/stats' })
+      console.log(res)
+      challengeStatistics.value = res
+    } catch (err) {
+      console.error('fetchChallengeStatistics error: ', err)
+      throw err
+    }
+  }
+
+  const joinChallenge = async (id: number) => {
     try {
       //   const res = await request({ method: 'POST', url: `/challenges/${id}/join` })
       const res = true
@@ -82,15 +91,49 @@ export const useChallengeStore = defineStore('challenge', () => {
     }
   }
 
-  const getChallengeById = (id: string) => {
-    return availChallengeDetailMap.value.get(id)
-  }
+  //computed
+  const getChallengeById = computed(() => (id: number) => {
+    return availChallengeDetailList.value.get(id)
+  })
+
+  const getParticipatingChallengeList = computed(() => {
+    return participatingChallengeList.value
+  })
+
+  const getParticipatingChallengeDetailById = computed(() => (id: number) => {
+    return participatingChallengeDetailList.value.get(id)
+  })
+
+  const getParticipatingChallengeDetailList = computed(() =>
+    Array.from(participatingChallengeDetailList.value.values()),
+  )
+
+  const getChallengeStatistics = computed(() => challengeStatistics.value)
+
+  const getChallengeStatisticsById = computed(
+    () => (id: number) =>
+      challengeStatistics.value.filter((challenge) => challenge.challengeId === id)[0],
+  )
 
   return {
-    getAvailChallengeList,
-    getAvailChallengeDetail,
+    //fetch
+    fetchAvailChallengeList,
+    fetchAvailChallengeDetail,
+    fetchParticipateChallenges,
+    fetchParticipateChallengeDetail,
+    fetchChallengeStatistics,
     joinChallenge,
+
+    //computed
     getChallengeById,
+    getParticipatingChallengeList,
+    getParticipatingChallengeDetailById,
+    getParticipatingChallengeDetailList,
+    getChallengeStatistics,
+    getChallengeStatisticsById,
+
+    //ref
+    participatingChallengeDetailList,
     availChallengeList,
     loading,
   }

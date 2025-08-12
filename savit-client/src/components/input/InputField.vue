@@ -7,7 +7,7 @@
       :type="type"
       :maxlength="maxlength"
       @input="onInput"
-      class="input-field border-b py-1 px-2 w-full"
+      :class="`input-field border-b py-1 px-2 w-full ${props.class || ''}`"
     />
   </div>
 </template>
@@ -18,6 +18,7 @@ interface inputProps {
   placeholder: string
   type: string
   maxlength?: number
+  class?: string
 }
 
 const props = defineProps<inputProps>()

@@ -10,12 +10,30 @@ import {
   HiSolidUserGroup,
   HiSolidCreditCard,
   HiChevronLeft,
+  HiChevronRight,
+  HiInformationCircle,
+  OiTriangleDown,
+  HiArrowNarrowUp,
+  HiArrowNarrowDown,
+  HiSolidPencil,
 } from 'oh-vue-icons/icons'
 
 import App from './App.vue'
 import router from './router'
 
-addIcons(HiSolidHome, HiSolidChartBar, HiSolidUserGroup, HiSolidCreditCard, HiChevronLeft)
+addIcons(
+  HiSolidHome,
+  HiSolidChartBar,
+  HiSolidUserGroup,
+  HiSolidCreditCard,
+  HiChevronLeft,
+  HiChevronRight,
+  HiInformationCircle,
+  OiTriangleDown,
+  HiArrowNarrowUp,
+  HiArrowNarrowDown,
+  HiSolidPencil,
+)
 
 const app = createApp(App)
 
