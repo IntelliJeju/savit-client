@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>카드 등록</span>
+  </Teleport>
+
   <div class="min-h-screen bg-app-light-gray">
     <div v-if="loading">Loading...</div>
     <div class="max-w-sm mx-auto p-4">

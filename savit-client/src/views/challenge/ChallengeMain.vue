@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>챌린지</span>
+  </Teleport>
+
   <div v-if="!loading" class="challenge-main-page h-full grid grid-rows-[1fr_auto]">
     <div class="content-area pt-6 overflow-y-auto overflow-x-hidden pb-3">
       <div class="my-challenge-container">

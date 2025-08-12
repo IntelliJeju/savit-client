@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>챌린지 상세 정보</span>
+  </Teleport>
+
   <div v-if="!loading && challenge" class="detail-page h-full grid grid-rows-[1fr_auto]">
     <div class="detail-contents overflow-auto flex flex-col gap-4 py-4">
       <div class="detail-info">

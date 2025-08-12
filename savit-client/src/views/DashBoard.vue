@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <ProfileImage />
+  </Teleport>
+
   <div class="max-w-4xl mx-auto min-h-screen px-4">
     <div class="py-2"></div>
     <div class="flex justify-between items-center text-center">
@@ -129,6 +133,7 @@ import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import { storeToRefs } from 'pinia'
 import { calculateDaysProgress, calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
+import ProfileImage from '@/components/user/ProfileImage.vue'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()

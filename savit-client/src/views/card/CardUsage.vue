@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>카드 사용 현황</span>
+  </Teleport>
+
   <div class="min-h-screen bg-app-light-gray">
     <div class="max-w-sm mx-auto p-4">
       <!-- 이번 달 청구 금액 -->

@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>내 카드</span>
+  </Teleport>
+
   <div class="min-h-screen bg-app-light-gray">
     <div class="max-w-sm mx-auto p-4">
       <!-- 카드 슬라이더 -->

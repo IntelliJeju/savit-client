@@ -1,9 +1,13 @@
 <template>
   <div class="main-layout h-dvh grid" :class="gridRowsClass">
     <Header v-show="route.meta.showHeader" :show-back-button="route.meta.showBackButton">
-      <ProfileImage v-if="showProfileImage"></ProfileImage>
-      {{ pageTitle }}</Header>
-    <div class="main-content bg-[#f5f5f5] overflow-auto px-4"><router-view /></div>
+      <div id="header-content">
+        <!-- 각 페이지에서 Teleport로 내용 삽입 -->
+      </div>
+    </Header>
+    <div class="main-content bg-[#f5f5f5] overflow-auto px-4">
+      <router-view />
+    </div>
     <div class="footer" v-if="route.meta.showNavigation">
       <BottomNavigation @tab-change="handleChangeTab" />
     </div>
@@ -15,25 +19,11 @@ import Header from './Header.vue'
 import BottomNavigation from '@/components/navigation/BottomNavigation.vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import ProfileImage from '@/components/user/ProfileImage.vue'
 
 const router = useRouter()
 const route = useRoute()
 
-const showProfileImage = computed(() => {
-  return route.name === 'Dashboard'
-})
-
-const pageTitle = computed(() => {
-  const routeName = route.name
-
-  switch (routeName) {
-    case 'Dashboard':
-      
-    default:
-      return route.meta.title
-  }
-})
+// 기본 헤더 로직 제거됨 - 각 페이지에서 Teleport로 관리
 
 const gridRowsClass = computed(() => {
   const hasHeader = route.meta.showHeader
