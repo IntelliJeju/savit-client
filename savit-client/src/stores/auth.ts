@@ -18,12 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
   const refreshToken = ref<string | null>(null)
 
   const isLoggedIn = computed(() => {
-    return true
-    // return isAuthenticated.value && !!accessToken.value
-  })
-
-  const currentUser = computed(() => {
-    return user.value
+    return isAuthenticated.value && !!accessToken.value
   })
 
   function setJWTToken(access: string, refresh: string) {
@@ -90,7 +85,6 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     accessToken,
     isLoggedIn,
-    currentUser,
     setJWTToken,
     kakaoLogin,
     logout,
