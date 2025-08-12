@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>챌린지 현황</span>
+  </Teleport>
+
   <div v-if="!challenge" class="challenge-current-page flex items-center justify-center h-full">
     <div class="text-center">
       <div class="text-lg font-medium">챌린지 정보를 불러오는 중...</div>

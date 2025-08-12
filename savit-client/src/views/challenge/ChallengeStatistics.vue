@@ -1,4 +1,8 @@
 <template>
+  <Teleport to="#header-content">
+    <span>챌린지 통계</span>
+  </Teleport>
+
   <div class="info-page py-6">
     <CardComponent
       class="info-success bg-gradient-to-tr from-[#2BDDAE] to-[#10B981] text-white p-6"
