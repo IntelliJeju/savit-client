@@ -69,7 +69,7 @@ import {
   processPaymentCompletion,
   completeChallenge,
   generateMerchantUid,
-} from '@/services/payment'
+} from '@/service/payment/payment'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

@@ -1,19 +1,15 @@
 <template>
   <div class="fcm-test-container">
     <h3>🧪 FCM 토큰 테스트</h3>
-    
+
     <div class="test-buttons">
       <button @click="testNotificationPermission" class="test-btn primary">
         🔔 알림 권한 요청 & 토큰 생성
       </button>
-      
-      <button @click="checkCurrentToken" class="test-btn secondary">
-        📱 현재 토큰 확인
-      </button>
-      
-      <button @click="testServiceWorker" class="test-btn info">
-        ⚙️ Service Worker 상태 확인
-      </button>
+
+      <button @click="checkCurrentToken" class="test-btn secondary">📱 현재 토큰 확인</button>
+
+      <button @click="testServiceWorker" class="test-btn info">⚙️ Service Worker 상태 확인</button>
     </div>
 
     <div v-if="testResult" class="test-result">
@@ -25,9 +21,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { handleAllowNotification } from '../service/notificationPermission'
+import { handleAllowNotification } from '../service/firebase/notificationPermission'
 import { getToken } from 'firebase/messaging'
-import { messaging } from '../service/initFirebase'
+import { messaging } from '../service/firebase/initFirebase'
 
 const testResult = ref('')
 
@@ -51,7 +47,7 @@ const testNotificationPermission = async () => {
 const checkCurrentToken = async () => {
   try {
     testResult.value = '🔍 토큰 확인 중...'
-    
+
     const permission = Notification.permission
     if (permission !== 'granted') {
       testResult.value = '❌ 알림 권한이 없습니다. 먼저 권한을 허용해주세요.'
@@ -80,14 +76,14 @@ const checkCurrentToken = async () => {
 const testServiceWorker = async () => {
   try {
     testResult.value = '🔍 Service Worker 상태 확인 중...'
-    
+
     if (!('serviceWorker' in navigator)) {
       testResult.value = '❌ 이 브라우저는 Service Worker를 지원하지 않습니다.'
       return
     }
 
     const registration = await navigator.serviceWorker.getRegistration()
-    
+
     if (registration) {
       const state = registration.active?.state || 'unknown'
       testResult.value = `✅ Service Worker 등록됨\n상태: ${state}\nScope: ${registration.scope}`
