@@ -22,37 +22,6 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import router from '@/router'
+<script setup lang="ts"></script>
 
-const isRetrying = ref(false)
-
-const handleRetry = async () => {
-  isRetrying.value = true
-
-  try {
-    // 간단한 헬스체크 API 호출 (실제 구현 시)
-    // await healthCheck()
-
-    // 임시로 1초 대기 후 홈으로 이동
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // 성공 시 홈으로 리다이렉트
-    router.push('/')
-  } catch (error) {
-    // 실패 시 현재 페이지 유지
-    console.error('Retry failed:', error)
-  } finally {
-    isRetrying.value = false
-  }
-}
-
-const handleGoHome = () => {
-  router.push('/')
-}
-</script>
-
-<style scoped>
-/* 커스텀 애니메이션이나 스타일이 필요하면 여기에 추가 */
-</style>
+<style scoped></style>
