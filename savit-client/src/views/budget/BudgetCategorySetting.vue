@@ -54,9 +54,7 @@
               <CategoryIcon :category="category.name" :size="24" color="#028174" />
               <span class="font-medium text-app-dark-gray">{{ category.name }}</span>
             </div>
-            <p class="text-lg font-bold text-app-dark-gray">
-              {{ category.percentage.toFixed(1) }}%
-            </p>
+            <p class="text-lg font-bold text-app-dark-gray">{{ Number(category.percentage).toFixed(1) }}%</p>
           </div>
 
           <div class="relative">
@@ -109,6 +107,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useBudgetsStore, DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/stores/budgets'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import type { CategoryData } from '@/stores/budgets'
+import type { MainCategory } from '@/types/budgets'
 import { getCurrentMonth } from '@/utils/budgetUtils'
 import { formatCurrency } from '@/utils/calculations'
 import {
@@ -181,17 +180,14 @@ const saveCategoriesData = (categoriesData: CategoryData[]) => {
 
 const categories = ref<CategoryData[]>(loadSavedCategories() as CategoryData[])
 
-const totalPercentage = computed(
-  () => Math.round(categories.value.reduce((sum, cat) => sum + cat.percentage, 0) * 10) / 10,
+const totalPercentage = computed(() => 
+  Math.round(categories.value.reduce((sum: number, cat: any) => sum + cat.percentage, 0) * 10) / 10
 )
 
-const remainingBudget = computed(
-  () =>
-    totalBudget.value -
-    categories.value.reduce(
-      (sum, cat) => sum + calculateAmount(cat.percentage, totalBudget.value),
-      0,
-    ),
+const remainingBudget = computed(() => 
+  totalBudget.value - categories.value.reduce((sum: number, cat: any) => 
+    sum + calculateAmount(cat.percentage, totalBudget.value), 0
+  )
 )
 
 const percentageClass = computed(() => [
@@ -210,9 +206,8 @@ const handleAmountInputChange = (categoryIndex: number, event: Event) => {
   categories.value[categoryIndex].percentage = newPercentage
 
   // 100% 초과시 다른 카테고리 조정
-  const otherTotal = categories.value.reduce(
-    (sum, cat, idx) => (idx === categoryIndex ? sum : sum + cat.percentage),
-    0,
+  const otherTotal = categories.value.reduce((sum: number, cat: any, idx: number) => 
+    idx === categoryIndex ? sum : sum + cat.percentage, 0
   )
 
   if (newPercentage + otherTotal > 100) {
@@ -237,14 +232,13 @@ const handleRecommendationClick = async () => {
     const totalDefaultBudget = calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
 
     // 각 카테고리별 비율 계산
-    const defaultRatios = categories.value.map(
-      (cat) => (DEFAULT_BUDGET_AMOUNTS[cat.name] / totalDefaultBudget) * 100,
-    )
-
-    categories.value.forEach(
-      (cat, idx) => (cat.percentage = Math.round(defaultRatios[idx] * 10) / 10),
-    )
-
+    const defaultRatios = categories.value.map((cat: any) => {
+      const categoryName = cat.name as MainCategory
+      return (DEFAULT_BUDGET_AMOUNTS[categoryName] / totalDefaultBudget) * 100
+    })
+    
+    categories.value.forEach((cat: any, idx: number) => cat.percentage = Math.round(defaultRatios[idx] * 10) / 10)
+    
     // 추천 값 저장
     saveCategoriesData(categories.value)
     alert('기본 추천 비율로 설정되었습니다!')
@@ -268,7 +262,7 @@ const handleSliderChange = (changedIndex: number, event: Event) => {
   }
 
   // 100% 초과시 재분배
-  const total = categories.value.reduce((sum, cat) => sum + cat.percentage, 0)
+  const total = categories.value.reduce((sum: number, cat: any) => sum + cat.percentage, 0)
   if (total > 100) {
     redistributeExcessPercentage(categories.value, changedIndex, total - 100)
   }
@@ -288,7 +282,7 @@ const handleSaveBudgetClick = async () => {
   try {
     const budgetRequest = {
       month: getCurrentMonth(),
-      mainCategoryBudgets: categories.value.map((cat) => ({
+      mainCategoryBudgets: categories.value.map((cat: any) => ({
         mainCategory: cat.name,
         budgetAmount: calculateCategoryAmount(cat.percentage),
       })),
