@@ -17,11 +17,37 @@
     <div class="text-center mb-8">
       <h1 class="text-2xl font-bold text-app-dark-gray mb-4">서버와의 연결이 원활하지 않습니다</h1>
       <p class="text-app-dark-gray/70 mb-2">일시적인 서버 문제로 서비스에 접속할 수 없습니다.</p>
-      <p class="text-app-dark-gray/70">잠시 후 다시 시도해주세요.</p>
+      <p class="text-app-dark-gray/70 mb-8">잠시 후 다시 시도해주세요.</p>
+
+      <!-- 액션 버튼들 -->
+      <div class="flex flex-col gap-3">
+        <button
+          @click="goHome"
+          class="bg-app-green text-white px-6 py-3 rounded-lg font-medium hover:bg-app-dark-green transition-colors duration-200"
+        >
+          홈으로 가기
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const goHome = () => {
+  authStore.restoreAuthentication()
+
+  if (authStore.isLoggedIn) {
+    router.push('/home')
+  } else {
+    router.push('/auth/login')
+  }
+}
+</script>
 
 <style scoped></style>
