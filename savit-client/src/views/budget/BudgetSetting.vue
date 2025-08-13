@@ -3,7 +3,7 @@
     <span>예산 설정</span>
   </Teleport>
 
-  <div class="max-w-4xl mx-auto min-h-screen px-4">
+  <div class="max-w-4xl mx-auto px-4">
     <div class="py-5"></div>
     <CardComponent>
       <p class="font-bold text-lg mb-4">이번 달 예산 금액</p>
@@ -196,6 +196,4 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

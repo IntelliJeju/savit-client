@@ -3,7 +3,7 @@
     <span>예산 설정</span>
   </Teleport>
 
-  <div class="max-w-4xl mx-auto min-h-screen px-4">
+  <div class="max-w-4xl mx-auto px-4">
     <div class="flex-1"></div>
 
     <h1 class="font-bold text-xl text-center mt-20 mb-10 text-app-dark-gray">
