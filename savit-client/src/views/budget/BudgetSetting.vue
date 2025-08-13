@@ -95,8 +95,12 @@ const displayAmount = computed({
 })
 
 // 입력 처리 함수
-const handleAmountInput = (value: string) => {
+const handleAmountInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const value = target.value
+  console.log('handleAmountInput:', value, typeof value)
   const numericValue = value.replace(/[^\d]/g, '')
+  console.log('numericValue:', numericValue)
   budgetAmount.value = numericValue
 }
 
@@ -192,4 +196,6 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

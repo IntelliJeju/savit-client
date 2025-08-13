@@ -72,9 +72,9 @@
             :class="{ 'border-b border-slate-200': index < recentTransactions.length - 1 }"
           >
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 flex-1 min-w-0">
                 <div
-                  class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray"
+                  class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray flex-shrink-0"
                 >
                   <!-- <CategoryIcon
                     :category="mapCategoryToMainCategory(transaction.category)"
@@ -82,19 +82,15 @@
                     :size="20"
                   /> -->
                 </div>
-                <div>
-                  <div class="font-medium text-slate-800">{{ transaction.resMemberStoreName }}</div>
-                  <div class="text-sm text-slate-500">{{ transaction.resUsedDate }}</div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-medium text-slate-800 truncate">{{ transaction.resMemberStoreName }}</div>
+                  <div class="text-sm text-slate-500 truncate">{{ transaction.resUsedDate }}</div>
                 </div>
               </div>
-              <div class="text-right">
-                <div class="font-semibold">
-                  {{ transaction.resCancelYN === '0' ? '-' : '+'
-                  }}{{
-                    (
-                      Number(transaction.resUsedAmount) * (transaction.resCancelYN === '0' ? 1 : -1)
-                    ).toLocaleString()
-                  }}원
+              <div class="text-right flex-shrink-0">
+                <div class="font-semibold whitespace-nowrap" :class="transaction.resCancelYN !== '0' ? 'text-app-green' : ''">
+                  {{ transaction.resCancelYN === '0' ? '-' : '+-' }}{{ Number(transaction.resUsedAmount).toLocaleString() }}원
+                  <div v-if="transaction.resCancelYN !== '0'" class="text-xs text-app-green font-normal">취소</div>
                 </div>
               </div>
             </div>

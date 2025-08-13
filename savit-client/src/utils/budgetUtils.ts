@@ -1,5 +1,5 @@
-import type { MainCategory, SubCategory, SubCategorySpending, MainCategoryBudgetStatus, MonthlyBudget, BudgetSettingRequest } from '@/stores/budgets'
-import { CATEGORIES, CATEGORY_ORDER, DEFAULT_BUDGET_AMOUNTS } from '@/stores/budgets'
+import type { MainCategory, SubCategory, SubCategorySpending, MainCategoryBudgetStatus, MonthlyBudget, BudgetSettingRequest } from '@/types/budgets'
+import { CATEGORIES, CATEGORY_ORDER, DEFAULT_BUDGET_AMOUNTS } from '@/types/budgets'
 import { calculateSum } from '@/utils/calculations'
 
 // 검증 결과 타입

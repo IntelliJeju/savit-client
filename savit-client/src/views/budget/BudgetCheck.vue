@@ -155,7 +155,7 @@ import SegmentedProgressBar from '@/components/progressBar/SegmentedProgressBar.
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import { useBudgetsStore } from '@/stores/budgets'
-import type { MainCategoryBudgetStatus, MainCategory } from '@/stores/budgets'
+import type { MainCategoryBudgetStatus, MainCategory } from '@/types/budgets'
 import { formatCurrency } from '@/utils/calculations'
 import router from '@/router'
 import CardComponent from '@/components/card/CardComponent.vue'

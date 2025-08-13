@@ -9,6 +9,9 @@ import type {
   UsageDetail,
   RegisterResponse,
 } from '@/types/card'
+import { 
+  saveTransaction
+} from '@/utils/category'
 
 export const useCardsStore = defineStore('cards', () => {
   const { request, loading } = useApi()
@@ -34,7 +37,11 @@ export const useCardsStore = defineStore('cards', () => {
     const cardTransactions = transactions.value[cardId] || []
     return cardTransactions
       .filter((t) => month === Number(t.resUsedDate.slice(4, 6)))
-      .reduce((sum, t) => sum + Number(t.resUsedAmount), 0)
+      .filter((t) => t.resCancelYN === '0') // 승인된 거래만 계산에 포함
+      .reduce((sum, t) => {
+        const amount = Number(t.resUsedAmount)
+        return sum + amount
+      }, 0)
   })
 
   // ===== 카드 관리 함수들 =====
@@ -202,6 +209,9 @@ export const useCardsStore = defineStore('cards', () => {
     // 데이터 관리
     fetchTransactions,
     // fetchBillingInfo,
+
+    // 거래 카테고리 관리
+    saveTransaction,
 
     // 유틸리티
     syncPendingNicknames,
