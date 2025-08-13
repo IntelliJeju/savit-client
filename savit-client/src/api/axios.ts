@@ -53,7 +53,7 @@ apiClient.interceptors.response.use(
           // 401 응답 시 로그인 상태 초기화 및 로그인 페이지로 리다이렉트
           const authStore = useAuthStore()
           authStore.logout()
-          // router.push('/auth/login')
+          router.push('/auth/login')
           break
         case 403:
           console.error('접근 권한이 없습니다.')
