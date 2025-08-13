@@ -9,11 +9,11 @@
       <p class="font-bold text-lg mb-4">이번 달 예산 금액</p>
       <div class="relative flex items-center">
         <InputField
-          v-model="displayAmount"
-          placeholder="설정할 예산액을 입력해주세요."
-          type="text"
+          v-model="budgetAmount"
+          placeholder="예산을 입력해주세요"
+          type="number"
+          :formatNumber="true"
           class="text-3xl font-bold text-right pr-12"
-          @input="handleAmountInput"
         />
         <span class="absolute right-2 text-3xl font-bold text-app-dark-gray">원</span>
       </div>
@@ -84,25 +84,6 @@ const getExistingBudget = (): string => {
 }
 
 const budgetAmount = ref(getExistingBudget())
-
-// 표시용 값 (쉼표 포함)
-const displayAmount = computed({
-  get: () => formatNumber(parseInt(budgetAmount.value) || 0),
-  set: (value: string) => {
-    // 숫자만 추출해서 저장
-    budgetAmount.value = value.replace(/[^\d]/g, '')
-  },
-})
-
-// 입력 처리 함수
-const handleAmountInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const value = target.value
-  console.log('handleAmountInput:', value, typeof value)
-  const numericValue = value.replace(/[^\d]/g, '')
-  console.log('numericValue:', numericValue)
-  budgetAmount.value = numericValue
-}
 
 const lastMonth = ref({
   name: '',
