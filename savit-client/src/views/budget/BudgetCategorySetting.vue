@@ -305,13 +305,9 @@ const handleSaveBudgetClick = async () => {
 }
 
 onMounted(async () => {
-  try {
-    await budgetsStore.initializeCurrentMonthBudget()
-    if (!route.query.totalBudget && budgetsStore.currentBudget?.totalBudget) {
-      totalBudget.value = budgetsStore.currentBudget.totalBudget
-    }
-  } catch (error) {
-    console.error('예산 데이터 로드 실패:', error)
+  // App.vue에서 이미 예산 초기화됨, 기존 예산 값만 설정
+  if (!route.query.totalBudget && budgetsStore.currentBudget?.totalBudget) {
+    totalBudget.value = budgetsStore.currentBudget.totalBudget
   }
 })
 </script>
