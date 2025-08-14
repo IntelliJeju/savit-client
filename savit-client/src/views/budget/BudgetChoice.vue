@@ -66,9 +66,7 @@ const handleCategoryBudgetSetting = () => {
   router.push('/budget/categories/list')
 }
 
-onMounted(async () => {
-  await budgetsStore.initializeCurrentMonthBudget()
-})
+// App.vue에서 이미 예산 초기화가 완료되므로 onMounted 불필요
 </script>
 
 <style scoped></style>

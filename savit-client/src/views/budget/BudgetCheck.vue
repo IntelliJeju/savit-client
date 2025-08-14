@@ -396,7 +396,10 @@ const getPrevPrevMonthBudgetAmount = (mainCategory: MainCategoryBudgetStatus): n
 const loadBudgetData = async () => {
   isLoading.value = true
   try {
-    await budgetsStore.initializeCurrentMonthBudget()
+    // App.vue에서 이미 초기화되었지만, 혹시 모를 상황을 대비해 체크만 수행
+    if (!budgetsStore.currentBudget) {
+      await budgetsStore.initializeCurrentMonthBudget()
+    }
   } catch (error) {
     console.error('예산 초기화 실패:', error)
   } finally {

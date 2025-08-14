@@ -9,9 +9,7 @@ import type {
   UsageDetail,
   RegisterResponse,
 } from '@/types/card'
-import { 
-  saveTransaction
-} from '@/utils/category'
+import { saveTransaction } from '@/utils/category'
 
 export const useCardsStore = defineStore('cards', () => {
   const { request, loading } = useApi()
@@ -76,43 +74,6 @@ export const useCardsStore = defineStore('cards', () => {
     }
   }
 
-  // async function updateCardNickname(cardId: number, nickname: string) {
-  //   try {
-  //     const response = await request({
-  //       method: 'PATCH',
-  //       url: `/cards/${cardId}/nickname`,
-  //       data: { nickname },
-  //     })
-
-  //     // 카드 목록에서 별칭 업데이트
-  //     const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
-  //     if (cardIndex !== -1) {
-  //       cards.value[cardIndex].cardNickname = nickname
-  //     }
-
-  //     // localStorage 정리 (서버와 동기화됨)
-  //     const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-  //     delete savedNicknames[cardId]
-  //     localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
-
-  //     return response.data
-  //   } catch (error) {
-  //     console.error(`카드 ${cardId} 별칭 수정 실패:`, error)
-
-  //     // 실패 시 로컬에서 우선 적용 후 localStorage에 저장
-  //     const cardIndex = cards.value.findIndex((card) => card.cardId === cardId)
-  //     if (cardIndex !== -1) {
-  //       cards.value[cardIndex].cardNickname = nickname
-  //     }
-
-  //     const savedNicknames = JSON.parse(localStorage.getItem('cardNicknames') || '{}')
-  //     savedNicknames[cardId] = nickname
-  //     localStorage.setItem('cardNicknames', JSON.stringify(savedNicknames))
-
-  //     return null
-  //   }
-  // }
-
   // ===== 트랜잭션 관리 함수들 =====
   async function fetchTransactions(cardId: number, method: 'GET' | 'POST' = 'GET') {
     try {
@@ -130,28 +91,6 @@ export const useCardsStore = defineStore('cards', () => {
       throw error
     }
   }
-
-  // // ===== 청구서 관리 함수들 =====
-  // async function fetchBillingInfo(cardId: number) {
-  //   try {
-  //     const response = await request({
-  //       method: 'GET',
-  //       url: `/cards/${cardId}/billing`,
-  //     })
-
-  //     const billingData = response.data
-  //     billing.value[cardId] = {
-  //       current: billingData.currentMonth || null,
-  //       last: billingData.lastMonth || null,
-  //     }
-
-  //     return billing.value[cardId]
-  //   } catch (error) {
-  //     console.error(`카드 ${cardId} 청구정보 조회 실패:`, error)
-  //     billing.value[cardId] = { current: null, last: null }
-  //     throw error
-  //   }
-  // }
 
   // ===== 유틸리티 함수들 =====
   async function syncPendingNicknames() {

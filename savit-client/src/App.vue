@@ -12,12 +12,14 @@ import SplashScreen from './components/loading/SplashScreen.vue'
 import { useAuthStore } from './stores/auth.ts'
 import { useCardsStore } from './stores/cards.ts'
 import { useChallengeStore } from './stores/challenges.ts'
+import { useBudgetsStore } from './stores/budgets.ts'
 import type { Card } from './types/card'
 import { storeToRefs } from 'pinia'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()
 const challengeStore = useChallengeStore()
+const budgetsStore = useBudgetsStore()
 
 //유저
 const { fetchUserInfo } = authStore
@@ -40,6 +42,9 @@ const {
   getParticipatingChallengeList,
   loading: challengeLoading,
 } = storeToRefs(challengeStore)
+
+//예산
+const { initializeCurrentMonthBudget } = budgetsStore
 
 // 전체 로딩 상태 (모든 store의 로딩 상태를 합침)
 const isLoading = computed(() => {
@@ -71,6 +76,9 @@ onMounted(async () => {
 
     await Promise.allSettled(promissesAvail)
     await Promise.allSettled(promissesParticipant)
+
+    //예산
+    await initializeCurrentMonthBudget()
   }
 })
 </script>

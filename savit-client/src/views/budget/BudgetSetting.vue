@@ -166,14 +166,12 @@ const saveBudget = async () => {
 }
 
 onMounted(async () => {
-  try {
-    await budgetsStore.initializeCurrentMonthBudget()
-    if (budgetsStore.currentBudget?.totalBudget && !budgetAmount.value) {
-      budgetAmount.value = budgetsStore.currentBudget.totalBudget.toString()
-    }
-  } catch (error) {
-    console.error('예산 데이터 로드 실패:', error)
+  // 기존 예산 값이 있으면 설정 (App.vue에서 이미 초기화됨)
+  if (budgetsStore.currentBudget?.totalBudget && !budgetAmount.value) {
+    budgetAmount.value = budgetsStore.currentBudget.totalBudget.toString()
   }
+
+  await loadPreviousData()
 })
 </script>
 
