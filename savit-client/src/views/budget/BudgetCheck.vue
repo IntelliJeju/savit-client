@@ -3,168 +3,95 @@
     <span>예산 확인</span>
   </Teleport>
 
-  <div class="max-w-4xl mx-auto min-h-screen px-4">
-    <div class="py-2"></div>
-    <div v-if="isLoading" class="text-center py-10 text-app-dark-gray">
-      <p>예산 정보를 불러오는 중...</p>
-    </div>
+  <BudgetLayout
+    :loading="isLoading"
+    loading-text="예산 정보를 불러오는 중..."
+    button-text="예산 설정"
+    @button-click="handleBudgetSetting"
+  >
     <!-- 예산 데이터가 없을 때 -->
-    <div v-else-if="!budgetSummary" class="text-center py-10 text-app-dark-gray">
+    <div v-if="!budgetSummary" class="text-center py-10 text-app-dark-gray">
       <p>설정된 예산이 없습니다.</p>
     </div>
     <CardComponent v-else>
-      <div
+      <BudgetCategoryCard
         v-for="mainCategory in mainCategories"
         :key="mainCategory.mainCategory"
-        class="mb-2 p-3 transition-all duration-200 relative rounded-lg last:mb-0"
-        :class="getExpandedClass(mainCategory)"
-      >
-        <div class="absolute top-2 right-2" @click="toggleCategory(mainCategory.mainCategory)">
-          <div
-            class="text-[8px] text-app-dark-gray transition-transform duration-200 cursor-pointer"
-            :class="{ 'rotate-180': mainCategory.expanded }"
-          >
-            <v-icon name="oi-triangle-down" class="w-8" />
-          </div>
-        </div>
-
-        <div
-          class="flex justify-between items-center cursor-pointer mb-1 mt-4"
-          @click="toggleCategory(mainCategory.mainCategory)"
-        >
-          <div class="flex items-center flex-1 min-w-0">
-            <div class="w-6 flex-shrink-0">
-              <CategoryIcon
-                :category="mainCategory.mainCategory"
-                :color="categoryColor"
-                :size="24"
-              />
-            </div>
-            <div class="min-w-0 flex-1 ml-2">
-              <div class="text-[16px] font-semibold text-black truncate">
-                {{ mainCategory.mainCategory }}
-                <span
-                  class="text-[12px] font-normal"
-                  :class="mainCategory.spendingRatio >= 100 ? 'text-app-red' : ''"
-                  >{{ mainCategory.spendingRatio.toFixed(1) }}%</span
-                >
-              </div>
-            </div>
-          </div>
-
-          <div v-if="mainCategory.expanded" class="flex items-baseline gap-1">
-            <div class="text-sm font-semibold" :class="getAmountClass(mainCategory)">
-              {{ formatCurrency(mainCategory.totalSpent) }}
-            </div>
-            <div class="text-sm text-app-dark-gray">
-              / {{ formatCurrency(mainCategory.budgetAmount) }}
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-1">
-          <SegmentedProgressBar
-            :name="`main-${mainCategory.mainCategory}`"
-            :segments="getMainCategorySegments(mainCategory)"
-            :total="100"
-            :showLegend="mainCategory.expanded"
-          />
-          <div v-if="!mainCategory.expanded" class="flex justify-between items-center mt-1 text-xs">
-            <div class="font-semibold" :class="getAmountClass(mainCategory)">
-              {{ formatCurrency(mainCategory.totalSpent) }}
-            </div>
-            <div class="text-app-dark-gray font-medium">
-              {{ formatCurrency(mainCategory.budgetAmount) }}
-            </div>
-          </div>
-        </div>
-
-        <div v-if="mainCategory.expanded" class="pt-3">
-          <div class="border-t border-app-gray pt-3">
-            <div class="mb-5">
-              <div class="flex justify-between items-center mb-3">
-                <h4 class="text-[14px] font-semibold text-app-dark-gray m-0 flex-1">
-                  {{ getPrevMonth() }} {{ mainCategory.mainCategory }}
-                  <span
-                    class="text-[12px] font-normal"
-                    :class="
-                      parseFloat(getPrevMonthRatio(mainCategory)) >= 100 ? 'text-app-red' : ''
-                    "
-                    >{{ getPrevMonthRatio(mainCategory) }}%
-                  </span>
-                </h4>
-                <div class="flex items-baseline gap-1">
-                  <div class="text-xs text-app-dark-gray font-semibold">
-                    {{ formatCurrency(getPrevMonthSpent(mainCategory)) }}
-                  </div>
-                  <div class="text-xs text-app-dark-gray">
-                    / {{ formatCurrency(getPrevMonthBudgetAmount(mainCategory)) }}
-                  </div>
-                </div>
-              </div>
-              <SegmentedProgressBar
-                :name="`prev-${mainCategory.mainCategory}`"
-                :segments="getPrevMonthSegments(mainCategory)"
-                :total="100"
-                :showLegend="true"
-              />
-            </div>
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <h4 class="text-sm font-medium text-app-dark-gray m-0 flex-1">
-                  {{ getPrevPrevMonth() }} {{ mainCategory.mainCategory }}
-                  <span
-                    class="text-[12px] font-normal"
-                    :class="
-                      parseFloat(getPrevPrevMonthRatio(mainCategory)) >= 100 ? 'text-app-red' : ''
-                    "
-                    >{{ getPrevPrevMonthRatio(mainCategory) }}%</span
-                  >
-                </h4>
-                <div class="flex items-baseline gap-1">
-                  <div class="text-xs text-app-dark-gray font-semibold">
-                    {{ formatCurrency(getPrevPrevMonthSpent(mainCategory)) }}
-                  </div>
-                  <div class="text-xs text-app-dark-gray">
-                    / {{ formatCurrency(getPrevPrevMonthBudgetAmount(mainCategory)) }}
-                  </div>
-                </div>
-              </div>
-              <SegmentedProgressBar
-                :name="`prev-prev-${mainCategory.mainCategory}`"
-                :segments="getPrevPrevMonthSegments(mainCategory)"
-                :total="100"
-                :showLegend="true"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+        :main-category="mainCategory"
+        :category-color="categoryColor"
+        :format-currency="formatCurrency"
+        :get-expanded-class="getExpandedClass"
+        :get-amount-class="getAmountClass"
+        :get-main-category-segments="getMainCategorySegments"
+        :get-prev-month="getPrevMonth"
+        :get-prev-prev-month="getPrevPrevMonth"
+        :get-prev-month-ratio="getPrevMonthRatio"
+        :get-prev-prev-month-ratio="getPrevPrevMonthRatio"
+        :get-prev-month-spent="getPrevMonthSpent"
+        :get-prev-prev-month-spent="getPrevPrevMonthSpent"
+        :get-prev-month-budget-amount="getPrevMonthBudgetAmount"
+        :get-prev-prev-month-budget-amount="getPrevPrevMonthBudgetAmount"
+        :get-prev-month-segments="getPrevMonthSegments"
+        :get-prev-prev-month-segments="getPrevPrevMonthSegments"
+        @toggle="toggleCategory"
+      />
     </CardComponent>
-    <div class="py-12"></div>
-
-    <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-app-gray z-10">
-      <ButtonItem text="예산 설정" @click="handleBudgetSetting" />
-    </div>
-  </div>
+  </BudgetLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onActivated } from 'vue'
-import SegmentedProgressBar from '@/components/progressBar/SegmentedProgressBar.vue'
-import CategoryIcon from '@/components/icon/CategoryIcon.vue'
-import ButtonItem from '@/components/button/ButtonItem.vue'
-import { useBudgetsStore } from '@/stores/budgets'
-import type { MainCategoryBudgetStatus, MainCategory } from '@/types/budgets'
+import { computed, onMounted, onActivated } from 'vue'
+import { useBudgetCommon } from '@/composables/useBudgetCommon'
+import { useBudgetSegments } from '@/composables/useBudgetSegments'
+import { useBudgetCalculations } from '@/composables/useBudgetCalculations'
 import { formatCurrency } from '@/utils/calculations'
 import router from '@/router'
+import BudgetLayout from '@/components/budget/BudgetLayout.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
+import BudgetCategoryCard from '@/components/budget/BudgetCategoryCard.vue'
 
-const budgetsStore = useBudgetsStore()
-const isLoading = ref(true)
-const expandedCategories = ref<Set<MainCategory>>(new Set())
+// Composables
+const {
+  isLoading,
+  budgetSummary,
+  initializeBudget,
+  getPrevMonth,
+  getPrevPrevMonth,
+  getPrevMonthSpendingData,
+  getPrevPrevMonthSpendingData,
+  getPrevMonthBudgetData,
+  getPrevPrevMonthBudgetData,
+  expandedCategories,
+  toggleCategory,
+} = useBudgetCommon()
 
-const budgetSummary = computed(() => budgetsStore.currentBudgetSummary)
+const { getMainCategorySegments, getPrevMonthSegments, getPrevPrevMonthSegments } =
+  useBudgetSegments(
+    expandedCategories,
+    getPrevMonth,
+    getPrevPrevMonth,
+    getPrevMonthSpendingData,
+    getPrevPrevMonthSpendingData,
+    getPrevMonthBudgetData,
+    getPrevPrevMonthBudgetData,
+  )
+
+const {
+  getPrevMonthSpent,
+  getPrevPrevMonthSpent,
+  getPrevMonthRatio,
+  getPrevPrevMonthRatio,
+  getPrevMonthBudgetAmount,
+  getPrevPrevMonthBudgetAmount,
+  getAmountClass,
+} = useBudgetCalculations(
+  getPrevMonthSpendingData,
+  getPrevPrevMonthSpendingData,
+  getPrevMonthBudgetData,
+  getPrevPrevMonthBudgetData,
+)
+
+// Constants
 const categoryColor = '#028174'
 
 const mainCategories = computed(() => {
@@ -178,241 +105,21 @@ const mainCategories = computed(() => {
   }))
 })
 
-const subCategoryColors: Record<string, string> = {
-  식당: '#92DE8B',
-  카페: '#0AB68B',
-  배달: '#028174',
-  대중교통: '#92DE8B',
-  택시: '#0AB68B',
-  통신비: '#92DE8B',
-  공과금: '#0AB68B',
-  의료비: '#028174',
-  교육: '#C3F2BF',
-  '편의점/마트': '#045D56',
-  공연: '#92DE8B',
-  영화: '#0AB68B',
-  쇼핑: '#028174',
-  정기구독: '#C3F2BF',
-  유흥: '#045D56',
-  기타: '#0AB68B',
-}
-
-const getSubCategoryColor = (subCategory: string): string => {
-  return subCategoryColors[subCategory] || '#6b7280'
-}
-
+// UI helpers
 const getExpandedClass = (mainCategory: any) => ({
   'bg-app-light-gray': mainCategory.expanded,
 })
 
-const getAmountClass = (mainCategory: any): string => {
-  return mainCategory.isOverBudget ? 'text-app-red' : 'text-app-blue'
+const handleBudgetSetting = () => {
+  router.push('/budget/choice')
 }
 
-const toggleCategory = (category: MainCategory) => {
-  if (expandedCategories.value.has(category)) {
-    expandedCategories.value.delete(category)
-  } else {
-    expandedCategories.value.clear()
-    expandedCategories.value.add(category)
-  }
-}
-
-const getMainCategorySegments = (mainCategory: any) => {
-  if (mainCategory.budgetAmount === 0) return []
-
-  if (mainCategory.expanded) {
-    return mainCategory.subCategories
-      .filter((sub: any) => sub.spentAmount > 0)
-      .map((sub: any) => ({
-        label: sub.subCategory,
-        value: Math.min((sub.spentAmount / mainCategory.budgetAmount) * 100, 100),
-        color: getSubCategoryColor(sub.subCategory),
-      }))
-  }
-
-  return [
-    {
-      label: mainCategory.mainCategory,
-      value: Math.min(mainCategory.spendingRatio, 100),
-      color: mainCategory.isOverBudget ? '#ef4444' : '#0AB68B',
-    },
-  ]
-}
-
-const getPrevMonthSegments = (mainCategory: MainCategoryBudgetStatus) => {
-  const isExpanded = expandedCategories.value.has(mainCategory.mainCategory)
-  const prevMonthData = getPrevMonthSpendingData()
-  const budgetAmount = getPrevMonthBudgetAmount(mainCategory)
-
-  if (isExpanded) {
-    return mainCategory.subCategories
-      .filter((sub) => prevMonthData[sub.subCategory] > 0)
-      .map((sub) => ({
-        label: sub.subCategory,
-        value: Math.min((prevMonthData[sub.subCategory] / budgetAmount) * 100, 100),
-        color: getSubCategoryColor(sub.subCategory),
-      }))
-  }
-
-  const prevMonthTotal = mainCategory.subCategories.reduce(
-    (sum, sub) => sum + prevMonthData[sub.subCategory],
-    0,
-  )
-
-  return [
-    {
-      label: `${getPrevMonth()} 지출`,
-      value: Math.min((prevMonthTotal / budgetAmount) * 100, 100),
-      color: '#6b7280',
-    },
-  ]
-}
-
-const getPrevPrevMonthSegments = (mainCategory: MainCategoryBudgetStatus) => {
-  const isExpanded = expandedCategories.value.has(mainCategory.mainCategory)
-  const prevPrevMonthData = getPrevPrevMonthSpendingData()
-  const budgetAmount = getPrevPrevMonthBudgetAmount(mainCategory)
-
-  if (isExpanded) {
-    return mainCategory.subCategories
-      .filter((sub) => prevPrevMonthData[sub.subCategory] > 0)
-      .map((sub) => ({
-        label: sub.subCategory,
-        value: Math.min((prevPrevMonthData[sub.subCategory] / budgetAmount) * 100, 100),
-        color: getSubCategoryColor(sub.subCategory),
-      }))
-  }
-
-  const prevPrevMonthTotal = mainCategory.subCategories.reduce(
-    (sum, sub) => sum + prevPrevMonthData[sub.subCategory],
-    0,
-  )
-
-  return [
-    {
-      label: `${getPrevPrevMonth()} 지출`,
-      value: Math.min((prevPrevMonthTotal / budgetAmount) * 100, 100),
-      color: '#9ca3af',
-    },
-  ]
-}
-
-// 지출 금액 계산 유틸리티
-const calculateSpentAmount = (
-  mainCategory: MainCategoryBudgetStatus,
-  spendingData: Record<string, number>,
-): number => {
-  return mainCategory.subCategories.reduce(
-    (sum, sub) => sum + (spendingData[sub.subCategory] || 0),
-    0,
-  )
-}
-
-const getPrevMonthSpent = (mainCategory: MainCategoryBudgetStatus): number =>
-  calculateSpentAmount(mainCategory, getPrevMonthSpendingData())
-
-const getPrevPrevMonthSpent = (mainCategory: MainCategoryBudgetStatus): number =>
-  calculateSpentAmount(mainCategory, getPrevPrevMonthSpendingData())
-
-// 비율 계산 유틸리티
-const calculateSpendingRatio = (spent: number, budget: number): string => {
-  return budget > 0 ? Math.min((spent / budget) * 100, 100).toFixed(1) : '0.0'
-}
-
-const getPrevMonthRatio = (mainCategory: MainCategoryBudgetStatus): string =>
-  calculateSpendingRatio(getPrevMonthSpent(mainCategory), getPrevMonthBudgetAmount(mainCategory))
-
-const getPrevPrevMonthRatio = (mainCategory: MainCategoryBudgetStatus): string =>
-  calculateSpendingRatio(
-    getPrevPrevMonthSpent(mainCategory),
-    getPrevPrevMonthBudgetAmount(mainCategory),
-  )
-const getPrevMonth = (): string => {
-  const date = new Date()
-  date.setMonth(date.getMonth() - 1)
-  return `${date.getMonth() + 1}월`
-}
-const getPrevPrevMonth = (): string => {
-  const date = new Date()
-  date.setMonth(date.getMonth() - 2)
-  return `${date.getMonth() + 1}월`
-}
-const handleBudgetSetting = async () => {
-  try {
-    useBudgetsStore
-    router.push('/budget/choice')
-  } catch (error) {}
-}
-
-// 이전 달 데이터 조회 유틸리티
-const createMonthlyDataUtils = () => {
-  const getMonthString = (monthsBack: number): string => {
-    const date = new Date()
-    date.setMonth(date.getMonth() - monthsBack)
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-  }
-
-  const getPrevMonthString = () => getMonthString(1)
-  const getPrevPrevMonthString = () => getMonthString(2)
-
-  const getPrevMonthSpendingData = () => budgetsStore.getSpendingByMonth(getPrevMonthString())
-  const getPrevPrevMonthSpendingData = () =>
-    budgetsStore.getSpendingByMonth(getPrevPrevMonthString())
-  const getPrevMonthBudgetData = () => budgetsStore.getBudgetByMonth(getPrevMonthString())
-  const getPrevPrevMonthBudgetData = () => budgetsStore.getBudgetByMonth(getPrevPrevMonthString())
-
-  return {
-    getPrevMonthSpendingData,
-    getPrevPrevMonthSpendingData,
-    getPrevMonthBudgetData,
-    getPrevPrevMonthBudgetData,
-  }
-}
-
-const {
-  getPrevMonthSpendingData,
-  getPrevPrevMonthSpendingData,
-  getPrevMonthBudgetData,
-  getPrevPrevMonthBudgetData,
-} = createMonthlyDataUtils()
-
-// 예산 금액 조회 유틸리티
-const getBudgetAmountForCategory = (
-  mainCategory: MainCategoryBudgetStatus,
-  budgetData: MainCategoryBudgetStatus[],
-): number => {
-  const budget = budgetData.find((b) => b.mainCategory === mainCategory.mainCategory)
-  return budget?.budgetAmount || mainCategory.budgetAmount
-}
-
-const getPrevMonthBudgetAmount = (mainCategory: MainCategoryBudgetStatus): number =>
-  getBudgetAmountForCategory(mainCategory, getPrevMonthBudgetData())
-
-const getPrevPrevMonthBudgetAmount = (mainCategory: MainCategoryBudgetStatus): number =>
-  getBudgetAmountForCategory(mainCategory, getPrevPrevMonthBudgetData())
-
-// 예산 데이터 로드 함수
-const loadBudgetData = async () => {
-  isLoading.value = true
-  try {
-    // App.vue에서 이미 초기화되었지만, 혹시 모를 상황을 대비해 체크만 수행
-    if (!budgetsStore.currentBudget) {
-      await budgetsStore.initializeCurrentMonthBudget()
-    }
-  } catch (error) {
-    console.error('예산 초기화 실패:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
+// Lifecycle hooks
 onMounted(async () => {
-  await loadBudgetData()
+  await initializeBudget()
 })
 
-// 페이지가 활성화될 때마다 최신 데이터 로드 (카테고리 설정 후 돌아올 때)
 onActivated(async () => {
-  await loadBudgetData()
+  await initializeBudget()
 })
 </script>
