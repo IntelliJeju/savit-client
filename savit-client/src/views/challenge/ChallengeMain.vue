@@ -37,7 +37,9 @@
                 <ProgressBar name="myChallenge" :min-value="0" :max-value="100" :value="30" />
               </div>
               <div class="mt-1 flex justify-between">
-                <span class="font-semibold">{{ Math.floor((30 / 100) * 100) }}%</span>
+                <span class="font-semibold"
+                  >{{ calculateProgress(challenge.startDate, challenge.endDate) }}%</span
+                >
                 <span class="text-xs text-slate-500"
                   >{{ challenge.startDate }} ~ {{ challenge.endDate }}</span
                 >
@@ -93,6 +95,7 @@ import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import { storeToRefs } from 'pinia'
 import now from '@/utils/date.ts'
+import { calculateProgress } from '@/utils/common.ts'
 
 const challengeStore = useChallengeStore()
 
