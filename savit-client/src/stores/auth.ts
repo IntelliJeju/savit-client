@@ -27,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
   const fetchUserInfo = async () => {
     try {
       const res = await request({ method: 'GET', url: '/profile' })
+      console.log(res)
       user.value = res
     } catch (err) {
       console.error('fetchUserInfo error: ', err)
