@@ -25,13 +25,17 @@
             <div class="my-challenge-title flex justify-between gap-2 items-center font-bold">
               <div class="text-2xl">{{ challenge.title }}</div>
               <div class="my-challenge-label">
-                <label-item>진행중</label-item>
+                <label-item>{{ getChallengeStatus(challenge.startDate) }}</label-item>
               </div>
             </div>
             <div class="my-challenge-progress mt-4">
               <div class="text-xs font-medium text-slate-600">
-                {{ Number(now.day) - Number(new Date(challenge.startDate).getDate()) + 1 }}일째
-                진행중
+                <template v-if="getChallengeStatus(challenge.startDate) === '대기중'">
+                  대기중
+                </template>
+                <template v-else>
+                  {{ calculateDaysProgressWithStatus(challenge.startDate) }}일째 진행중
+                </template>
               </div>
               <div class="mt-1">
                 <ProgressBar name="myChallenge" :min-value="0" :max-value="100" :value="30" />
@@ -95,7 +99,7 @@ import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import { storeToRefs } from 'pinia'
 import now from '@/utils/date.ts'
-import { calculateProgress } from '@/utils/common.ts'
+import { calculateProgress, getChallengeStatus, calculateDaysProgressWithStatus } from '@/utils/common.ts'
 
 const challengeStore = useChallengeStore()
 

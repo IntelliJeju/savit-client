@@ -19,3 +19,29 @@ export const calculateProgress = (start: string, end: string): number => {
 
   return Math.round(timeProgress)
 }
+
+// 챌린지 상태 판단 함수
+export const getChallengeStatus = (startDate: string): '대기중' | '진행중' => {
+  const today = new Date()
+  const start = new Date(startDate)
+  
+  // 날짜만 비교 (시간 제외)
+  today.setHours(0, 0, 0, 0)
+  start.setHours(0, 0, 0, 0)
+  
+  return today >= start ? '진행중' : '대기중'
+}
+
+// 챌린지 진행 일자 계산 (시작 전이면 0일째)
+export const calculateDaysProgressWithStatus = (startDate: string): number => {
+  const today = new Date()
+  const start = new Date(startDate)
+  
+  // 시작 전이면 0일째
+  if (today < start) {
+    return 0
+  }
+  
+  // 진행중이면 기존 함수 사용
+  return calculateDaysProgress(startDate)
+}
