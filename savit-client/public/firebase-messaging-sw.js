@@ -62,89 +62,83 @@ const messaging = firebase.messaging();
 
 /**
  * 백그라운드 메시지 처리 이벤트 리스너
- * 
- * 웹 앱이 백그라운드에 있거나 닫혀있을 때 FCM 메시지를 수신하면
- * 이 이벤트 핸들러가 실행됩니다.
- * 
+ *
+ * 백엔드에서 data 페이로드로 전송된 FCM 메시지를 처리합니다.
+ * 백엔드 NotificationService에서 putData()로 전송한 내용을 받습니다.
+ *
  * @param {Object} payload - 서버에서 전송된 푸시 메시지 데이터
- * @param {Object} payload.notification - 알림 내용
- * @param {string} payload.notification.title - 알림 제목
- * @param {string} payload.notification.body - 알림 본문
- * @param {Object} payload.data - 추가 사용자 정의 데이터 (선택사항)
+ * @param {Object} payload.data - 백엔드에서 putData()로 전송한 데이터
+ * @param {string} payload.data.title - 알림 제목
+ * @param {string} payload.data.body - 알림 본문
+ * @param {string} payload.data.icon - 알림 아이콘 경로
  */
 messaging.onBackgroundMessage((payload) => {
-  // 수신된 메시지를 콘솔에 로깅 (디버깅 용도)
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
+
+  // 백엔드에서 data 페이로드로 전송된 정보 추출
+  const messageData = payload.data || {};
+
   /**
-   * 알림 제목 추출
-   * 
-   * 서버에서 전송한 notification.title을 사용합니다.
-   * 만약 title이 없다면 기본값을 사용할 수 있습니다.
+   * 알림 제목과 본문 추출
+   * 백엔드 NotificationService에서 putData("title", ...), putData("body", ...)로 전송
    */
-  const notificationTitle = payload.notification.title || 'Savit 알림';
-  
+  const notificationTitle = messageData.title || 'Savit 알림';
+  const notificationBody = messageData.body || '새로운 알림이 도착했습니다.';
+
   /**
    * 알림 옵션 설정
-   * 
-   * 브라우저 알림에 표시될 내용과 스타일을 정의합니다.
+   * 백엔드에서 전송한 아이콘 경로 사용
    */
   const notificationOptions = {
-    body: payload.notification.body || '새로운 알림이 도착했습니다.',
-    icon: '/favicon.ico', // 알림에 표시될 아이콘 (public 폴더 기준)
-    badge: '/favicon.ico', // 작은 배지 아이콘
-    
-    // 추가 옵션들 (필요에 따라 사용)
-    // tag: 'savit-notification', // 같은 태그의 알림은 하나만 표시
-    // requireInteraction: true, // 사용자가 직접 닫을 때까지 표시
-    // silent: false, // 소리와 진동 허용
-    // vibrate: [200, 100, 200], // 진동 패턴 (모바일)
-    
-    // 사용자 정의 데이터 저장 (알림 클릭 시 활용 가능)
+    body: notificationBody,
+    icon: messageData.icon || '/favicon.ico', // 백엔드에서 전송한 SAVIT_LOGO_ICON 사용
+    badge: '/favicon.ico',
+    tag: 'savit-notification', // 같은 태그의 알림은 하나만 표시
+    requireInteraction: false, // 자동으로 사라지도록 설정
+
+    // 사용자 정의 데이터 저장 (알림 클릭 시 메인 홈페이지로 이동)
     data: {
-      url: payload.data?.url || '/', // 클릭 시 이동할 URL
-      clickAction: payload.data?.clickAction,
-      ...payload.data // 서버에서 전송한 추가 데이터
+      url: '/', // 메인 홈페이지로 이동
+      ...messageData // 백엔드에서 전송한 추가 데이터 포함
     }
   };
 
-  /**
-   * 브라우저 알림 표시
-   * 
-   * Service Worker의 registration 객체를 통해
-   * 브라우저 네이티브 알림을 표시합니다.
-   * 
-   * 이 알림은 운영체제의 알림 센터에 표시되며,
-   * 사용자가 클릭하면 notificationclick 이벤트가 발생합니다.
-   */
+  // 브라우저 알림 표시
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 /**
- * 알림 클릭 이벤트 처리 (선택사항)
- * 
- * 사용자가 알림을 클릭했을 때의 동작을 정의합니다.
- * 일반적으로 해당 페이지로 이동하거나 앱을 활성화합니다.
+ * 알림 클릭 이벤트 처리
+ *
+ * 사용자가 알림을 클릭했을 때 메인 홈페이지로 이동합니다.
+ * 기존에 열린 앱이 있으면 포커스를 이동하고, 없으면 새 창을 엽니다.
  */
 self.addEventListener('notificationclick', function(event) {
+  console.log('[firebase-messaging-sw.js] Notification click received');
+
   // 알림을 닫습니다
   event.notification.close();
-  
-  // 알림 데이터에서 URL 추출
-  const targetUrl = event.notification.data?.url || '/';
-  
+
+  // 메인 홈페이지 URL (요구사항에 따라 고정)
+  const targetUrl = '/';
+
   // 브라우저 창을 열거나 기존 창으로 포커스 이동
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      // 이미 열린 창이 있는지 확인
+    clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    }).then(function(clientList) {
+      // 이미 열린 앱 창이 있는지 확인
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
-        if (client.url.includes(targetUrl) && 'focus' in client) {
-          return client.focus(); // 기존 창으로 포커스 이동
+        // 같은 origin의 창이면 포커스 이동
+        if (client.url.indexOf(self.location.origin) === 0 && 'focus' in client) {
+          // 메인 페이지로 이동
+          return client.navigate(targetUrl).then(() => client.focus());
         }
       }
-      
-      // 열린 창이 없으면 새 창 열기
+
+      // 열린 창이 없으면 새 창으로 메인 페이지 열기
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
       }
