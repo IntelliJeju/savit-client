@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBudgetCommon } from '@/composables/useBudgetCommon'
+import { useBudgetCommon } from '@/composables/budget/useBudgetCommon'
 import BudgetOptionCard from '@/components/budget/BudgetOptionCard.vue'
 
 const router = useRouter()

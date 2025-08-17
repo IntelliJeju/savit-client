@@ -21,8 +21,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBudgetCommon } from '@/composables/useBudgetCommon'
-import { usePreviousMonthsData } from '@/composables/usePreviousMonthsData'
+import { useBudgetCommon } from '@/composables/budget/useBudgetCommon'
+import { usePreviousMonthsData } from '@/composables/budget/usePreviousMonthsData'
 import { getCurrentMonth } from '@/utils/budgetUtils'
 import { formatCurrency } from '@/utils/calculations'
 import BudgetLayout from '@/components/budget/BudgetLayout.vue'

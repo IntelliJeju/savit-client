@@ -73,8 +73,8 @@ import { createInputHandlers, formatCurrency } from '@/utils/calculations'
 import CardComponent from '@/components/card/CardComponent.vue'
 import CategorySlider from '@/components/budget/CategorySlider.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
-import { useBudgetCategories } from '@/composables/useBudgetCategories'
-import { useBudgetManagement } from '@/composables/useBudgetManagement'
+import { useBudgetCategories } from '@/composables/budget/useBudgetCategories'
+import { useBudgetManagement } from '@/composables/budget/useBudgetManagement'
 
 // Composables
 const { totalBudget, isLoading, handleSaveBudgetClick, handleRecommendationClick } =
