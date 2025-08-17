@@ -22,6 +22,12 @@
       <!-- 액션 버튼들 -->
       <div class="flex flex-col gap-3">
         <button
+          @click="goBack"
+          class="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors duration-200"
+        >
+          뒤로가기
+        </button>
+        <button
           @click="goHome"
           class="bg-app-green text-white px-6 py-3 rounded-lg font-medium hover:bg-app-dark-green transition-colors duration-200"
         >
@@ -38,6 +44,10 @@ import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+const goBack = () => {
+  router.go(-1)
+}
 
 const goHome = () => {
   authStore.restoreAuthentication()
