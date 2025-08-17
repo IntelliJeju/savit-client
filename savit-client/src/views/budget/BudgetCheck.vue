@@ -41,9 +41,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onActivated } from 'vue'
-import { useBudgetCommon } from '@/composables/useBudgetCommon'
-import { useBudgetSegments } from '@/composables/useBudgetSegments'
-import { useBudgetCalculations } from '@/composables/useBudgetCalculations'
+import { useBudgetCommon } from '@/composables/budget/useBudgetCommon'
+import { useBudgetSegments } from '@/composables/budget/useBudgetSegments'
+import { useBudgetCalculations } from '@/composables/budget/useBudgetCalculations'
 import { formatCurrency } from '@/utils/calculations'
 import router from '@/router'
 import BudgetLayout from '@/components/budget/BudgetLayout.vue'
