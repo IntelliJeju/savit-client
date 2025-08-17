@@ -55,14 +55,27 @@
                     />
                   </div>
                   <div class="min-w-0 flex-1">
-                    <div class="font-medium text-slate-800 truncate">{{ usage.resMemberStoreName }}</div>
-                    <div class="text-sm text-slate-500 truncate">{{ usage.resMemberStoreType }}</div>
+                    <div class="font-medium text-slate-800 truncate">
+                      {{ usage.resMemberStoreName }}
+                    </div>
+                    <div class="text-sm text-slate-500 truncate">
+                      {{ usage.resMemberStoreType }}
+                    </div>
                   </div>
                 </div>
                 <div class="text-right flex-shrink-0">
-                  <div class="font-semibold whitespace-nowrap" :class="usage.resCancelYN !== '0' ? 'text-app-green' : ''">
-                    {{ usage.resCancelYN === '0' ? '-' : '+-' }}{{ Number(usage.resUsedAmount).toLocaleString() }}원
-                    <div v-if="usage.resCancelYN !== '0'" class="text-xs text-app-green font-normal">취소</div>
+                  <div
+                    class="font-semibold whitespace-nowrap"
+                    :class="usage.resCancelYN !== '0' ? 'text-app-green' : ''"
+                  >
+                    {{ usage.resCancelYN === '0' ? '-' : '+-'
+                    }}{{ Number(usage.resUsedAmount).toLocaleString() }}원
+                    <div
+                      v-if="usage.resCancelYN !== '0'"
+                      class="text-xs text-app-green font-normal"
+                    >
+                      취소
+                    </div>
                   </div>
                 </div>
               </div>

@@ -20,21 +20,21 @@ export function useCamera() {
    */
   const startCamera = async (): Promise<void> => {
     if (isStartingCamera.value) return
-    
+
     isStartingCamera.value = true
-    
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment', // 후면 카메라 우선
           width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
+          height: { ideal: 1080 },
+        },
       })
-      
+
       mediaStream.value = stream
       showCamera.value = true
-      
+
       // 비디오 엘리먼트에 스트림 연결
       if (videoElement.value) {
         videoElement.value.srcObject = stream
@@ -42,7 +42,7 @@ export function useCamera() {
     } catch (error: any) {
       console.error('카메라 접근 실패:', error)
       showCamera.value = false
-      
+
       let errorMessage = '카메라 접근에 실패했습니다.'
       if (error.name === 'NotAllowedError') {
         errorMessage = '카메라 권한이 필요합니다. 브라우저 설정에서 카메라를 허용해주세요.'
@@ -59,26 +59,26 @@ export function useCamera() {
    */
   const capturePhoto = (): string | null => {
     if (!videoElement.value) return null
-    
+
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
-    
+
     if (!context) return null
-    
+
     // 캔버스 크기를 비디오 크기에 맞춤
     canvas.width = videoElement.value.videoWidth
     canvas.height = videoElement.value.videoHeight
-    
+
     // 비디오 프레임을 캔버스에 그리기
     context.drawImage(videoElement.value, 0, 0)
-    
+
     // 이미지 데이터 URL 생성
     const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8)
     capturedImage.value = imageDataUrl
-    
+
     // 카메라 중지
     stopCamera()
-    
+
     return imageDataUrl
   }
 
@@ -95,7 +95,7 @@ export function useCamera() {
    */
   const stopCamera = (): void => {
     if (mediaStream.value) {
-      mediaStream.value.getTracks().forEach(track => track.stop())
+      mediaStream.value.getTracks().forEach((track) => track.stop())
       mediaStream.value = null
     }
     showCamera.value = false
@@ -121,12 +121,12 @@ export function useCamera() {
     capturedImage: readonly(capturedImage),
     videoElement,
     isStartingCamera: readonly(isStartingCamera),
-    
+
     // 메서드
     startCamera,
     capturePhoto,
     retakePhoto,
     stopCamera,
-    setCapturedImage
+    setCapturedImage,
   }
 }

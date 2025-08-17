@@ -1,7 +1,6 @@
 // OCR 결과 타입
 export interface OCRResult {
   cardNumber?: string
-  cardCompany?: string
   confidence?: number
   [key: string]: any
 }

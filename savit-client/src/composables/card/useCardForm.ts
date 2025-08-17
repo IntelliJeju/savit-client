@@ -2,7 +2,7 @@ import { ref, readonly } from 'vue'
 import { useCardsStore } from '@/stores/cards'
 import { useRouter } from 'vue-router'
 import type { registerCardForm } from '@/types/card'
-import type { CardNumberParts, OCRResult } from '@/types/composables'
+import type { CardNumberParts, OCRResult } from '@/types/card.composables'
 import organization from '@/utils/cardOrganization.ts'
 
 /**
@@ -16,7 +16,7 @@ import organization from '@/utils/cardOrganization.ts'
 export function useCardForm() {
   const cardsStore = useCardsStore()
   const router = useRouter()
-  
+
   // 카드 등록 폼 데이터
   const cardData = ref<registerCardForm>({
     organization: '',
@@ -101,20 +101,7 @@ export function useCardForm() {
     if (ocrResult.cardNumber) {
       setCardNumberFromOCR(ocrResult.cardNumber)
     }
-
-    if (ocrResult.cardCompany) {
-      // 카드사 이름으로 organization 코드 찾기
-      const foundOrg = organization.find(
-        (org) =>
-          org.name.toLowerCase().includes(ocrResult.cardCompany.toLowerCase()) ||
-          ocrResult.cardCompany.toLowerCase().includes(org.name.toLowerCase()),
-      )
-      if (foundOrg) {
-        cardData.value.organization = foundOrg.code
-      }
-    }
   }
-
 
   /**
    * 카드 등록 처리
@@ -171,13 +158,12 @@ export function useCardForm() {
     }
   }
 
-
   return {
     // 상태
     cardData: readonly(cardData),
     cardNumber: readonly(cardNumber),
     isProcessingTransactions: readonly(isProcessingTransactions),
-    
+
     // 메서드
     handleCardNumberInput,
     handlePasswordInput,
@@ -185,7 +171,7 @@ export function useCardForm() {
     fillFormFromOCR,
     handleRegisterCard,
     resetForm,
-    
+
     // 유틸리티
     organization,
   }
