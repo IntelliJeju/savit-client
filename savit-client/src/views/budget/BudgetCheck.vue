@@ -3,34 +3,39 @@
     <span>예산 확인</span>
   </Teleport>
 
-  <BudgetLayout
-    :loading="isLoading"
-    loading-text="예산 정보를 불러오는 중..."
-    button-text="예산 설정"
-    @button-click="handleBudgetSetting"
-  >
-    <!-- 예산 데이터가 없을 때 -->
-    <div v-if="!budgetSummary" class="text-center py-10 text-app-dark-gray">
-      <p>설정된 예산이 없습니다.</p>
+  <div class="h-full grid grid-rows-[1fr_auto]">
+    <div class="py-4">
+      <div v-if="isLoading" class="text-center py-10 text-app-dark-gray">
+        <p>{{ '데이터를 불러오는 중...' }}</p>
+      </div>
+
+      <template v-else>
+        <div v-if="!budgetSummary" class="text-center py-10 text-app-dark-gray">
+          <p>설정된 예산이 없습니다.</p>
+        </div>
+        <CardComponent v-else>
+          <BudgetCategoryCard
+            v-for="mainCategory in mainCategories"
+            :key="mainCategory.mainCategory"
+            :main-category="mainCategory"
+            @toggle="toggleCategory"
+          />
+        </CardComponent>
+      </template>
     </div>
-    <CardComponent v-else>
-      <BudgetCategoryCard
-        v-for="mainCategory in mainCategories"
-        :key="mainCategory.mainCategory"
-        :main-category="mainCategory"
-        @toggle="toggleCategory"
-      />
-    </CardComponent>
-  </BudgetLayout>
+    <div class="py-4">
+      <ButtonItem text="예산 설정" @click="handleBudgetSetting" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onActivated } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useBudget } from '@/composables/budget/useBudget'
 import router from '@/router'
-import BudgetLayout from '@/components/budget/BudgetLayout.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import BudgetCategoryCard from '@/components/budget/BudgetCategoryCard.vue'
+import ButtonItem from '@/components/button/ButtonItem.vue'
 
 // Composables
 const {
@@ -58,10 +63,6 @@ const handleBudgetSetting = () => {
 
 // Lifecycle hooks
 onMounted(async () => {
-  await initializeBudget()
-})
-
-onActivated(async () => {
   await initializeBudget()
 })
 </script>

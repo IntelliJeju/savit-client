@@ -3,19 +3,20 @@
     <span>예산 설정</span>
   </Teleport>
 
-  <BudgetLayout :loading="isLoading" button-text="설정" @button-click="saveBudget">
-    <div class="py-5"></div>
+  <div class="h-full grid grid-rows-[1fr_auto]">
+    <div class="py-4">
+      <BudgetAmountCard
+        v-model="inputBudgetAmount"
+        title="이번 달 예산 금액"
+        placeholder="설정할 예산액을 입력해주세요."
+      />
+      <BudgetHistoryCard class="mt-4" :last-month="lastMonth" :two-months-ago="twoMonthsAgo" />
+    </div>
 
-    <BudgetAmountCard
-      v-model="inputBudgetAmount"
-      title="이번 달 예산 금액"
-      placeholder="설정할 예산액을 입력해주세요."
-    />
-
-    <div class="m-5" />
-
-    <BudgetHistoryCard :last-month="lastMonth" :two-months-ago="twoMonthsAgo" />
-  </BudgetLayout>
+    <div class="py-4">
+      <ButtonItem text="예산 설정" @click="saveBudget" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -24,9 +25,9 @@ import { useRouter } from 'vue-router'
 import { useBudget } from '@/composables/budget/useBudget'
 import { getCurrentMonth } from '@/utils/dateUtils'
 import { formatCurrency } from '@/utils/calculations'
-import BudgetLayout from '@/components/budget/BudgetLayout.vue'
 import BudgetAmountCard from '@/components/budget/BudgetAmountCard.vue'
 import BudgetHistoryCard from '@/components/budget/BudgetHistoryCard.vue'
+import ButtonItem from '@/components/button/ButtonItem.vue'
 
 const router = useRouter()
 const { budgetsStore, initializeBudget } = useBudget()

@@ -75,24 +75,31 @@ const onKeydown = (event: KeyboardEvent) => {
   if (props.type === 'number' || (props.formatNumber && props.type === 'number')) {
     // 숫자, 백스페이스, 삭제, 탭, 화살표 키만 허용
     const allowedKeys = [
-      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
-      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'
+      'Backspace',
+      'Delete',
+      'Tab',
+      'Escape',
+      'Enter',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
     ]
-    
+
     if (allowedKeys.includes(event.key)) {
       return
     }
-    
+
     // 숫자 키 허용
     if (event.key >= '0' && event.key <= '9') {
       return
     }
-    
+
     // Ctrl+A, Ctrl+C, Ctrl+V 등 허용
     if (event.ctrlKey || event.metaKey) {
       return
     }
-    
+
     // 그 외는 차단
     event.preventDefault()
   }
@@ -103,7 +110,7 @@ const onPaste = (event: ClipboardEvent) => {
     event.preventDefault()
     const pastedData = event.clipboardData?.getData('text') || ''
     const numericValue = pastedData.replace(/[^\d]/g, '')
-    
+
     if (numericValue) {
       const target = event.target as HTMLInputElement
       if (props.formatNumber) {
