@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import MainLayout from './layout/MainLayout.vue'
 import SplashScreen from './components/loading/SplashScreen.vue'
 import { useAuthStore } from './stores/auth.ts'
@@ -53,34 +53,47 @@ const isLoading = computed(() => {
   return authLoading.value || cardsLoading.value || challengeLoading.value || budgetsLoading.value
 })
 
+// 데이터 로딩 함수
+const loadAllData = async () => {
+  if (!authStore.isLoggedIn) return
+
+  //유저
+  await fetchUserInfo()
+
+  //카드
+  await fetchCards()
+  const promises = cardsList.value.map((card: Card) => fetchTransactions(card.cardId, 'GET'))
+  await Promise.allSettled(promises)
+
+  //챌린지
+  await fetchAvailChallengeList()
+  await fetchParticipateChallenges()
+  await fetchChallengeStatistics()
+
+  const promissesAvail = availChallengeList.value.map((challenge) => {
+    fetchAvailChallengeDetail(challenge.challengeId)
+  })
+  const promissesParticipant = getParticipatingChallengeList.value.map((challenge) => {
+    fetchParticipateChallengeDetail(challenge.challengeId)
+  })
+
+  await Promise.allSettled(promissesAvail)
+  await Promise.allSettled(promissesParticipant)
+
+  //예산
+  await fetchBudgetsByMonth(getCurrentMonth())
+}
+
 onMounted(async () => {
   authStore.restoreAuthentication()
-  if (authStore.isLoggedIn) {
-    //유저
-    await fetchUserInfo()
+  await loadAllData()
+})
 
-    //카드
-    await fetchCards()
-    const promises = cardsList.value.map((card: Card) => fetchTransactions(card.cardId, 'GET'))
-    await Promise.allSettled(promises)
-
-    //챌린지
-    await fetchAvailChallengeList()
-    await fetchParticipateChallenges()
-    await fetchChallengeStatistics()
-
-    const promissesAvail = availChallengeList.value.map((challenge) => {
-      fetchAvailChallengeDetail(challenge.challengeId)
-    })
-    const promissesParticipant = getParticipatingChallengeList.value.map((challenge) => {
-      fetchParticipateChallengeDetail(challenge.challengeId)
-    })
-
-    await Promise.allSettled(promissesAvail)
-    await Promise.allSettled(promissesParticipant)
-
-    //예산
-    // await fetchBudgetsByMonth(getCurrentMonth())
+// 로그인 상태 변경 감시
+watch(() => authStore.isLoggedIn, async (newValue, oldValue) => {
+  if (newValue && !oldValue) {
+    // 로그인 상태로 변경된 경우에만 데이터 로드
+    await loadAllData()
   }
 })
 </script>
