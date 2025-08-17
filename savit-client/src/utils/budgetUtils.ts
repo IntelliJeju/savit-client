@@ -8,20 +8,35 @@ interface ValidationResult {
   error?: string
 }
 
-// 서브카테고리 배열 가져오기
-export const getSubCategoriesByMain = (mainCategory: MainCategory): SubCategory[] => {
-  return [...CATEGORIES.SUB[mainCategory]]
+// 공통 유틸리티 함수들
+const validateMonthFormat = (month: string): boolean => {
+  return Boolean(month && /^\d{4}-\d{2}$/.test(month))
+}
+
+const createTimestamps = () => {
+  const now = new Date().toISOString()
+  return { createdAt: now, updatedAt: now }
+}
+
+const createMainCategoryBudgets = (
+  categoryAmounts: Partial<Record<MainCategory, number>> = {}
+): MainCategoryBudgetStatus[] => {
+  return CATEGORY_ORDER.map(category => ({
+    mainCategory: category,
+    budgetAmount: categoryAmounts[category] || 0,
+    totalSpent: 0,
+    subCategories: createSubCategorySpending(category)
+  }))
 }
 
 // 메인카테고리에 속하는 서브카테고리별 지출 구조 생성
 export const createSubCategorySpending = (mainCategory: MainCategory): SubCategorySpending[] => {
-  return getSubCategoriesByMain(mainCategory).map(sub => ({
+  return CATEGORIES.SUB[mainCategory].map(sub => ({
     subCategory: sub,
     spentAmount: 0
   }))
 }
 
-export const getCurrentMonth = (): string => new Date().toISOString().slice(0, 7)
 
 // 메인 카테고리 예산 생성
 export const createMainCategoryBudgetStatus = (mainCategory: MainCategory): MainCategoryBudgetStatus => ({
@@ -33,7 +48,7 @@ export const createMainCategoryBudgetStatus = (mainCategory: MainCategory): Main
 
 // 예산 설정 요청 검증
 export const validateBudgetSettings = (request: BudgetSettingRequest): ValidationResult => {
-  if (!request.month || !/^\d{4}-\d{2}$/.test(request.month)) {
+  if (!validateMonthFormat(request.month)) {
     return { isValid: false, error: '올바른 월 형식이 아닙니다 (YYYY-MM)' }
   }
   
@@ -54,40 +69,9 @@ export const validateBudgetSettings = (request: BudgetSettingRequest): Validatio
   return { isValid: true }
 }
 
-// 설정 데이터에서 예산 생성
-export const createBudgetFromSettings = (request: BudgetSettingRequest): MonthlyBudget => {
-  const mainCategoryBudgets = CATEGORY_ORDER.map(mainCategory => {
-    const categoryBudget = request.mainCategoryBudgets.find(b => b.mainCategory === mainCategory)
-    
-    return {
-      mainCategory,
-      budgetAmount: categoryBudget?.budgetAmount || 0,
-      totalSpent: 0,
-      subCategories: createSubCategorySpending(mainCategory)
-    }
-  })
-  
-  const totalBudget = calculateSum(mainCategoryBudgets, 'budgetAmount')
-  
-  return {
-    id: `budget_${request.month}`,
-    month: request.month,
-    totalBudget,
-    mainCategoryBudgets,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-}
-
-// api 데이터에서 예산 생성
-export const createBudgetFromApiData = (data: any[], month: string): MonthlyBudget => {
-  const mainCategoryBudgets = data.map((item: any) => ({
-    mainCategory: item.mainCategory as MainCategory,
-    budgetAmount: item.budgetAmount || 0,
-    totalSpent: 0,
-    subCategories: createSubCategorySpending(item.mainCategory)
-  }))
-
+// 통합된 예산 생성 함수
+const createBudget = (month: string, categoryAmounts: Partial<Record<MainCategory, number>> = {}): MonthlyBudget => {
+  const mainCategoryBudgets = createMainCategoryBudgets(categoryAmounts)
   const totalBudget = calculateSum(mainCategoryBudgets, 'budgetAmount')
   
   return {
@@ -95,16 +79,33 @@ export const createBudgetFromApiData = (data: any[], month: string): MonthlyBudg
     month,
     totalBudget,
     mainCategoryBudgets,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    ...createTimestamps()
   }
 }
 
+// 설정 데이터에서 예산 생성
+export const createBudgetFromSettings = (request: BudgetSettingRequest): MonthlyBudget => {
+  const categoryAmounts = request.mainCategoryBudgets.reduce((acc, budget) => {
+    acc[budget.mainCategory as MainCategory] = budget.budgetAmount
+    return acc
+  }, {} as Partial<Record<MainCategory, number>>)
+  
+  return createBudget(request.month, categoryAmounts)
+}
 
-// 총 예산만 설정하는 함수용 검증
+// API 데이터에서 예산 생성
+export const createBudgetFromApiData = (data: any[], month: string): MonthlyBudget => {
+  const categoryAmounts = data.reduce((acc, item) => {
+    acc[item.mainCategory as MainCategory] = item.budgetAmount || 0
+    return acc
+  }, {} as Partial<Record<MainCategory, number>>)
 
+  return createBudget(month, categoryAmounts)
+}
+
+// 검증 함수들 (통합)
 export const validateTotalBudget = (month: string, totalBudget: number): ValidationResult => {
-  if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+  if (!validateMonthFormat(month)) {
     return { isValid: false, error: '올바른 월 형식이 아닙니다 (YYYY-MM)' }
   }
 
@@ -115,21 +116,9 @@ export const validateTotalBudget = (month: string, totalBudget: number): Validat
   return { isValid: true }
 }
 
-// 새 예산 객체 생성
+// 새 예산 객체 생성 (단순화)
 export const createNewBudget = (month: string, totalBudget: number): MonthlyBudget => {
-  return {
-    id: `budget_${month}`,
-    month,
-    totalBudget,
-    mainCategoryBudgets: CATEGORY_ORDER.map(category => ({
-      mainCategory: category,
-      budgetAmount: 0,
-      totalSpent: 0,
-      subCategories: createSubCategorySpending(category)
-    })),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
+  return createBudget(month, {}) // 빈 카테고리 금액으로 생성
 }
 
 // 기본 카테고리 데이터 생성  
@@ -144,4 +133,9 @@ export const createDefaultCategoryData = (defaultAmounts: Record<MainCategory, n
 // 기본 총 예산 계산
 export const calculateDefaultTotalBudget = (defaultAmounts: Record<MainCategory, number>): number => {
   return Object.values(defaultAmounts).reduce((sum, amount) => sum + amount, 0)
+}
+
+// 지출 비율 계산 (중복 제거)
+export const calculateSpendingRatio = (spent: number, budget: number): string => {
+  return budget > 0 ? Math.min((spent / budget) * 100, 100).toFixed(1) : '0.0'
 }

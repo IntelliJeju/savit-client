@@ -1,5 +1,5 @@
 import { ref, computed, type Ref } from 'vue'
-import { useBudgetsStore, DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/stores/budgets'
+import { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/stores/budgets'
 import { calculateDefaultTotalBudget, createDefaultCategoryData } from '@/utils/budgetUtils'
 import type { CategoryData } from '@/stores/budgets'
 import type { MainCategory } from '@/types/budgets'
@@ -16,16 +16,17 @@ const BUDGET_STORAGE_KEY = 'budget-category-settings'
 const MAX_PERCENTAGE = 100
 
 export function useBudgetCategories(totalBudget: Ref<number>) {
-  const budgetsStore = useBudgetsStore()
-
   const loadSavedCategories = (): CategoryData[] => {
     try {
       const saved = localStorage.getItem(BUDGET_STORAGE_KEY)
       if (saved) {
         const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed) && parsed.every(item => 
-          item && typeof item.name === 'string' && typeof item.percentage === 'number'
-        )) {
+        if (
+          Array.isArray(parsed) &&
+          parsed.every(
+            (item) => item && typeof item.name === 'string' && typeof item.percentage === 'number',
+          )
+        ) {
           return parsed
         }
       }
@@ -53,8 +54,9 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
   })
 
   const remainingBudget = computed(() => {
-    const usedBudget = categories.value.reduce((sum, cat) => 
-      sum + calculateAmount(cat.percentage, totalBudget.value), 0
+    const usedBudget = categories.value.reduce(
+      (sum, cat) => sum + calculateAmount(cat.percentage, totalBudget.value),
+      0,
     )
     return totalBudget.value - usedBudget
   })
@@ -68,13 +70,14 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
     calculateAmount(percentage, totalBudget.value)
 
   const calculateOtherCategoriesTotal = (excludeIndex: number): number =>
-    categories.value.reduce((sum, cat, idx) => 
-      idx === excludeIndex ? sum : sum + cat.percentage, 0
+    categories.value.reduce(
+      (sum, cat, idx) => (idx === excludeIndex ? sum : sum + cat.percentage),
+      0,
     )
 
   const adjustExcessPercentage = (categoryIndex: number, newPercentage: number): void => {
     const otherTotal = calculateOtherCategoriesTotal(categoryIndex)
-    
+
     if (newPercentage + otherTotal > MAX_PERCENTAGE) {
       const excess = newPercentage + otherTotal - MAX_PERCENTAGE
       adjustCategoriesProportionally({
@@ -87,7 +90,7 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
 
   const redistributeIfExceeds = (changedIndex: number): void => {
     const total = categories.value.reduce((sum, cat) => sum + cat.percentage, 0)
-    
+
     if (total > MAX_PERCENTAGE) {
       redistributeExcessPercentage(categories.value, changedIndex, total - MAX_PERCENTAGE)
     }
@@ -122,7 +125,7 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
 
   const calculateDefaultRatios = (): number[] => {
     const totalDefaultBudget = calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
-    
+
     return categories.value.map((cat) => {
       const categoryName = cat.name as MainCategory
       return (DEFAULT_BUDGET_AMOUNTS[categoryName] / totalDefaultBudget) * MAX_PERCENTAGE
@@ -131,11 +134,11 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
 
   const applyRecommendedRatios = (): void => {
     const defaultRatios = calculateDefaultRatios()
-    
+
     categories.value.forEach((cat, idx) => {
       cat.percentage = Math.round(defaultRatios[idx] * 10) / 10
     })
-    
+
     saveCategoriesData(categories.value)
   }
 

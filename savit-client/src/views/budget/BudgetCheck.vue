@@ -18,21 +18,6 @@
         v-for="mainCategory in mainCategories"
         :key="mainCategory.mainCategory"
         :main-category="mainCategory"
-        :category-color="categoryColor"
-        :format-currency="formatCurrency"
-        :get-expanded-class="getExpandedClass"
-        :get-amount-class="getAmountClass"
-        :get-main-category-segments="getMainCategorySegments"
-        :get-prev-month="getPrevMonth"
-        :get-prev-prev-month="getPrevPrevMonth"
-        :get-prev-month-ratio="getPrevMonthRatio"
-        :get-prev-prev-month-ratio="getPrevPrevMonthRatio"
-        :get-prev-month-spent="getPrevMonthSpent"
-        :get-prev-prev-month-spent="getPrevPrevMonthSpent"
-        :get-prev-month-budget-amount="getPrevMonthBudgetAmount"
-        :get-prev-prev-month-budget-amount="getPrevPrevMonthBudgetAmount"
-        :get-prev-month-segments="getPrevMonthSegments"
-        :get-prev-prev-month-segments="getPrevPrevMonthSegments"
         @toggle="toggleCategory"
       />
     </CardComponent>
@@ -41,10 +26,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onActivated } from 'vue'
-import { useBudgetCommon } from '@/composables/budget/useBudgetCommon'
-import { useBudgetSegments } from '@/composables/budget/useBudgetSegments'
-import { useBudgetCalculations } from '@/composables/budget/useBudgetCalculations'
-import { formatCurrency } from '@/utils/calculations'
+import { useBudget } from '@/composables/budget/useBudget'
 import router from '@/router'
 import BudgetLayout from '@/components/budget/BudgetLayout.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
@@ -55,44 +37,10 @@ const {
   isLoading,
   budgetSummary,
   initializeBudget,
-  getPrevMonth,
-  getPrevPrevMonth,
-  getPrevMonthSpendingData,
-  getPrevPrevMonthSpendingData,
-  getPrevMonthBudgetData,
-  getPrevPrevMonthBudgetData,
-  expandedCategories,
   toggleCategory,
-} = useBudgetCommon()
-
-const { getMainCategorySegments, getPrevMonthSegments, getPrevPrevMonthSegments } =
-  useBudgetSegments(
-    expandedCategories,
-    getPrevMonth,
-    getPrevPrevMonth,
-    getPrevMonthSpendingData,
-    getPrevPrevMonthSpendingData,
-    getPrevMonthBudgetData,
-    getPrevPrevMonthBudgetData,
-  )
-
-const {
-  getPrevMonthSpent,
-  getPrevPrevMonthSpent,
-  getPrevMonthRatio,
-  getPrevPrevMonthRatio,
-  getPrevMonthBudgetAmount,
-  getPrevPrevMonthBudgetAmount,
-  getAmountClass,
-} = useBudgetCalculations(
-  getPrevMonthSpendingData,
-  getPrevPrevMonthSpendingData,
-  getPrevMonthBudgetData,
-  getPrevPrevMonthBudgetData,
-)
-
-// Constants
-const categoryColor = '#028174'
+  expandedCategories,
+  calculateSpendingRatio,
+} = useBudget()
 
 const mainCategories = computed(() => {
   if (!budgetSummary.value) return []
@@ -100,14 +48,8 @@ const mainCategories = computed(() => {
     ...cat,
     expanded: expandedCategories.value.has(cat.mainCategory),
     isOverBudget: cat.totalSpent >= cat.budgetAmount,
-    spendingRatio:
-      cat.budgetAmount > 0 ? parseFloat(((cat.totalSpent / cat.budgetAmount) * 100).toFixed(1)) : 0,
+    spendingRatio: parseFloat(calculateSpendingRatio(cat.totalSpent, cat.budgetAmount)),
   }))
-})
-
-// UI helpers
-const getExpandedClass = (mainCategory: any) => ({
-  'bg-app-light-gray': mainCategory.expanded,
 })
 
 const handleBudgetSetting = () => {

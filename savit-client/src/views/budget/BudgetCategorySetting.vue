@@ -38,7 +38,7 @@
             <span class="text-app-dark-gray">현재 설정량</span>
             <div class="flex items-center gap-2">
               <span :class="percentageClass">{{ totalPercentage.toFixed(1) }}%</span>
-              <ButtonItem @click="onRecommendationClick" :disabled="isLoading" class="w-[70px] h-8">
+              <ButtonItem @click="applyRecommendation" :disabled="isLoading" class="w-[70px] h-8">
                 {{ isLoading ? '추천 중...' : '추천' }}
               </ButtonItem>
             </div>
@@ -61,7 +61,7 @@
       <!-- 설정 버튼 -->
       <div class="fixed bottom-16 inset-x-0 p-4 bg-white border-t">
         <div class="max-w-4xl mx-auto">
-          <ButtonItem @click="onSaveBudgetClick" text="설정" />
+          <ButtonItem @click="saveBudget" text="설정" />
         </div>
       </div>
     </div>
@@ -69,16 +69,101 @@
 </template>
 
 <script setup lang="ts">
-import { createInputHandlers, formatCurrency } from '@/utils/calculations'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { createInputHandlers, formatCurrency, calculateAmount } from '@/utils/calculations'
+import { useBudgetsStore, DEFAULT_BUDGET_AMOUNTS } from '@/stores/budgets'
+import { calculateDefaultTotalBudget } from '@/utils/budgetUtils'
+import { getCurrentMonth } from '@/utils/dateUtils'
 import CardComponent from '@/components/card/CardComponent.vue'
 import CategorySlider from '@/components/budget/CategorySlider.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import { useBudgetCategories } from '@/composables/budget/useBudgetCategories'
-import { useBudgetManagement } from '@/composables/budget/useBudgetManagement'
 
-// Composables
-const { totalBudget, isLoading, handleSaveBudgetClick, handleRecommendationClick } =
-  useBudgetManagement()
+const route = useRoute()
+const router = useRouter()
+const budgetsStore = useBudgetsStore()
+const isLoading = ref(false)
+
+const RECOMMENDATION_API_DELAY = 1000
+
+// 초기 예산 계산
+const getInitialTotalBudget = (): number => {
+  const queryBudget = parseInt(route.query.totalBudget as string)
+  return !isNaN(queryBudget) && queryBudget > 0
+    ? queryBudget
+    : budgetsStore.currentBudget?.totalBudget || calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
+}
+
+const totalBudget = ref(getInitialTotalBudget())
+
+// 예산 저장 처리 (단순화)
+const saveBudget = async () => {
+  if (totalPercentage.value === 0) {
+    alert('최소 한 카테고리에 예산을 배분해주세요.')
+    return
+  }
+
+  if (isLoading.value) return
+  isLoading.value = true
+
+  try {
+    const budgetRequest = {
+      month: getCurrentMonth(),
+      mainCategoryBudgets: categories.value.map((cat) => ({
+        mainCategory: cat.name,
+        budgetAmount: calculateAmount(cat.percentage, totalBudget.value),
+      })),
+    }
+
+    const result = await budgetsStore.setBudgetForMonth(budgetRequest)
+
+    if (result?.success) {
+      alert('카테고리별 예산이 성공적으로 설정되었습니다!')
+      setTimeout(() => router.push('/budget'), 100)
+    } else {
+      alert(result?.message || '예산 설정에 실패했습니다.')
+    }
+  } catch (error) {
+    console.error('예산 설정 오류:', error)
+    const message = error instanceof Error ? error.message : '예산 설정 중 오류가 발생했습니다.'
+    alert(`${message} 다시 시도해주세요.`)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 추천 버튼 처리 (단순화)
+const applyRecommendation = async () => {
+  if (isLoading.value) return
+
+  isLoading.value = true
+  try {
+    await new Promise((resolve) => setTimeout(resolve, RECOMMENDATION_API_DELAY))
+    applyRecommendedRatios()
+    alert('기본 추천 비율로 설정되었습니다!')
+  } catch (error) {
+    console.error('추천 실패:', error)
+    alert('추천 비율을 가져오는 중 오류가 발생했습니다. 다시 시도해주세요.')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 초기화
+onMounted(async () => {
+  try {
+    await budgetsStore.initializeCurrentMonthBudget()
+    if (!route.query.totalBudget && budgetsStore.currentBudget?.totalBudget) {
+      totalBudget.value = budgetsStore.currentBudget.totalBudget
+    }
+  } catch (error) {
+    console.error('예산 데이터 로드 실패:', error)
+    if (!totalBudget.value) {
+      totalBudget.value = calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
+    }
+  }
+})
 
 const {
   categories,
@@ -94,8 +179,4 @@ const {
 // Input handlers
 const { handleFocus: handleAmountInputFocus, handleBlur: handleAmountInputBlur } =
   createInputHandlers(formatCurrency)
-
-// Event handlers
-const onRecommendationClick = () => handleRecommendationClick(applyRecommendedRatios)
-const onSaveBudgetClick = () => handleSaveBudgetClick(categories.value, totalPercentage.value)
 </script>
