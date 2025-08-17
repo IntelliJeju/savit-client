@@ -81,7 +81,7 @@
     </div>
 
     <!-- 메인 콘텐츠 (상단 여백 추가) -->
-    <div class="pt-32">
+    <div class="pt-32 pb-4">
       <CardComponent>
         <DoughnutChart :cards-list="cardsList" :total-budget="totalBudget" />
         <div class="text-[2rem] font-semibold whitespace-nowrap">
@@ -125,8 +125,6 @@
           </div>
         </div>
       </CardComponent>
-
-      <div class="py-5"></div>
     </div>
   </div>
 </template>

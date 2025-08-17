@@ -1,15 +1,15 @@
 <template>
   <CardComponent>
     <p class="font-bold text-lg mb-4">{{ title }}</p>
-    <div class="relative flex items-center">
+    <div class="flex items-center text-app-dark-gray">
       <InputField
         v-model="displayAmount"
         :placeholder="placeholder"
         type="text"
-        class="text-3xl font-bold text-right pr-12"
+        class="text-3xl font-bold text-right flex-1"
         @input="handleAmountInput"
       />
-      <span class="absolute right-2 text-3xl font-bold text-app-dark-gray">원</span>
+      <span class="right-2 text-3xl font-bold">원</span>
     </div>
   </CardComponent>
 </template>

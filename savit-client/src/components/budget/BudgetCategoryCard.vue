@@ -18,11 +18,7 @@
     >
       <div class="flex items-center flex-1 min-w-0">
         <div class="w-6 flex-shrink-0">
-          <CategoryIcon
-            :category="mainCategory.mainCategory"
-            :color="categoryColor"
-            :size="24"
-          />
+          <CategoryIcon :category="mainCategory.mainCategory" :color="categoryColor" :size="24" />
         </div>
         <div class="min-w-0 flex-1 ml-2">
           <div class="text-[16px] font-semibold text-black truncate">
@@ -87,7 +83,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import SegmentedProgressBar from '@/components/progressBar/SegmentedProgressBar.vue'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import BudgetHistorySection from '@/components/budget/BudgetHistorySection.vue'

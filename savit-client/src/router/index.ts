@@ -292,15 +292,15 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  // if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-  //   next('/auth/login')
-  //   return
-  // }
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next('/auth/login')
+    return
+  }
 
-  // if (to.path === '/auth/login' && authStore.isLoggedIn) {
-  //   next('/home')
-  //   return
-  // }
+  if (to.path === '/auth/login' && authStore.isLoggedIn) {
+    next('/home')
+    return
+  }
 
   next()
 })
