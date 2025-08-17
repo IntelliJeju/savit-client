@@ -5,15 +5,12 @@
     </div>
     <div class="custom-legend-container overflow-x-auto scrollbar-hide p-4">
       <div class="flex justify-center space-x-6 px-2 min-w-max">
-        <div 
-          v-for="(item, index) in legendItems" 
-          :key="index" 
+        <div
+          v-for="(item, index) in legendItems"
+          :key="index"
           class="flex items-center space-x-2 flex-shrink-0"
         >
-          <div 
-            class="w-3 h-3 rounded-full" 
-            :style="{ backgroundColor: item.color }"
-          ></div>
+          <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: item.color }"></div>
           <span class="text-sm text-gray-700 whitespace-nowrap">{{ item.label }}</span>
         </div>
       </div>
@@ -31,7 +28,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  totalBudget: 1000000
+  totalBudget: 0,
 })
 
 const chartCanvas = ref<HTMLCanvasElement | null>(null)
@@ -41,20 +38,20 @@ let chartInstance: any = null
 const generateCardColors = (cards: any[]): string[] => {
   // 카드사별 색상 매핑
   const cardCompanyColors: { [key: string]: string } = {
-    '국민': '#FFBC00', 
-    '신한': '#0046FF',
-    '하나': '#008485',
-    '비씨': '#FA3246',
-    '기본': '#0AB68B'
+    국민: '#FFBC00',
+    신한: '#0046FF',
+    하나: '#008485',
+    비씨: '#FA3246',
+    기본: '#0AB68B',
   }
-  
-  const colors = cards.map(card => {
+
+  const colors = cards.map((card) => {
     const cardName = card.cardName || ''
     // 카드명에서 카드사 추출
-    const company = Object.keys(cardCompanyColors).find(comp => cardName.includes(comp))
+    const company = Object.keys(cardCompanyColors).find((comp) => cardName.includes(comp))
     return cardCompanyColors[company || '기본']
   })
-  
+
   return [...colors, 'transparent']
 }
 
@@ -64,14 +61,14 @@ const totalAmount = computed(() => {
 
 const chartData = computed(() => {
   const cards = props.cardsList
-  
-  const labels = cards.map(card => card.cardName)
-  const amounts = cards.map(card => card.usageAmount)
-  
+
+  const labels = cards.map((card) => card.cardName)
+  const amounts = cards.map((card) => card.usageAmount)
+
   const remainingBudget = Math.max(0, props.totalBudget - totalAmount.value)
-  
+
   return {
-    labels: [...labels,'남은 예산'],
+    labels: [...labels, '남은 예산'],
     datasets: [
       {
         data: [...amounts, remainingBudget],
@@ -82,7 +79,7 @@ const chartData = computed(() => {
       },
       {
         data: [...amounts, remainingBudget],
-        backgroundColor: [...new Array(cards.length).fill('transparent'),'#D9D9D9'],
+        backgroundColor: [...new Array(cards.length).fill('transparent'), '#D9D9D9'],
         borderWidth: 0,
         cutout: '80%',
         borderRadius: 20,
@@ -97,10 +94,10 @@ const chartData = computed(() => {
 const legendItems = computed(() => {
   const cards = props.cardsList
   const colors = generateCardColors(cards)
-  
+
   return cards.map((card, index) => ({
     label: card.cardName,
-    color: colors[index]
+    color: colors[index],
   }))
 })
 
@@ -113,12 +110,12 @@ const chartOptions = {
     },
     tooltip: {
       callbacks: {
-        labelColor: function(context: any) {
-        const colors = generateCardColors(props.cardsList)
-        return {
-          backgroundColor: colors[context.dataIndex] || '#0AB68B'
-        }
-      },
+        labelColor: function (context: any) {
+          const colors = generateCardColors(props.cardsList)
+          return {
+            backgroundColor: colors[context.dataIndex] || '#0AB68B',
+          }
+        },
         // 백분율 표시
         label: function (context: any) {
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
@@ -153,11 +150,15 @@ const centerTextPlugin = {
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    ctx.fillText(`${((currentTotalAmount/currentTotalBudget)*100).toFixed(1).toLocaleString()}%`, x, y - 10)
-    
+    ctx.fillText(
+      `${((currentTotalAmount / currentTotalBudget) * 100).toFixed(1).toLocaleString()}%`,
+      x,
+      y - 10,
+    )
+
     ctx.font = '1rem Pretendard'
     ctx.fillText('사용률', x, y + 25)
-  
+
     ctx.restore()
   },
 }

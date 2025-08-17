@@ -32,7 +32,7 @@ export { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER, CATEGORY_ID_MAP } from '@/types
 export type { CategoryData } from '@/types/budgets'
 
 export const useBudgetsStore = defineStore('budgets', () => {
-  const { request } = useApi()
+  const { request, loading } = useApi()
 
   const monthlyBudgets = ref<MonthlyBudget[]>(
     loadFromStorage<MonthlyBudget[]>(STORAGE_KEYS.MONTHLY_BUDGETS) || [],
@@ -47,25 +47,25 @@ export const useBudgetsStore = defineStore('budgets', () => {
     if (categorySpendingData.value[month]) return categorySpendingData.value[month]
 
     const spendingData = transactionService.getSpendingByMonth(month)
-    
-    return categorySpendingData.value[month] = spendingData
+
+    return (categorySpendingData.value[month] = spendingData)
   }
 
   const updateSpendingData = (
-    mainCategoryBudgets: MainCategoryBudgetStatus[], 
-    month: string
+    mainCategoryBudgets: MainCategoryBudgetStatus[],
+    month: string,
   ): MainCategoryBudgetStatus[] =>
-    mainCategoryBudgets.map(mainCategory => {
+    mainCategoryBudgets.map((mainCategory) => {
       const monthSpending = getSpendingByMonthData(month)
-      const updatedSubCategories = mainCategory.subCategories.map(sub => ({
+      const updatedSubCategories = mainCategory.subCategories.map((sub) => ({
         ...sub,
-        spentAmount: monthSpending[sub.subCategory] || 0
+        spentAmount: monthSpending[sub.subCategory] || 0,
       }))
-      
+
       return {
         ...mainCategory,
         totalSpent: calculateSum(updatedSubCategories, 'spentAmount'),
-        subCategories: updatedSubCategories
+        subCategories: updatedSubCategories,
       }
     })
 
@@ -79,18 +79,21 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  const getDefaultTotalBudget = (): Promise<number> => 
-    apiCall('/budget', Object.values(DEFAULT_BUDGET_AMOUNTS).reduce((sum, amount) => sum + amount, 0))
-      .then(data => (data as any).totalBudget || data)
+  const getDefaultTotalBudget = (): Promise<number> =>
+    apiCall(
+      '/budget',
+      Object.values(DEFAULT_BUDGET_AMOUNTS).reduce((sum, amount) => sum + amount, 0),
+    ).then((data) => (data as any).totalBudget || data)
 
-  const getDefaultCategoryBudgets = (): Promise<Record<MainCategory, number>> => 
-    apiCall('/budget/categories', { ...DEFAULT_BUDGET_AMOUNTS })
-      .then(data => (data as any).categoryBudgets || data)
+  const getDefaultCategoryBudgets = (): Promise<Record<MainCategory, number>> =>
+    apiCall('/budget/categories', { ...DEFAULT_BUDGET_AMOUNTS }).then(
+      (data) => (data as any).categoryBudgets || data,
+    )
 
   const transformBudgetRequestToCategoryData = (budgetRequest: BudgetSettingRequest) =>
-    budgetRequest.mainCategoryBudgets.map(item => ({
+    budgetRequest.mainCategoryBudgets.map((item) => ({
       categoryId: CATEGORY_ID_MAP[item.mainCategory as MainCategory],
-      targetAmount: item.budgetAmount
+      targetAmount: item.budgetAmount,
     }))
 
   async function fetchBudgetData(url: string) {
@@ -107,10 +110,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     if (!currentBudget.value) return null
 
     const budget = currentBudget.value
-    const mainCategoryBudgets = updateSpendingData(
-      budget.mainCategoryBudgets,
-      getCurrentMonth()
-    )
+    const mainCategoryBudgets = updateSpendingData(budget.mainCategoryBudgets, getCurrentMonth())
     const totalSpent = calculateSum(mainCategoryBudgets, 'totalSpent')
     const remainingBudget = budget.totalBudget - totalSpent
     const spendingRatio = budget.totalBudget > 0 ? (totalSpent / budget.totalBudget) * 100 : 0
@@ -134,14 +134,14 @@ export const useBudgetsStore = defineStore('budgets', () => {
 
     // 로컬 저장
     updateBudgetInStore(createNewBudget(month, totalBudget), month)
-    
+
     // API 호출
     for (const method of ['PUT', 'POST'] as const) {
       try {
         await request({ method, url: '/budget', data: { month, totalBudget } })
-        return { 
-          success: true, 
-          message: `전체 예산이 성공적으로 ${method === 'PUT' ? '업데이트' : '생성'}되었습니다`
+        return {
+          success: true,
+          message: `전체 예산이 성공적으로 ${method === 'PUT' ? '업데이트' : '생성'}되었습니다`,
         }
       } catch (error) {
         if (method === 'POST') {
@@ -186,11 +186,6 @@ export const useBudgetsStore = defineStore('budgets', () => {
     }
   }
 
-  async function initializeCurrentMonthBudget(): Promise<void> {
-    const currentMonth = getCurrentMonth()
-    await fetchBudgetsByMonth(currentMonth)
-  }
-
   async function getPreviousMonthsSummary(monthsBack: number): Promise<MonthSummary> {
     const monthData = getRelativeMonth(monthsBack)
     const monthStr = monthData.string
@@ -220,14 +215,14 @@ export const useBudgetsStore = defineStore('budgets', () => {
 
     // API 호출
     const categoryData = transformBudgetRequestToCategoryData(budgetRequest)
-    
+
     for (const method of ['PUT', 'POST'] as const) {
       try {
         await request({ method, url: '/budget/categories', data: categoryData })
-        return { 
-          success: true, 
+        return {
+          success: true,
           message: `카테고리별 예산이 성공적으로 ${method === 'PUT' ? '업데이트' : '생성'}되었습니다`,
-          data: budget
+          data: budget,
         }
       } catch (error) {
         if (method === 'POST') {
@@ -245,9 +240,10 @@ export const useBudgetsStore = defineStore('budgets', () => {
     currentBudget,
     categorySpendingData,
     currentBudgetSummary,
+    loading,
     setTotalBudget,
     setBudgetForMonth,
-    initializeCurrentMonthBudget,
+    fetchBudgetsByMonth,
     getPreviousMonthsSummary,
     getSpendingByMonth: getSpendingByMonthData,
     getBudgetByMonth,
