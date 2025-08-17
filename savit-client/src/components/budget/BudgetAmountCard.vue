@@ -32,21 +32,21 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+// 숫자 추출 및 업데이트 공통 함수
+const updateNumericValue = (value: string) => {
+  const numericValue = value.replace(/[^\d]/g, '')
+  emit('update:modelValue', numericValue)
+}
+
 // 표시용 값 (쉼표 포함)
 const displayAmount = computed({
   get: () => formatNumber(parseInt(props.modelValue) || 0),
-  set: (value: string) => {
-    // 숫자만 추출해서 저장
-    const numericValue = value.replace(/[^\d]/g, '')
-    emit('update:modelValue', numericValue)
-  },
+  set: updateNumericValue,
 })
 
 // 입력 처리 함수
 const handleAmountInput = (event: Event) => {
   const target = event.target as HTMLInputElement
-  const value = target.value
-  const numericValue = value.replace(/[^\d]/g, '')
-  emit('update:modelValue', numericValue)
+  updateNumericValue(target.value)
 }
 </script>

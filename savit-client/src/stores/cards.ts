@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '@/api/useApi'
+import { transactionService } from '@/services/transactionService'
 import type {
   Card,
   Transaction,
@@ -127,6 +128,12 @@ export const useCardsStore = defineStore('cards', () => {
       failed: Object.keys(failedUpdates).length,
     }
   }
+
+  // 거래 서비스에 데이터 제공자 등록
+  transactionService.registerDataProvider(() => ({
+    cards: cards.value,
+    transactions: transactions.value
+  }))
 
   // ===== 반환값 =====
   return {
