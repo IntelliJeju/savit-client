@@ -39,7 +39,7 @@ import { useBudget } from '@/composables/budget/useBudget'
 import BudgetOptionCard from '@/components/budget/BudgetOptionCard.vue'
 
 const router = useRouter()
-const { isTotalBudgetSet, initializeBudget } = useBudget()
+const { isTotalBudgetSet } = useBudget()
 
 const handleBudgetSetting = () => {
   router.push('/budget/all')
@@ -53,7 +53,5 @@ const handleCategoryBudgetSetting = () => {
   router.push('/budget/categories/list')
 }
 
-onMounted(async () => {
-  await initializeBudget()
-})
+// 초기화는 App.vue에서 이미 처리됨
 </script>

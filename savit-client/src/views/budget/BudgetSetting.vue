@@ -30,7 +30,7 @@ import BudgetHistoryCard from '@/components/budget/BudgetHistoryCard.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 
 const router = useRouter()
-const { budgetsStore, initializeBudget } = useBudget()
+const { budgetsStore } = useBudget()
 
 // 이전 월 데이터 인터페이스
 interface MonthData {
@@ -120,7 +120,7 @@ const saveBudget = async () => {
 
 onMounted(async () => {
   try {
-    await Promise.all([initializeBudget(), loadPreviousData()])
+    await loadPreviousData()
     // budgetAmount는 이제 computed로 자동 동기화됨
     inputBudgetAmount.value = budgetAmount.value
   } catch (error) {

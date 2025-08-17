@@ -20,18 +20,6 @@ export function useBudget() {
   // 현재 예산 요약 정보
   const budgetSummary = computed(() => budgetsStore.currentBudgetSummary)
 
-  // 현재 월 예산 초기화
-  const initializeBudget = async () => {
-    isLoading.value = true
-    try {
-      await budgetsStore.initializeCurrentMonthBudget()
-    } catch (error) {
-      console.error('예산 초기화 실패:', error)
-      throw error
-    } finally {
-      isLoading.value = false
-    }
-  }
 
   // 카테고리 확장/축소 함수들
   const toggleCategory = (category: MainCategory) => {
@@ -99,7 +87,6 @@ export function useBudget() {
     expandedCategories,
     
     // 함수
-    initializeBudget,
     toggleCategory,
     isExpanded,
     getExpandedClass,

@@ -31,17 +31,19 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useBudget } from '@/composables/budget/useBudget'
-import router from '@/router'
 import CardComponent from '@/components/card/CardComponent.vue'
 import BudgetCategoryCard from '@/components/budget/BudgetCategoryCard.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
+
+const router = useRouter()
 
 // Composables
 const {
   isLoading,
   budgetSummary,
-  initializeBudget,
+  isTotalBudgetSet,
   toggleCategory,
   expandedCategories,
   calculateSpendingRatio,
@@ -61,8 +63,10 @@ const handleBudgetSetting = () => {
   router.push('/budget/choice')
 }
 
-// Lifecycle hooks
-onMounted(async () => {
-  await initializeBudget()
+// 예산 설정 확인 및 리다이렉트
+onMounted(() => {
+  if (!isTotalBudgetSet.value) {
+    router.replace('/budget/choice')
+  }
 })
 </script>

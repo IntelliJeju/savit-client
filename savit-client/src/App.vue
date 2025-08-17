@@ -15,6 +15,7 @@ import { useChallengeStore } from './stores/challenges.ts'
 import { useBudgetsStore } from './stores/budgets.ts'
 import type { Card } from './types/card'
 import { storeToRefs } from 'pinia'
+import { getCurrentMonth } from '@/utils/dateUtils'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()
@@ -44,11 +45,12 @@ const {
 } = storeToRefs(challengeStore)
 
 //예산
-const { initializeCurrentMonthBudget } = budgetsStore
+const { fetchBudgetsByMonth } = budgetsStore
+const { loading: budgetsLoading } = storeToRefs(budgetsStore)
 
 // 전체 로딩 상태 (모든 store의 로딩 상태를 합침)
 const isLoading = computed(() => {
-  return authLoading.value || cardsLoading.value || challengeLoading.value
+  return authLoading.value || cardsLoading.value || challengeLoading.value || budgetsLoading.value
 })
 
 onMounted(async () => {
@@ -78,7 +80,7 @@ onMounted(async () => {
     await Promise.allSettled(promissesParticipant)
 
     //예산
-    await initializeCurrentMonthBudget()
+    // await fetchBudgetsByMonth(getCurrentMonth())
   }
 })
 </script>

@@ -143,18 +143,13 @@ const applyRecommendation = async () => {
   }
 }
 
-// 초기화
-onMounted(async () => {
-  try {
-    await budgetsStore.initializeCurrentMonthBudget()
-    if (!route.query.totalBudget && budgetsStore.currentBudget?.totalBudget) {
-      totalBudget.value = budgetsStore.currentBudget.totalBudget
-    }
-  } catch (error) {
-    console.error('예산 데이터 로드 실패:', error)
-    if (!totalBudget.value) {
-      totalBudget.value = calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
-    }
+// 초기화는 App.vue에서 이미 처리됨
+onMounted(() => {
+  if (!route.query.totalBudget && budgetsStore.currentBudget?.totalBudget) {
+    totalBudget.value = budgetsStore.currentBudget.totalBudget
+  }
+  if (!totalBudget.value) {
+    totalBudget.value = calculateDefaultTotalBudget(DEFAULT_BUDGET_AMOUNTS)
   }
 })
 
