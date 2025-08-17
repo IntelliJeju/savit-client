@@ -26,18 +26,18 @@ export interface CardFormEvents {
   'update:loginId': [value: string]
   'update:loginPw': [value: string]
   'update:birthDate': [value: string]
-  'cardNumberInput': [partIndex: number, event: Event]
-  'passwordInput': [event: Event]
-  'submit': []
+  cardNumberInput: [partIndex: number, event: Event]
+  passwordInput: [event: Event]
+  submit: []
 }
 
 // 카메라 이벤트 타입
 export interface CameraEvents {
-  'start': []
-  'capture': []
-  'retake': []
-  'upload': [event: Event]
-  'processOCR': []
+  start: []
+  capture: []
+  retake: []
+  upload: [event: Event]
+  processOCR: []
 }
 
 // 기존 타입 재export

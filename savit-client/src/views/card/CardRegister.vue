@@ -3,7 +3,7 @@
     <span>카드 등록</span>
   </Teleport>
 
-  <div class="min-h-screen bg-app-light-gray">
+  <div class="min-h-screen bg-app-light-gray my-4">
     <!-- 로딩 화면 -->
     <SplashScreen v-if="loading || isProcessingTransactions" />
 
