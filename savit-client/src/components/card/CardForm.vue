@@ -129,7 +129,7 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 import InputField from '@/components/input/InputField.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import type { registerCardForm } from '@/types/card'
-import type { CardNumberParts, CardOrganization, CardFormEvents } from '@/types/composables'
+import type { CardNumberParts, CardOrganization, CardFormEvents } from '@/types/card.composables'
 
 interface Props {
   cardData: registerCardForm

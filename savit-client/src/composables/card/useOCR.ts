@@ -1,6 +1,6 @@
 import { ref, readonly } from 'vue'
 import { useApi } from '@/api/useApi'
-import type { OCRResult } from '@/types/composables'
+import type { OCRResult } from '@/types/card.composables'
 
 /**
  * OCR 관련 기능을 관리하는 컴포저블
@@ -10,7 +10,7 @@ import type { OCRResult } from '@/types/composables'
  */
 export function useOCR() {
   const { request } = useApi()
-  
+
   // 상태 관리
   const selectedImage = ref<File | null>(null)
   const imagePreview = ref<string | null>(null)
@@ -23,11 +23,11 @@ export function useOCR() {
   const handleImageUpload = (event: Event): string | null => {
     const target = event.target as HTMLInputElement
     const file = target.files?.[0]
-    
+
     if (!file) return null
-    
+
     selectedImage.value = file
-    
+
     // 이미지 미리보기 생성
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -35,10 +35,10 @@ export function useOCR() {
       imagePreview.value = result
     }
     reader.readAsDataURL(file)
-    
+
     // 기존 OCR 결과 초기화
     ocrResult.value = null
-    
+
     return URL.createObjectURL(file)
   }
 
@@ -49,12 +49,12 @@ export function useOCR() {
     if (!capturedImageUrl && !selectedImage.value) {
       throw new Error('처리할 이미지가 없습니다.')
     }
-    
+
     isProcessingOCR.value = true
-    
+
     try {
       const formData = new FormData()
-      
+
       if (selectedImage.value) {
         // 파일에서 선택한 경우
         formData.append('cardImage', selectedImage.value)
@@ -64,19 +64,18 @@ export function useOCR() {
         const blob = await response.blob()
         formData.append('cardImage', blob, 'card.jpg')
       }
-      
+
       const result = await request({
         method: 'POST',
         url: '/cards/ocr',
         data: formData,
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       })
-      
+
       ocrResult.value = result
       return result
-      
     } catch (error) {
       console.error('OCR 처리 실패:', error)
       throw new Error('카드 정보 인식에 실패했습니다. 다시 시도해주세요.')
@@ -94,16 +93,15 @@ export function useOCR() {
     imagePreview.value = null
   }
 
-
   return {
     // 상태
     imagePreview: readonly(imagePreview),
     ocrResult: readonly(ocrResult),
     isProcessingOCR: readonly(isProcessingOCR),
-    
+
     // 메서드
     handleImageUpload,
     processOCR,
-    clearOCRResult
+    clearOCRResult,
   }
 }

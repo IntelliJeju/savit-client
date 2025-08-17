@@ -136,14 +136,13 @@
       </div>
       <div class="text-xs text-green-700">
         <p v-if="ocrResult.cardNumber">카드번호: {{ ocrResult.cardNumber }}</p>
-        <p v-if="ocrResult.cardCompany">카드사: {{ ocrResult.cardCompany }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { OCRResult, CameraEvents } from '@/types/composables'
+import type { OCRResult, CameraEvents } from '@/types/card.composables'
 
 interface Props {
   showCamera: boolean
