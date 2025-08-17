@@ -4,7 +4,8 @@
       "Bash(rm:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npm run build:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": [],
     "ask": []

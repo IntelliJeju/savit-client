@@ -1,8 +1,7 @@
 import { ref, computed, type Ref } from 'vue'
-import { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/stores/budgets'
+import { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/types/budgets'
 import { calculateDefaultTotalBudget, createDefaultCategoryData } from '@/utils/budgetUtils'
-import type { CategoryData } from '@/stores/budgets'
-import type { MainCategory } from '@/types/budgets'
+import type { CategoryData, MainCategory } from '@/types/budgets'
 import {
   calculateAmount,
   calculatePercentageFromAmount,
@@ -66,6 +65,7 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
     totalPercentage.value === MAX_PERCENTAGE ? 'text-app-green' : 'text-app-red',
   ])
 
+  // 카테고리 금액 계산 (이미 calculations utils에 있는 함수 재사용)
   const calculateCategoryAmount = (percentage: number): number =>
     calculateAmount(percentage, totalBudget.value)
 

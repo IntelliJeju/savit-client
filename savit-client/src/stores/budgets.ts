@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { calculateSum } from '@/utils/calculations'
 import { saveToStorage, loadFromStorage } from '@/utils/storage'
 import { useApi } from '@/api/useApi'
-import { useCardsStore } from '@/stores/cards'
+import { transactionService } from '@/services/transactionService'
 
 import {
   validateBudgetSettings,
@@ -28,12 +28,11 @@ import type {
 import { STORAGE_KEYS, DEFAULT_BUDGET_AMOUNTS, CATEGORY_ID_MAP, CATEGORIES } from '@/types/budgets'
 
 // Re-export for components
-export { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER } from '@/types/budgets'
+export { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ORDER, CATEGORY_ID_MAP } from '@/types/budgets'
 export type { CategoryData } from '@/types/budgets'
 
 export const useBudgetsStore = defineStore('budgets', () => {
   const { request } = useApi()
-  const cardsStore = useCardsStore()
 
   const monthlyBudgets = ref<MonthlyBudget[]>(
     loadFromStorage<MonthlyBudget[]>(STORAGE_KEYS.MONTHLY_BUDGETS) || [],
@@ -43,47 +42,13 @@ export const useBudgetsStore = defineStore('budgets', () => {
   )
   const categorySpendingData = ref<Record<string, Record<SubCategory, number>>>({})
 
-  // ===== 데이터 처리 로직 (useBudgetDataProcessor에서 이동) =====
-  const initializeSpendingByCategory = (): Record<SubCategory, number> =>
-    Object.values(CATEGORIES.SUB).flat().reduce(
-      (acc, subCategory) => ({ ...acc, [subCategory]: 0 }),
-      {} as Record<SubCategory, number>
-    )
-
-  function getAllTransactionsForMonth(month: string): any[] {
-    const allTransactions: any[] = []
-    const monthPrefix = month.replace('-', '')
-    
-    cardsStore.cardsList.forEach(card => {
-      const cardTransactions = cardsStore.getTransactionsByCard(card.cardId)
-      allTransactions.push(...cardTransactions)
-    })
-    
-    return allTransactions.filter(transaction => 
-      transaction.resUsedDate.startsWith(monthPrefix)
-    )
-  }
-
-  function processCardTransactions(
-    transactions: any[], 
-    spendingByCategory: Record<SubCategory, number>
-  ): void {
-    transactions.forEach(transaction => {
-      if (transaction.resCancelYN === '0') {
-        const category = '기타' as SubCategory
-        const amount = Number(transaction.resUsedAmount)
-        spendingByCategory[category] += amount
-      }
-    })
-  }
-
+  // ===== 데이터 처리 로직 (거래 서비스 사용) =====
   const getSpendingByMonthData = (month: string): Record<SubCategory, number> => {
     if (categorySpendingData.value[month]) return categorySpendingData.value[month]
 
-    const spendingByCategory = initializeSpendingByCategory()
-    processCardTransactions(getAllTransactionsForMonth(month), spendingByCategory)
+    const spendingData = transactionService.getSpendingByMonth(month)
     
-    return categorySpendingData.value[month] = spendingByCategory
+    return categorySpendingData.value[month] = spendingData
   }
 
   const updateSpendingData = (
