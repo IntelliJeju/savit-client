@@ -112,7 +112,7 @@ import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import { mapCategoryToMainCategory } from '@/utils/category'
 import { storeToRefs } from 'pinia'
-import now from '@/utils/date.ts'
+import now from '@/utils/dateUtils'
 
 const route = useRoute()
 const cardsStore = useCardsStore()

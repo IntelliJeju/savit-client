@@ -98,7 +98,7 @@ import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import { storeToRefs } from 'pinia'
-import now from '@/utils/date.ts'
+import now from '@/utils/dateUtils'
 import { calculateProgress, getChallengeStatus, calculateDaysProgressWithStatus } from '@/utils/common.ts'
 
 const challengeStore = useChallengeStore()

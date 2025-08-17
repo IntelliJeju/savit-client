@@ -7,7 +7,7 @@
     <div class="py-5"></div>
 
     <BudgetAmountCard
-      v-model="budgetAmount"
+      v-model="inputBudgetAmount"
       title="이번 달 예산 금액"
       placeholder="설정할 예산액을 입력해주세요."
     />
@@ -19,46 +19,78 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBudgetCommon } from '@/composables/budget/useBudgetCommon'
-import { usePreviousMonthsData } from '@/composables/budget/usePreviousMonthsData'
-import { getCurrentMonth } from '@/utils/budgetUtils'
+import { useBudget } from '@/composables/budget/useBudget'
+import { getCurrentMonth } from '@/utils/dateUtils'
 import { formatCurrency } from '@/utils/calculations'
 import BudgetLayout from '@/components/budget/BudgetLayout.vue'
 import BudgetAmountCard from '@/components/budget/BudgetAmountCard.vue'
 import BudgetHistoryCard from '@/components/budget/BudgetHistoryCard.vue'
 
 const router = useRouter()
-const { budgetsStore, initializeBudget } = useBudgetCommon()
-const { lastMonth, twoMonthsAgo, loadPreviousData } = usePreviousMonthsData()
+const { budgetsStore, initializeBudget } = useBudget()
+
+// 이전 월 데이터 인터페이스
+interface MonthData {
+  name: string
+  spending: number
+  budget: number
+}
+
+// 이전 월 데이터 관리
+const lastMonth = ref<MonthData>({
+  name: '',
+  spending: 0,
+  budget: 0,
+})
+
+const twoMonthsAgo = ref<MonthData>({
+  name: '',
+  spending: 0,
+  budget: 0,
+})
+
+const loadPreviousData = async () => {
+  try {
+    const [lastMonthData, twoMonthsAgoData] = await Promise.all([
+      budgetsStore.getPreviousMonthsSummary(1),
+      budgetsStore.getPreviousMonthsSummary(2),
+    ])
+
+    lastMonth.value = {
+      name: lastMonthData.monthName,
+      spending: lastMonthData.totalSpent,
+      budget: lastMonthData.totalBudget,
+    }
+
+    twoMonthsAgo.value = {
+      name: twoMonthsAgoData.monthName,
+      spending: twoMonthsAgoData.totalSpent,
+      budget: twoMonthsAgoData.totalBudget,
+    }
+  } catch (error) {
+    console.error('Failed to load previous data:', error)
+    throw error
+  }
+}
 
 const isLoading = ref(false)
 
-// 기존 예산이 있으면 그 값을 기본으로 설정
-const getExistingBudget = (): string => {
-  if (budgetsStore.currentBudget?.totalBudget) {
-    return budgetsStore.currentBudget.totalBudget.toString()
-  }
-  return ''
-}
+// Reactive 예산 금액 (store와 자동 동기화)
+const budgetAmount = computed({
+  get: () => budgetsStore.currentBudget?.totalBudget?.toString() || '',
+  set: (value: string) => {
+    // 필요시 별도 ref로 관리 가능
+  },
+})
 
-const budgetAmount = ref(getExistingBudget())
+// 입력용 별도 ref
+const inputBudgetAmount = ref('')
 
-// 예산 저장 함수
+// 예산 저장 함수 (store 검증 사용)
 const saveBudget = async () => {
-  if (!budgetAmount.value) {
-    alert('예산 금액을 입력해주세요.')
-    return
-  }
-
-  const amount = parseInt(budgetAmount.value)
-
-  if (isNaN(amount) || amount <= 0) {
-    alert('올바른 금액을 입력해주세요.')
-    return
-  }
-
+  const amount = parseInt(inputBudgetAmount.value || budgetAmount.value)
   isLoading.value = true
 
   try {
@@ -88,10 +120,8 @@ const saveBudget = async () => {
 onMounted(async () => {
   try {
     await Promise.all([initializeBudget(), loadPreviousData()])
-
-    if (budgetsStore.currentBudget?.totalBudget && !budgetAmount.value) {
-      budgetAmount.value = budgetsStore.currentBudget.totalBudget.toString()
-    }
+    // budgetAmount는 이제 computed로 자동 동기화됨
+    inputBudgetAmount.value = budgetAmount.value
   } catch (error) {
     console.error('데이터 로드 실패:', error)
   }

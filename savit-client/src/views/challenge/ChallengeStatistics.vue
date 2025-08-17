@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import CardComponent from '@/components/card/CardComponent.vue'
-import now from '@/utils/date.ts'
+import now from '@/utils/dateUtils'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'

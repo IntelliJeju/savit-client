@@ -35,11 +35,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBudgetCommon } from '@/composables/budget/useBudgetCommon'
+import { useBudget } from '@/composables/budget/useBudget'
 import BudgetOptionCard from '@/components/budget/BudgetOptionCard.vue'
 
 const router = useRouter()
-const { isTotalBudgetSet, initializeBudget } = useBudgetCommon()
+const { isTotalBudgetSet, initializeBudget } = useBudget()
 
 const handleBudgetSetting = () => {
   router.push('/budget/all')
