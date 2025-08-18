@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
-import type { CategoryData } from '@/stores/budgets'
+import type { CategoryData } from '@/types/budgets'
 import { formatCurrency, calculateAmount } from '@/utils/calculations'
 
 const props = defineProps<{
