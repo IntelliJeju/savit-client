@@ -14,7 +14,7 @@ import { computed } from 'vue'
 
 // Props 정의
 interface Props {
-  variant?: 'default' | 'green' | 'red' | 'grey'
+  variant?: 'default' | 'green' | 'red' | 'grey' | 'purple'
   text?: string
 }
 
