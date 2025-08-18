@@ -44,12 +44,14 @@
               class="pr-2"
               @click="nextChallenge"
               :disabled="currentChallengeIndex === participatingChallenges.length - 1"
-              :class="{ 'opacity-50': currentChallengeIndex === participatingChallenges.length - 1 }"
+              :class="{
+                'opacity-50': currentChallengeIndex === participatingChallenges.length - 1,
+              }"
             >
               <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
             </button>
           </template>
-          
+
           <template v-else>
             <div class="flex-1 flex items-center justify-center text-app-dark-gray/70">
               진행중인 챌린지가 없습니다
@@ -102,28 +104,23 @@
             / {{ totalBudget.toLocaleString() }} 원
           </div>
 
-          <!-- 남은 한도와 일평균 사용 표시 -->
-          <div class="flex justify-center gap-8 text-[1.5rem] mx-8 mb-6">
-            <div class="flex flex-col items-center w-1/2">
-              <div class="text-center">
-                <div class="font-semibold whitespace-nowrap">
-                  {{ (totalBudget - totalAmount).toLocaleString() }} 원
-                </div>
-                <div class="text-[0.9rem] text-app-dark-gray/70 mt-1">남은 한도</div>
+          <div class="flex mt-8 text-center">
+            <div class="flex-1">
+              <div class="text-[1.5rem] font-semibold">
+                {{ (totalBudget - totalAmount).toLocaleString() }} 원
               </div>
+              <div class="text-[1rem] font-regular text-app-dark-gray/50">남은 한도</div>
             </div>
-            <div class="flex flex-col items-center w-1/2">
-              <div class="text-center">
-                <div class="font-semibold whitespace-nowrap">
-                  {{ Math.round(totalAmount / new Date().getDate()).toLocaleString() }} 원
-                </div>
-                <div class="text-[0.9rem] text-app-dark-gray/70 mt-1">일평균 사용</div>
+            <div class="flex-1">
+              <div class="text-[1.5rem] font-semibold">
+                {{ Math.round(totalAmount / new Date().getDate()).toLocaleString() }} 원
               </div>
+              <div class="text-[1rem] font-regular text-app-dark-gray/50">일평균 사용</div>
             </div>
           </div>
 
           <!-- 분석 버튼 영역 -->
-          <div class="flex justify-center mx-8 mb-6">
+          <div class="flex justify-center mx-4 mb-6 mt-8">
             <template v-if="totalAmount > 0">
               <div class="flex gap-8 w-full">
                 <ButtonItem class="flex-1 min-w-32 h-28 font-semibold" @click="BudgetCheck">
@@ -143,7 +140,7 @@
                 </ButtonItem>
               </div>
             </template>
-            
+
             <template v-else>
               <ButtonItem class="w-full max-w-80 h-28 font-semibold" @click="BudgetCheck">
                 <div class="text-center">카드 사용 후</div>
