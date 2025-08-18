@@ -90,12 +90,15 @@ onMounted(async () => {
 })
 
 // 로그인 상태 변경 감시
-watch(() => authStore.isLoggedIn, async (newValue, oldValue) => {
-  if (newValue && !oldValue) {
-    // 로그인 상태로 변경된 경우에만 데이터 로드
-    await loadAllData()
-  }
-})
+watch(
+  () => authStore.isLoggedIn,
+  async (newValue, oldValue) => {
+    if (newValue && !oldValue) {
+      // 로그인 상태로 변경된 경우에만 데이터 로드
+      await loadAllData()
+    }
+  },
+)
 </script>
 
 <style scoped></style>

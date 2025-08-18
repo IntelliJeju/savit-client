@@ -1,17 +1,5 @@
 import type { SubCategory } from '@/types/budgets'
-
-// 거래 데이터 타입 정의
-export interface Transaction {
-  resUsedDate: string
-  resUsedAmount: string
-  resCancelYN: string
-  [key: string]: any
-}
-
-export interface Card {
-  cardId: number
-  [key: string]: any
-}
+import type { Transaction, Card } from '@/types/card'
 
 // 거래 데이터 처리 서비스
 export class TransactionService {
@@ -57,13 +45,40 @@ export class TransactionService {
     
     transactions.forEach(transaction => {
       if (transaction.resCancelYN === '0') {
-        const category = '기타' as SubCategory
+        const category = this.categorizeTransaction(transaction)
         const amount = Number(transaction.resUsedAmount)
         spendingByCategory[category] += amount
       }
     })
     
     return spendingByCategory
+  }
+
+  // 기존 카테고리 시스템을 활용한 분류 로직
+  private categorizeTransaction(transaction: Transaction): SubCategory {
+    const storeName = (transaction.resMemberStoreName || '').toLowerCase()
+    const storeType = (transaction.resMemberStoreType || '').toLowerCase()
+    
+    // 가맹점 유형으로 먼저 분류 시도
+    if (storeType.includes('식당') || storeType.includes('음식점')) return '식당'
+    if (storeType.includes('카페') || storeType.includes('커피')) return '카페'
+    if (storeType.includes('편의점')) return '편의점/마트'
+    if (storeType.includes('슈퍼마켓') || storeType.includes('마트')) return '편의점/마트'
+    if (storeType.includes('택시') || storeType.includes('버스') || storeType.includes('지하철')) return '대중교통'
+    if (storeType.includes('병원') || storeType.includes('의원') || storeType.includes('약국')) return '의료비'
+    if (storeType.includes('영화') || storeType.includes('극장')) return '영화'
+    if (storeType.includes('통신')) return '통신비'
+    
+    // 가맹점명으로 보완 분류
+    if (storeName.includes('스타벅스') || storeName.includes('투썸') || storeName.includes('카페')) return '카페'
+    if (storeName.includes('치킨') || storeName.includes('피자') || storeName.includes('맥도날드')) return '식당'
+    if (storeName.includes('gs25') || storeName.includes('cu') || storeName.includes('세븐일레븐')) return '편의점/마트'
+    if (storeName.includes('이마트') || storeName.includes('롯데마트') || storeName.includes('홈플러스')) return '편의점/마트'
+    if (storeName.includes('cgv') || storeName.includes('롯데시네마') || storeName.includes('메가박스')) return '영화'
+    if (storeName.includes('skt') || storeName.includes('kt') || storeName.includes('lg유플러스')) return '통신비'
+    if (storeName.includes('배달의민족') || storeName.includes('요기요') || storeName.includes('쿠팡이츠')) return '배달'
+    
+    return '기타'
   }
 
   // 특정 월의 카테고리별 지출 조회

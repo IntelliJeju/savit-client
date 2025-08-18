@@ -47,10 +47,10 @@ export const useBudgetsStore = defineStore('budgets', () => {
 
   // ===== 데이터 처리 로직 =====
   const getSpendingByMonthData = (month: string): Record<SubCategory, number> => {
-    if (categorySpendingData.value[month]) return categorySpendingData.value[month]
-
+    // 캐시된 데이터가 있어도 항상 최신 데이터로 업데이트
     const spendingData = transactionService.getSpendingByMonth(month)
-    return (categorySpendingData.value[month] = spendingData)
+    categorySpendingData.value[month] = spendingData
+    return spendingData
   }
 
   const updateSpendingData = (

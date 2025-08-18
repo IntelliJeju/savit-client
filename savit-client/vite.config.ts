@@ -13,6 +13,7 @@ export default defineConfig({
     // 선택사항: 자동으로 브라우저 열지 않기
     open: false,
     // HTTPS 설정 (Firebase Messaging 필요)
+    allowedHosts: ['3db3eeb4f562.ngrok-free.app'],
   },
   resolve: {
     alias: {

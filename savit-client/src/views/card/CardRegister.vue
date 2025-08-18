@@ -22,14 +22,10 @@
           </div>
 
           <CardCamera
-            :show-camera="showCamera"
             :captured-image="capturedImage"
-            :is-starting-camera="isStartingCamera"
             :is-processing-o-c-r="isProcessingOCR"
             :ocr-result="ocrResult"
-            :video-element="videoElement"
-            @start="startCamera"
-            @capture="capturePhoto"
+            @capture="handleCapturePhoto"
             @retake="handleRetakePhoto"
             @upload="handleGalleryUpload"
             @process-o-c-r="handleOCRProcess"
@@ -74,32 +70,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref } from 'vue'
 import { useCardsStore } from '@/stores/cards'
 import CardComponent from '@/components/card/CardComponent.vue'
 import SplashScreen from '@/components/loading/SplashScreen.vue'
 import CardCamera from '@/components/card/CardCamera.vue'
 import CardForm from '@/components/card/CardForm.vue'
 import { storeToRefs } from 'pinia'
-import { useCamera } from '@/composables/card/useCamera'
 import { useOCR } from '@/composables/card/useOCR'
 import { useCardForm } from '@/composables/card/useCardForm'
 
 const cardsStore = useCardsStore()
 const { loading } = storeToRefs(cardsStore)
 
-// 컴포저블 사용
-const {
-  showCamera,
-  capturedImage,
-  videoElement,
-  isStartingCamera,
-  startCamera,
-  capturePhoto,
-  retakePhoto,
-  stopCamera,
-  setCapturedImage,
-} = useCamera()
+// 상태 관리
+const capturedImage = ref<string | null>(null)
 
 const { imagePreview, ocrResult, isProcessingOCR, handleImageUpload, processOCR, clearOCRResult } =
   useOCR()
@@ -129,17 +114,16 @@ const handleOCRProcess = async () => {
   }
 }
 
-// 다시 촬영 함수 래핑 (OCR 결과 초기화 포함)
-const handleRetakePhoto = async () => {
-  clearOCRResult()
-  await retakePhoto()
+// 사진 촬영 완료 처리
+const handleCapturePhoto = (imageDataUrl: string) => {
+  capturedImage.value = imageDataUrl
 }
 
-// 컴포넌트 초기화
-onMounted(async () => {
-  // 페이지 로드 시 자동으로 카메라 시작
-  await startCamera()
-})
+// 다시 촬영 처리 (OCR 결과 초기화 포함)
+const handleRetakePhoto = () => {
+  clearOCRResult()
+  capturedImage.value = null
+}
 
 // 갤러리에서 이미지 업로드 처리
 const handleGalleryUpload = (event: Event) => {
@@ -148,8 +132,7 @@ const handleGalleryUpload = (event: Event) => {
   // imagePreview가 설정되면 capturedImage에도 복사
   const checkImagePreview = () => {
     if (imagePreview.value) {
-      setCapturedImage(imagePreview.value)
-      stopCamera()
+      capturedImage.value = imagePreview.value
     } else {
       // 100ms 후 다시 확인 (비동기 처리를 위해)
       setTimeout(checkImagePreview, 100)
