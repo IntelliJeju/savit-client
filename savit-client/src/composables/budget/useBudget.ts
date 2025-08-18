@@ -79,11 +79,6 @@ export function useBudget() {
     return mainCategory.isOverBudget ? 'text-app-red' : 'text-app-blue'
   }
 
-  // 모든 카테고리 또래 평균 조회
-  const getAllPeerAverages = async () => {
-    return await budgetsStore.getPeerAvgForAllCategories()
-  }
-
   return {
     // 상태
     isLoading,
@@ -105,7 +100,6 @@ export function useBudget() {
     getMonthRatio,
     getMonthBudgetAmount,
     getAmountClass,
-    getAllPeerAverages,
     
     // 유틸리티
     formatCurrency,
