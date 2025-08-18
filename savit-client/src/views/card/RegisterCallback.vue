@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-app-light-gray">
-    <div class="max-w-sm mx-auto p-4">
+  <div class="bg-app-light-gray min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
       <!-- 등록 성공 헤더 -->
       <div class="text-center mb-6">
         <div

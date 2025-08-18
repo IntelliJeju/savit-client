@@ -1,5 +1,5 @@
 const organization = [
-  { name: 'KB카드', code: '0301' },
+  { name: '국민카드', code: '0301' },
   { name: '현대카드', code: '0302' },
   { name: '삼성카드', code: '0303' },
   { name: 'NH카드', code: '0304' },

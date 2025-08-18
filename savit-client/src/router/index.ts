@@ -261,7 +261,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '',
     },
   },
-  
+
   // Error pages
   {
     path: '/error/server',
@@ -275,7 +275,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '서버 오류',
     },
   },
-  
+
   // 404 페이지 - 존재하지 않는 모든 경로를 /home으로 리다이렉트
   {
     path: '/:pathMatch(.*)*',

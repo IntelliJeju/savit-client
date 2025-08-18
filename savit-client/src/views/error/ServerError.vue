@@ -17,42 +17,47 @@
     <div class="text-center mb-8">
       <h1 class="text-2xl font-bold text-app-dark-gray mb-4">서버와의 연결이 원활하지 않습니다</h1>
       <p class="text-app-dark-gray/70 mb-2">일시적인 서버 문제로 서비스에 접속할 수 없습니다.</p>
-      <p class="text-app-dark-gray/70">잠시 후 다시 시도해주세요.</p>
+      <p class="text-app-dark-gray/70 mb-8">잠시 후 다시 시도해주세요.</p>
+
+      <!-- 액션 버튼들 -->
+      <div class="flex flex-col gap-3">
+        <button
+          @click="goBack"
+          class="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors duration-200"
+        >
+          뒤로가기
+        </button>
+        <button
+          @click="goHome"
+          class="bg-app-green text-white px-6 py-3 rounded-lg font-medium hover:bg-app-dark-green transition-colors duration-200"
+        >
+          홈으로 가기
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import router from '@/router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-const isRetrying = ref(false)
+const router = useRouter()
+const authStore = useAuthStore()
 
-const handleRetry = async () => {
-  isRetrying.value = true
-
-  try {
-    // 간단한 헬스체크 API 호출 (실제 구현 시)
-    // await healthCheck()
-
-    // 임시로 1초 대기 후 홈으로 이동
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // 성공 시 홈으로 리다이렉트
-    router.push('/')
-  } catch (error) {
-    // 실패 시 현재 페이지 유지
-    console.error('Retry failed:', error)
-  } finally {
-    isRetrying.value = false
-  }
+const goBack = () => {
+  router.go(-1)
 }
 
-const handleGoHome = () => {
-  router.push('/')
+const goHome = () => {
+  authStore.restoreAuthentication()
+
+  if (authStore.isLoggedIn) {
+    router.push('/home')
+  } else {
+    router.push('/auth/login')
+  }
 }
 </script>
 
-<style scoped>
-/* 커스텀 애니메이션이나 스타일이 필요하면 여기에 추가 */
-</style>
+<style scoped></style>

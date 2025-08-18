@@ -3,94 +3,56 @@
     <span>카드 등록</span>
   </Teleport>
 
-  <div class="min-h-screen bg-app-light-gray">
-    <div v-if="loading">Loading...</div>
-    <div class="max-w-sm mx-auto p-4">
-      <!-- 카드 등록 폼 -->
-      <form @submit.prevent="handleRegisterCard" class="space-y-5">
-        <!-- 카드 등록 정보 섹션 -->
-        <CardComponent>
-          <div class="space-y-4">
-            <div>
-              <label for="organization" class="block text-sm font-bold text-slate-700 mb-2"
-                >카드사</label
-              >
-              <select
-                id="organization"
-                v-model="cardData.organization"
-                class="input-field border-b py-1 px-2 w-full appearance-none"
-                required
-              >
-                <option value="" disabled>카드사를 선택해주세요</option>
-                <option v-for="card in organization" :value="card.code">{{ card.name }}</option>
-              </select>
-            </div>
+  <div class="min-h-screen bg-app-light-gray my-4">
+    <!-- 로딩 화면 -->
+    <SplashScreen
+      v-if="loading || isProcessingTransactions"
+      :message="'카드 정보를 불러오는 중...' + '\n' + '10초 이상 소요될 수 있습니다.'"
+    />
 
-            <div>
-              <label for="encryptedCardNo" class="block text-sm font-bold text-slate-700 mb-2"
-                >카드 번호</label
-              >
-              <InputField
-                v-model="cardData.encryptedCardNo"
-                placeholder="카드 번호를 입력해주세요"
-                type="text"
-                :maxlength="16"
-              />
-            </div>
-
-            <div>
-              <label for="cardPassword" class="block text-sm font-bold text-slate-700 mb-2"
-                >카드 비밀번호 (앞 두자리)</label
-              >
-              <InputField
-                v-model="cardData.cardPassword"
-                placeholder="카드 비밀번호 앞 두자리를 입력해주세요"
-                type="password"
-                :maxlength="2"
-              />
-            </div>
-
-            <div>
-              <label for="loginId" class="block text-sm font-bold text-slate-700 mb-2"
-                >사용자 ID</label
-              >
-              <InputField
-                v-model="cardData.loginId"
-                placeholder="카드사 사이트 로그인 ID"
-                type="text"
-              />
-            </div>
-
-            <div>
-              <label for="loginPw" class="block text-sm font-bold text-slate-700 mb-2"
-                >사용자 비밀번호</label
-              >
-              <InputField
-                v-model="cardData.loginPw"
-                placeholder="카드사 사이트 로그인 비밀번호"
-                type="password"
-              />
-            </div>
-
-            <div>
-              <label for="birthDate" class="block text-sm font-bold text-slate-700 mb-2"
-                >생년월일</label
-              >
-              <InputField
-                v-model="cardData.birthDate"
-                placeholder="YYYYMMDD (예: 20001225)"
-                type="text"
-                :maxlength="8"
-              />
-            </div>
+    <div class="max-w-sm mx-auto">
+      <!-- 카드 이미지 인식 섹션 -->
+      <CardComponent class="mb-5">
+        <div class="space-y-4">
+          <div class="text-center">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">간편 등록</h3>
+            <p class="text-sm text-slate-600 mb-4">
+              카드 이미지를 촬영하여 자동으로 정보를 입력하세요
+            </p>
           </div>
-        </CardComponent>
 
-        <!-- 등록 버튼 -->
-        <div class="pb-4">
-          <ButtonItem text="카드 등록하기" />
+          <CardCamera
+            :captured-image="capturedImage"
+            :is-processing-o-c-r="isProcessingOCR"
+            :ocr-result="ocrResult"
+            @capture="handleCapturePhoto"
+            @retake="handleRetakePhoto"
+            @upload="handleGalleryUpload"
+            @process-o-c-r="handleOCRProcess"
+          />
         </div>
-      </form>
+      </CardComponent>
+
+      <!-- 구분선 (OCR 결과가 있을 때만 표시) -->
+      <div v-if="!ocrResult" class="flex items-center my-6">
+        <div class="flex-1 border-t border-slate-300"></div>
+        <span class="px-4 text-sm text-slate-500">또는 직접 입력</span>
+        <div class="flex-1 border-t border-slate-300"></div>
+      </div>
+
+      <!-- 카드 등록 폼 -->
+      <CardForm
+        :card-data="cardData"
+        :card-number="cardNumber"
+        :organization="organization"
+        @submit="handleRegisterCard"
+        @update:organization="updateCardData('organization', $event)"
+        @update:login-id="updateCardData('loginId', $event)"
+        @update:login-pw="updateCardData('loginPw', $event)"
+        @update:birth-date="updateCardData('birthDate', $event)"
+        @card-number-input="handleCardNumberInput"
+        @password-input="handlePasswordInput"
+      />
 
       <!-- 안내 메시지 -->
       <CardComponent>
@@ -110,49 +72,74 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useCardsStore } from '@/stores/cards'
-import { useRouter } from 'vue-router'
-import ButtonItem from '@/components/button/ButtonItem.vue'
-import InputField from '@/components/input/InputField.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
-import organization from '@/utils/cardOrganization.ts'
+import SplashScreen from '@/components/loading/SplashScreen.vue'
+import CardCamera from '@/components/card/CardCamera.vue'
+import CardForm from '@/components/card/CardForm.vue'
 import { storeToRefs } from 'pinia'
-import type { registerCardForm } from '@/types/card'
+import { useOCR } from '@/composables/card/useOCR'
+import { useCardForm } from '@/composables/card/useCardForm'
 
 const cardsStore = useCardsStore()
-
 const { loading } = storeToRefs(cardsStore)
-const { registerCard } = cardsStore
 
-const router = useRouter()
+// 상태 관리
+const capturedImage = ref<string | null>(null)
 
-const cardData = ref<registerCardForm>({
-  organization: '',
-  encryptedCardNo: '',
-  cardPassword: '',
-  loginId: '',
-  loginPw: '',
-  birthDate: '',
-})
+const { imagePreview, ocrResult, isProcessingOCR, handleImageUpload, processOCR, clearOCRResult } =
+  useOCR()
 
-const handleRegisterCard = async () => {
+const {
+  cardData,
+  cardNumber,
+  isProcessingTransactions,
+  handleCardNumberInput,
+  handlePasswordInput,
+  fillFormFromOCR,
+  handleRegisterCard,
+  updateCardData,
+  organization,
+} = useCardForm()
+
+// 서버 OCR 처리 함수
+const handleOCRProcess = async () => {
   try {
-    await registerCard(cardData.value)
-
-    alert('카드가 성공적으로 등록되었습니다!')
-    cardData.value = {
-      organization: '',
-      encryptedCardNo: '',
-      cardPassword: '',
-      loginId: '',
-      loginPw: '',
-      birthDate: '',
+    const result = await processOCR(capturedImage.value || undefined)
+    if (result) {
+      fillFormFromOCR(result)
     }
-
-    router.push({ name: 'RegisterCallback' })
   } catch (error) {
-    alert('카드 등록에 실패했습니다.')
-    console.error('카드 등록 에러:', error)
+    console.error('OCR 처리 실패:', error)
+    alert('카드 정보 인식에 실패했습니다. 다시 시도해주세요.')
   }
+}
+
+// 사진 촬영 완료 처리
+const handleCapturePhoto = (imageDataUrl: string) => {
+  capturedImage.value = imageDataUrl
+}
+
+// 다시 촬영 처리 (OCR 결과 초기화 포함)
+const handleRetakePhoto = () => {
+  clearOCRResult()
+  capturedImage.value = null
+}
+
+// 갤러리에서 이미지 업로드 처리
+const handleGalleryUpload = (event: Event) => {
+  handleImageUpload(event)
+
+  // imagePreview가 설정되면 capturedImage에도 복사
+  const checkImagePreview = () => {
+    if (imagePreview.value) {
+      capturedImage.value = imagePreview.value
+    } else {
+      // 100ms 후 다시 확인 (비동기 처리를 위해)
+      setTimeout(checkImagePreview, 100)
+    }
+  }
+
+  checkImagePreview()
 }
 </script>
 

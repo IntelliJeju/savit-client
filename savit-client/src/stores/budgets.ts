@@ -1,357 +1,256 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { useApi } from '@/api/useApi'
-import { useCardsStore } from './cards'
-import type { Transaction } from '@/types/card'
 import { calculateSum } from '@/utils/calculations'
+import { saveToStorage, loadFromStorage } from '@/utils/storage'
+import { useApi } from '@/api/useApi'
+import { transactionService } from '@/services/transactionService'
 
-import { 
-  getCurrentMonth,
+import {
   validateBudgetSettings,
   createBudgetFromSettings,
   createBudgetFromApiData,
+  createNewBudget,
   validateTotalBudget,
-  createNewBudget
 } from '@/utils/budgetUtils'
+import { getCurrentMonth, getRelativeMonth } from '@/utils/dateUtils'
 
-import { saveToStorage, loadFromStorage } from '@/utils/storage'
+import type {
+  SubCategory,
+  MainCategoryBudgetStatus,
+  MonthlyBudget,
+  BudgetSummary,
+  BudgetSettingResponse,
+  MonthSummary,
+  BudgetSettingRequest,
+  MainCategory,
+} from '@/types/budgets'
 
-export type MainCategory = '식비' | '교통' | '생활' | '문화' | '기타'
-
-export type SubCategory = 
-  | '식당' | '카페' | '배달'
-  | '대중교통' | '택시'
-  | '통신비' | '공과금' | '편의점/마트' | '의료비' | '교육'
-  | '공연' | '쇼핑' | '유흥' | '영화' | '정기구독'
-  | '기타'
-
-export const CATEGORIES = {
-  MAIN: ['식비', '교통', '생활', '문화', '기타'] as const,
-  SUB: {
-    식비: ['식당', '카페', '배달'],
-    교통: ['대중교통', '택시'],
-    생활: ['통신비', '공과금', '편의점/마트', '의료비', '교육'],
-    문화: ['공연', '쇼핑', '유흥', '영화', '정기구독'],
-    기타: ['기타']
-  } as const
-} as const
-
-export const CATEGORY_ORDER: MainCategory[] = [...CATEGORIES.MAIN]
-
-export const STORAGE_KEYS = {
-  MONTHLY_BUDGETS: 'savit_monthly_budgets',
-  CURRENT_BUDGET: 'savit_current_budget'
-} as const
-
-export const DEFAULT_BUDGET_AMOUNTS: Record<MainCategory, number> = {
-  식비: 400000,
-  교통: 100000,
-  생활: 300000,
-  문화: 150000,
-  기타: 50000
-}
-
-export interface SubCategorySpending {
-  subCategory: SubCategory  
-  spentAmount: number       
-}
-
-export interface MainCategoryBudgetStatus {
-  mainCategory: MainCategory              
-  budgetAmount: number                   
-  totalSpent: number                      
-  subCategories: SubCategorySpending[]    
-}
-
-export interface MonthlyBudget {
-  id: string                                
-  month: string                             
-  totalBudget: number                       
-  mainCategoryBudgets: MainCategoryBudgetStatus[] 
-  createdAt: string                         
-  updatedAt: string                         
-}
-
-export interface BudgetSummary {
-  totalBudget: number                       
-  totalSpent: number                        
-  remainingBudget: number                   
-  spendingRatio: number                     
-  mainCategoryBudgets: MainCategoryBudgetStatus[] 
-  isOverBudget: boolean                     
-}
-
-export interface BudgetSettingResponse {
-  success: boolean                         
-  message?: string                          
-  data?: MonthlyBudget                      
-}
-
-export interface MonthSummary {
-  month: string
-  monthName: string
-  totalSpent: number
-  totalBudget: number
-}
-
-export interface CategoryData {
-  name: MainCategory
-  percentage: number
-  lastMonthSpent: number
-}
-
-export interface SliderValues {
-  newValue: number
-  oldValue: number
-  difference: number
-}
-
-export type AdjustmentOperation = 'increase' | 'decrease'
-
-export interface BudgetSettingRequest {
-  month: string
-  mainCategoryBudgets: {
-    mainCategory: MainCategory
-    budgetAmount: number
-  }[]
-}
+import { STORAGE_KEYS, DEFAULT_BUDGET_AMOUNTS, CATEGORY_ID_MAP } from '@/types/budgets'
 
 export const useBudgetsStore = defineStore('budgets', () => {
-  const { request } = useApi()
-  const cardsStore = useCardsStore()
-  
-  const monthlyBudgets = ref<MonthlyBudget[]>(loadFromStorage<MonthlyBudget[]>(STORAGE_KEYS.MONTHLY_BUDGETS) || [])
-  const currentBudget = ref<MonthlyBudget | null>(loadFromStorage<MonthlyBudget>(STORAGE_KEYS.CURRENT_BUDGET))
+  const { request, loading } = useApi()
+
+  const monthlyBudgets = ref<MonthlyBudget[]>(
+    loadFromStorage<MonthlyBudget[]>(STORAGE_KEYS.MONTHLY_BUDGETS) || [],
+  )
+  const currentBudget = ref<MonthlyBudget | null>(
+    loadFromStorage<MonthlyBudget>(STORAGE_KEYS.CURRENT_BUDGET),
+  )
   const categorySpendingData = ref<Record<string, Record<SubCategory, number>>>({})
 
+  // ===== 유틸리티 함수 =====
+  const transformBudgetRequestToCategoryData = (budgetRequest: BudgetSettingRequest) =>
+    budgetRequest.mainCategoryBudgets.map((item) => ({
+      categoryId: CATEGORY_ID_MAP[item.mainCategory as MainCategory],
+      targetAmount: item.budgetAmount,
+    }))
+
+  // ===== 데이터 처리 로직 =====
+  const getSpendingByMonthData = (month: string): Record<SubCategory, number> => {
+    // 캐시된 데이터가 있어도 항상 최신 데이터로 업데이트
+    const spendingData = transactionService.getSpendingByMonth(month)
+    categorySpendingData.value[month] = spendingData
+    return spendingData
+  }
+
+  const updateSpendingData = (
+    mainCategoryBudgets: MainCategoryBudgetStatus[],
+    month: string,
+  ): MainCategoryBudgetStatus[] =>
+    mainCategoryBudgets.map((mainCategory) => {
+      const monthSpending = getSpendingByMonthData(month)
+      const updatedSubCategories = mainCategory.subCategories.map((sub) => ({
+        ...sub,
+        spentAmount: monthSpending[sub.subCategory] || 0,
+      }))
+
+      return {
+        ...mainCategory,
+        totalSpent: calculateSum(updatedSubCategories, 'spentAmount'),
+        subCategories: updatedSubCategories,
+      }
+    })
+
+  // ===== 로컬 스토리지 관리 =====
+  const updateBudgetInStore = (budget: MonthlyBudget, month: string): void => {
+    if (!budget?.month) return console.warn('Invalid budget object:', budget)
+
+    const existingIndex = monthlyBudgets.value.findIndex((b) => b?.month === month)
+
+    existingIndex !== -1
+      ? (monthlyBudgets.value[existingIndex] = budget)
+      : monthlyBudgets.value.push(budget)
+
+    if (month === getCurrentMonth()) {
+      currentBudget.value = budget
+      saveToStorage(STORAGE_KEYS.CURRENT_BUDGET, budget)
+    }
+
+    saveToStorage(STORAGE_KEYS.MONTHLY_BUDGETS, monthlyBudgets.value)
+  }
+
+  const getBudgetByMonth = (month: string): MainCategoryBudgetStatus[] =>
+    monthlyBudgets.value.find((b) => b.month === month)?.mainCategoryBudgets ||
+    currentBudget.value?.mainCategoryBudgets ||
+    []
+
+  // ===== API 호출 로직 =====
+  const apiCall = async <T>(url: string, fallback?: T): Promise<T | null> => {
+    try {
+      const response = await request({ method: 'GET', url })
+      return response.data
+    } catch (error) {
+      if (fallback !== undefined) {
+        return fallback
+      }
+      console.warn(`API 호출 실패 (${url}):`, error)
+      return null
+    }
+  }
+
+  const saveWithRetry = async (
+    url: string,
+    data: unknown,
+    successMessage: string,
+  ): Promise<BudgetSettingResponse> => {
+    for (const method of ['PUT', 'POST'] as const) {
+      try {
+        await request({ method, url, data })
+        return {
+          success: true,
+          message: `${successMessage} ${method === 'PUT' ? '업데이트' : '생성'}되었습니다`,
+        }
+      } catch (error) {
+        if (method === 'POST') {
+          console.warn(`서버 저장 실패 (${url}):`, error)
+          return { success: false, message: '서버 저장에 실패했습니다' }
+        }
+      }
+    }
+    return { success: false, message: '예상치 못한 오류가 발생했습니다' }
+  }
+
+  const getDefaultTotalBudget = async (): Promise<number> => {
+    const fallbackBudget = Object.values(DEFAULT_BUDGET_AMOUNTS).reduce(
+      (sum, amount) => sum + amount,
+      0,
+    )
+    const data = await apiCall('/budget', fallbackBudget)
+    if (typeof data === 'number') return data
+    return (data as any)?.totalBudget || fallbackBudget
+  }
+
+  const getDefaultCategoryBudgets = async (): Promise<Record<MainCategory, number>> => {
+    const fallbackBudgets = { ...DEFAULT_BUDGET_AMOUNTS }
+    const data = await apiCall('/budget/categories', fallbackBudgets)
+    return (data as any)?.categoryBudgets || data || fallbackBudgets
+  }
+
+  const getPeerAvgByCategoryId = async (categoryId: number): Promise<number> => {
+    const data = await apiCall(`/budget/peer-avg/${categoryId}`, { amount: 0 })
+    return (data as any)?.amount || 0
+  }
+
+  async function fetchBudgetsByMonth(month: string): Promise<void> {
+    const data = await apiCall('/budget')
+    if (data) {
+      const budget = Array.isArray(data)
+        ? createBudgetFromApiData(data, month)
+        : (data as MonthlyBudget)
+      updateBudgetInStore(budget, month)
+    }
+  }
+
+  // ===== Computed Properties =====
   const currentBudgetSummary = computed((): BudgetSummary | null => {
     if (!currentBudget.value) return null
-    
+
     const budget = currentBudget.value
     const mainCategoryBudgets = updateSpendingData(budget.mainCategoryBudgets, getCurrentMonth())
     const totalSpent = calculateSum(mainCategoryBudgets, 'totalSpent')
     const remainingBudget = budget.totalBudget - totalSpent
     const spendingRatio = budget.totalBudget > 0 ? (totalSpent / budget.totalBudget) * 100 : 0
-    
+
     return {
       totalBudget: budget.totalBudget,
       totalSpent,
       remainingBudget,
       spendingRatio,
       mainCategoryBudgets,
-      isOverBudget: totalSpent > budget.totalBudget
+      isOverBudget: totalSpent > budget.totalBudget,
     }
   })
 
-
-  async function getDefaultTotalBudget(): Promise<number> {
-    try {
-      const response = await request({ method: 'GET', url: '/budget/all' })
-      return response.data.totalBudget
-    } catch (error) {
-      return Object.values(DEFAULT_BUDGET_AMOUNTS).reduce((sum, amount) => sum + amount, 0)
-    }
-  }
-
-  async function getDefaultCategoryBudgets(): Promise<Record<MainCategory, number>> {
-    try {
-      const response = await request({ method: 'GET', url: '/budget/categories/list' })
-      return response.data.categoryBudgets
-    } catch (error) {
-      return { ...DEFAULT_BUDGET_AMOUNTS }
-    }
-  }
-
-  async function setTotalBudget(month: string, totalBudget: number): Promise<BudgetSettingResponse> {
+  // ===== 예산 설정 함수 =====
+  async function setTotalBudget(
+    month: string,
+    totalBudget: number,
+  ): Promise<BudgetSettingResponse> {
     const validation = validateTotalBudget(month, totalBudget)
-    if (!validation.isValid) {
-      return { success: false, message: validation.error }
-    }
+    if (!validation.isValid) return { success: false, message: validation.error }
 
-    // 일단 로컬에 저장
-    const targetBudget = createNewBudget(month, totalBudget)
-    updateBudgetInStore(targetBudget, month)
-
-    try {
-      // 네트워크 요청 시도
-      await request({
-        method: 'POST',
-        url: '/budget/all',
-        data: { month, totalBudget }
-      })
-      
-      return { success: true, message: '전체 예산이 성공적으로 설정되었습니다' }
-    } catch (error) {
-      // 네트워크 오류가 발생해도 로컬 저장은 성공했으므로 success를 true로 반환
-      console.warn('서버 연결 실패, 로컬에만 저장됨:', error)
-      return { success: true, message: '로컬에 예산이 저장되었습니다' }
-    }
+    updateBudgetInStore(createNewBudget(month, totalBudget), month)
+    return saveWithRetry('/budget', { month, totalBudget }, '전체 예산이 성공적으로')
   }
 
-
-  function updateSpendingData(mainCategoryBudgets: MainCategoryBudgetStatus[], month: string): MainCategoryBudgetStatus[] {
-    return mainCategoryBudgets.map(mainCategory => {
-      const updatedSubCategories = mainCategory.subCategories.map(sub => ({
-        ...sub,
-        spentAmount: calculateSpentAmount(sub.subCategory, month)
-      }))
-      
-      return {
-        ...mainCategory,
-        totalSpent: calculateSum(updatedSubCategories, 'spentAmount'),
-        subCategories: updatedSubCategories
-      }
-    })
-  }
-
-  function getSpendingByMonth(month: string): Record<SubCategory, number> {
-    const monthData = categorySpendingData.value[month]
-    if (monthData) return monthData
-
-    const spendingByCategory = {} as Record<SubCategory, number>
-    Object.values(CATEGORIES.SUB).flat().forEach(subCategory => {
-      spendingByCategory[subCategory as SubCategory] = 0
-    })
-    
-    // Get all transactions from all cards for the specified month
-    const allTransactions: Transaction[] = []
-    cardsStore.cardsList.forEach(card => {
-      const cardTransactions = cardsStore.getTransactionsByCard(card.cardId)
-      allTransactions.push(...cardTransactions)
-    })
-    
-    allTransactions
-      .filter((transaction: Transaction) => transaction.resUsedDate.startsWith(month.replace('-', '')))
-      .forEach((transaction: Transaction) => {
-        // For now, we'll use the store type as category mapping
-        // This should be updated based on how categories are determined
-        const category = transaction.resMemberStoreType as SubCategory
-        if (Object.values(CATEGORIES.SUB).flat().includes(category)) {
-          const amount = transaction.resCancelYN === '0' ? Number(transaction.resUsedAmount) : 0
-          spendingByCategory[category] += amount
-        }
-      })
-    
-    return spendingByCategory
-  }
-
-  function calculateSpentAmount(subCategory: SubCategory, month: string): number {
-    return getSpendingByMonth(month)[subCategory] || 0
-  }
-
-  function getBudgetByMonth(month: string): MainCategoryBudgetStatus[] {
-    const monthBudget = monthlyBudgets.value.find(b => b.month === month)
-    return monthBudget ? monthBudget.mainCategoryBudgets : currentBudget.value?.mainCategoryBudgets || []
-  }
-
-  function updateBudgetInStore(budget: MonthlyBudget, month: string): void {
-    if (!budget?.month) {
-      console.warn('Invalid budget object:', budget)
-      return
-    }
-
-    const existingIndex = monthlyBudgets.value.findIndex(b => b?.month === month)
-    const isCurrentMonth = month === getCurrentMonth()
-    
-    if (existingIndex !== -1) {
-      monthlyBudgets.value[existingIndex] = budget
-    } else {
-      monthlyBudgets.value.push(budget)
-    }
-    
-    if (isCurrentMonth) {
-      currentBudget.value = budget
-      saveToStorage(STORAGE_KEYS.CURRENT_BUDGET, budget)
-    }
-    
-    saveToStorage(STORAGE_KEYS.MONTHLY_BUDGETS, monthlyBudgets.value)
-  }
-
-  async function fetchCategorySpending(month: string): Promise<void> {
-    try {
-      const response = await request({ method: 'GET', url: `/cards/${month}` })
-      categorySpendingData.value[month] = response.data
-    } catch (error) {
-    }
-  }
-
-  async function fetchBudgetsByMonth(month: string): Promise<void> {
-    try {
-      const response = await request({ method: 'GET', url: `/budget/${month}` })
-      const budget = Array.isArray(response.data) 
-        ? createBudgetFromApiData(response.data, month)
-        : response.data as MonthlyBudget
-      
-      updateBudgetInStore(budget, month)
-    } catch (error) {
-    }
-  }
-
-  async function initializeCurrentMonthBudget(): Promise<void> {
-    const currentMonth = getCurrentMonth()
-    await Promise.all([
-      fetchBudgetsByMonth(currentMonth),
-      fetchCategorySpending(currentMonth)
-    ])
-  }
-
-  async function getPreviousMonthsSummary(monthsBack: number): Promise<MonthSummary> {
-    const targetDate = new Date()
-    targetDate.setMonth(targetDate.getMonth() - monthsBack)
-    
-    const monthStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`
-    const monthName = `${targetDate.getMonth() + 1}월`
-    
-    const spendingData = getSpendingByMonth(monthStr)
-    const totalSpent = Object.values(spendingData).reduce((sum, amount) => sum + amount, 0)
-    
-    const monthBudget = monthlyBudgets.value.find(b => b.month === monthStr)
-    const totalBudget = monthBudget?.totalBudget || 0
-    
-    return { month: monthStr, monthName, totalSpent, totalBudget }
-  }
-
-  async function setBudgetForMonth(budgetRequest: BudgetSettingRequest): Promise<BudgetSettingResponse> {
+  async function setBudgetForMonth(
+    budgetRequest: BudgetSettingRequest,
+  ): Promise<BudgetSettingResponse> {
     const validation = validateBudgetSettings(budgetRequest)
-    if (!validation.isValid) {
-      return { success: false, message: validation.error }
-    }
+    if (!validation.isValid) return { success: false, message: validation.error }
 
-    // 일단 로컬에 저장
     const budget = createBudgetFromSettings(budgetRequest)
     updateBudgetInStore(budget, budgetRequest.month)
 
-    try {
-      // 네트워크 요청 시도
-      await request({
-        method: 'POST',
-        url: '/budget/categories/list',
-        data: budgetRequest
-      })
-      
-      return { success: true, message: '카테고리별 예산이 성공적으로 설정되었습니다', data: budget }
-    } catch (error) {
-      // 네트워크 오류가 발생해도 로컬 저장은 성공했으므로 success를 true로 반환
-      console.warn('서버 연결 실패, 로컬에만 저장됨:', error)
-      return { success: true, message: '로컬에 카테고리별 예산이 저장되었습니다', data: budget }
-    }
+    const categoryData = transformBudgetRequestToCategoryData(budgetRequest)
+    const result = await saveWithRetry(
+      '/budget/categories',
+      categoryData,
+      '카테고리별 예산이 성공적으로',
+    )
+
+    return { ...result, data: budget }
+  }
+
+  // ===== 데이터 조회 함수 =====
+  async function getPreviousMonthsSummary(monthsBack: number): Promise<MonthSummary> {
+    const monthData = getRelativeMonth(monthsBack)
+    const monthStr = monthData.string
+    const monthName = monthData.name
+
+    const spendingData = getSpendingByMonthData(monthStr)
+    const totalSpent = Object.values(spendingData).reduce(
+      (sum: number, amount: number) => sum + amount,
+      0,
+    )
+
+    const monthBudget = monthlyBudgets.value.find((b) => b.month === monthStr)
+    const totalBudget = monthBudget?.totalBudget || 0
+
+    return { month: monthStr, monthName, totalSpent, totalBudget }
   }
 
   return {
+    //fetch
+    fetchBudgetsByMonth,
+
+    //ref
     monthlyBudgets,
     currentBudget,
     categorySpendingData,
+    loading,
+
+    //computed
     currentBudgetSummary,
     setTotalBudget,
     setBudgetForMonth,
-    updateSpendingData,
-    initializeCurrentMonthBudget,
     getPreviousMonthsSummary,
-    getSpendingByMonth,
+    getSpendingByMonth: getSpendingByMonthData,
     getBudgetByMonth,
     getDefaultTotalBudget,
     getDefaultCategoryBudgets,
+    getPeerAvgByCategoryId,
     validateBudgetSettings,
-    createBudgetFromSettings
+    createBudgetFromSettings,
   }
 })

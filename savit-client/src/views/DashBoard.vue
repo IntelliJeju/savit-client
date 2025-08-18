@@ -15,57 +15,48 @@
       <div class="max-w-4xl mx-auto">
         <div class="text-center bg-app-green/30 font-medium">진행 중인 챌린지</div>
         <div class="flex justify-between items-center text-center w-full h-20 mx-auto">
-          <button
-            class="pl-2"
-            @click="previousChallenge"
-            :disabled="currentChallengeIndex === 0"
-            :class="{ 'opacity-50': currentChallengeIndex === 0 }"
-          >
-            <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
-          </button>
-
-          <div ref="challengeContainer" class="flex-1 overflow-hidden relative">
-            <div
-              class="flex transition-transform duration-300 ease-in-out"
-              :style="{ transform: `translateX(-${currentChallengeIndex * 100}%)` }"
+          <template v-if="participatingChallenges.length > 0">
+            <button
+              class="pl-2"
+              @click="previousChallenge"
+              :disabled="currentChallengeIndex === 0"
+              :class="{ 'opacity-50': currentChallengeIndex === 0 }"
             >
+              <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
+            </button>
+
+            <div ref="challengeContainer" class="flex-1 overflow-hidden relative">
               <div
-                v-for="(challenge, index) in participatingChallenges"
-                :key="challenge.challengeId"
-                class="w-full flex-shrink-0 px-4"
-                @click="currentChallenge(challenge.challengeId)"
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentChallengeIndex * 100}%)` }"
               >
-                <div>
-                  <span class="my-challenge-title text-xl font-semibold whitespace-nowrap">
-                    {{ challenge.title }}
-                  </span>
-                </div>
-                <div class="my-challenge-progress">
-                  <div class="mt-1 flex justify-between text-sm font-regular">
-                    <span>{{ calculateDaysProgress(challenge.startDate) }}일째 진행중</span>
-                    <span>{{ Math.floor(challenge.progress) }}%</span>
-                  </div>
-                  <div class="mt-1">
-                    <ProgressBar
-                      name="myChallenge"
-                      :min-value="0"
-                      :max-value="100"
-                      :value="challenge.progress"
-                    />
-                  </div>
-                </div>
+                <CurrentChallengeCard
+                  v-for="challenge in participatingChallenges"
+                  :key="challenge.challengeId"
+                  :challenge="challenge"
+                  variant="slide"
+                  @click="currentChallenge"
+                />
               </div>
             </div>
-          </div>
 
-          <button
-            class="pr-2"
-            @click="nextChallenge"
-            :disabled="currentChallengeIndex === participatingChallenges.length - 1"
-            :class="{ 'opacity-50': currentChallengeIndex === participatingChallenges.length - 1 }"
-          >
-            <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
-          </button>
+            <button
+              class="pr-2"
+              @click="nextChallenge"
+              :disabled="currentChallengeIndex === participatingChallenges.length - 1"
+              :class="{
+                'opacity-50': currentChallengeIndex === participatingChallenges.length - 1,
+              }"
+            >
+              <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
+            </button>
+          </template>
+
+          <template v-else>
+            <div class="flex-1 flex items-center justify-center text-app-dark-gray/70">
+              진행중인 챌린지가 없습니다
+            </div>
+          </template>
         </div>
 
         <!-- 챌린지 인디케이터 점들 -->
@@ -81,52 +72,84 @@
     </div>
 
     <!-- 메인 콘텐츠 (상단 여백 추가) -->
-    <div class="pt-32">
+    <div class="pt-32 pb-4">
       <CardComponent>
-        <DoughnutChart :cards-list="cardsList" :total-budget="totalBudget" />
-        <div class="text-[2rem] font-semibold whitespace-nowrap">
-          {{ totalAmount.toLocaleString() }} 원
-        </div>
-        <div class="text-[1rem] font-regular text-app-dark-gray/50 whitespace-nowrap m-2">
-          / {{ totalBudget.toLocaleString() }} 원
-        </div>
+        <!-- 예산이 설정되지 않은 경우 -->
+        <template v-if="totalBudget === 0">
+          <div class="py-8 px-6 text-center">
+            <div class="mb-8">
+              <v-icon name="hi-chart-pie" class="w-20 h-20 text-app-dark-gray/40 mx-auto mb-6" />
+              <h3 class="text-2xl font-semibold text-app-dark-gray mb-3">
+                예산이 설정되지 않았습니다
+              </h3>
+              <p class="text-app-dark-gray/70 text-lg leading-relaxed">
+                예산을 설정하시면 지출 현황을 차트로<br />
+                확인하실 수 있어요
+              </p>
+            </div>
 
-        <div class="flex justify-center gap-8 text-[1.5rem] mx-8 my-10">
-          <div class="flex flex-col items-center w-1/2">
-            <div class="text-center mb-4">
-              <div class="font-semibold whitespace-nowrap">
+            <div class="mb-10">
+              <ButtonItem @click="goToBudgetSetting"> 예산 설정하기 </ButtonItem>
+            </div>
+          </div>
+        </template>
+
+        <!-- 예산이 설정된 경우 -->
+        <template v-else>
+          <DoughnutChart :cards-list="cardsList" :total-budget="totalBudget" />
+          <div class="text-[2rem] font-semibold whitespace-nowrap">
+            {{ totalAmount.toLocaleString() }} 원
+          </div>
+          <div class="text-[1rem] font-regular text-app-dark-gray/50 whitespace-nowrap m-2">
+            / {{ totalBudget.toLocaleString() }} 원
+          </div>
+
+          <div class="flex mt-8 text-center">
+            <div class="flex-1">
+              <div class="text-[1.5rem] font-semibold">
                 {{ (totalBudget - totalAmount).toLocaleString() }} 원
               </div>
-              <div class="text-[0.9rem] text-app-dark-gray/70 mt-1">남은 한도</div>
+              <div class="text-[1rem] font-regular text-app-dark-gray/50">남은 한도</div>
             </div>
-            <ButtonItem class="w-full min-w-32 h-28 font-semibold" @click="BudgetCheck">
-              <div class="text-center">이번 달 예산의 30%를</div>
-              <div class="text-center">쇼핑 카테고리에</div>
-              <div class="text-center">사용했어요!</div>
-            </ButtonItem>
-          </div>
-          <div class="flex flex-col items-center w-1/2">
-            <div class="text-center mb-4">
-              <div class="font-semibold whitespace-nowrap">
+            <div class="flex-1">
+              <div class="text-[1.5rem] font-semibold">
                 {{ Math.round(totalAmount / new Date().getDate()).toLocaleString() }} 원
               </div>
-              <div class="text-[0.9rem] text-app-dark-gray/70 mt-1">일평균 사용</div>
+              <div class="text-[1rem] font-regular text-app-dark-gray/50">일평균 사용</div>
             </div>
-            <ButtonItem
-              variant="purple"
-              class="w-full min-w-32 h-28 font-semibold"
-              @click="BudgetCheck"
-            >
-              <div class="text-center">지난 달 보다</div>
-              <div class="text-center">문화 카테고리에</div>
-              <div class="text-center">10% 더</div>
-              <div class="text-center">사용했어요!</div>
-            </ButtonItem>
           </div>
-        </div>
-      </CardComponent>
 
-      <div class="py-5"></div>
+          <!-- 분석 버튼 영역 -->
+          <div class="flex justify-center mx-4 mb-6 mt-8">
+            <template v-if="totalAmount > 0">
+              <div class="flex gap-8 w-full">
+                <ButtonItem class="flex-1 min-w-32 h-28 font-semibold" @click="BudgetCheck">
+                  <div class="text-center">이번 달 예산의 30%를</div>
+                  <div class="text-center">쇼핑 카테고리에</div>
+                  <div class="text-center">사용했어요!</div>
+                </ButtonItem>
+                <ButtonItem
+                  variant="purple"
+                  class="flex-1 min-w-32 h-28 font-semibold"
+                  @click="BudgetCheck"
+                >
+                  <div class="text-center">지난 달 보다</div>
+                  <div class="text-center">문화 카테고리에</div>
+                  <div class="text-center">10% 더</div>
+                  <div class="text-center">사용했어요!</div>
+                </ButtonItem>
+              </div>
+            </template>
+
+            <template v-else>
+              <ButtonItem class="w-full max-w-80 h-28 font-semibold" @click="BudgetCheck">
+                <div class="text-center">카드 사용 후</div>
+                <div class="text-center">분석 결과를 확인하세요</div>
+              </ButtonItem>
+            </template>
+          </div>
+        </template>
+      </CardComponent>
     </div>
   </div>
 </template>
@@ -135,36 +158,49 @@
 import { computed, ref } from 'vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import DoughnutChart from '@/components/chart/DoughnutChart.vue'
+import CurrentChallengeCard from '@/components/challenge/CurrentChallengeCard.vue'
 import { useCardsStore } from '@/stores/cards'
 import { useChallengeStore } from '@/stores/challenges'
+import { useBudgetsStore } from '@/stores/budgets'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import router from '@/router'
-import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import { storeToRefs } from 'pinia'
-import { calculateDaysProgress, calculateProgress } from '@/utils/common.ts'
+import { calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import ProfileImage from '@/components/user/ProfileImage.vue'
+import { transactionService } from '@/services/transactionService'
+import { getCurrentMonth } from '@/utils/dateUtils'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()
 const challengeStore = useChallengeStore()
+const budgetsStore = useBudgetsStore()
 
 const { getUser } = storeToRefs(authStore)
 const { cardsList } = storeToRefs(cardsStore)
 const { getParticipatingChallengeList } = storeToRefs(challengeStore)
+const { currentBudgetSummary } = storeToRefs(budgetsStore)
 
 // 챌린지 슬라이드
 const currentChallengeIndex = ref(0)
 const challengeContainer = ref<HTMLElement | null>(null)
 
 const totalAmount = computed(() => {
-  return cardsList.value.reduce((acc, cur) => acc + cur.usageAmount, 0)
+  const currentMonth = getCurrentMonth()
+  const spendingData = transactionService.getSpendingByMonth(currentMonth)
+  return Object.values(spendingData).reduce((sum, amount) => sum + amount, 0)
 })
 
-const totalBudget = computed(() => 1000000)
+const totalBudget = computed(() => {
+  return currentBudgetSummary.value?.totalBudget || 0
+})
 
 const BudgetCheck = () => {
   router.push('/budget')
+}
+
+const goToBudgetSetting = () => {
+  router.push('/budget/choice')
 }
 
 // 챌린지 슬라이드 기능

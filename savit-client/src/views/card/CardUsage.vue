@@ -4,7 +4,7 @@
   </Teleport>
 
   <div class="min-h-screen bg-app-light-gray">
-    <div class="max-w-sm mx-auto p-4">
+    <div class="max-w-sm mx-auto py-4">
       <!-- 이번 달 청구 금액 -->
       <CardComponent class="mb-6">
         <div class="flex items-center justify-between">
@@ -44,24 +44,39 @@
               :class="{ 'border-b border-slate-200': index < group.items.length - 1 }"
             >
               <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
                   <div
-                    class="w-10 h-10 bg-app-light-gray rounded-lg flex items-center justify-center"
+                    class="w-10 h-10 bg-app-light-gray rounded-lg flex items-center justify-center flex-shrink-0"
                   >
+                    {{ console.log(usage) }}
                     <CategoryIcon
-                      :category="mapCategoryToMainCategory(usage.category)"
+                      :category="mapCategoryToMainCategory(usage.resMemberStoreType)"
                       :color="'#028174'"
                       :size="20"
                     />
                   </div>
-                  <div>
-                    <div class="font-medium text-slate-800">{{ usage.resMemberStoreName }}</div>
-                    <div class="text-sm text-slate-500">{{ usage.resMemberStoreType }}</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="font-medium text-slate-800 truncate">
+                      {{ usage.resMemberStoreName }}
+                    </div>
+                    <div class="text-sm text-slate-500 truncate">
+                      {{ usage.resMemberStoreType }}
+                    </div>
                   </div>
                 </div>
-                <div class="text-right">
-                  <div class="font-semibold whitespace-nowrap">
-                    -{{ Number(usage.resUsedAmount).toLocaleString() }}원
+                <div class="text-right flex-shrink-0">
+                  <div
+                    class="font-semibold whitespace-nowrap"
+                    :class="usage.resCancelYN !== '0' ? 'text-app-green' : ''"
+                  >
+                    {{ usage.resCancelYN === '0' ? '-' : '+'
+                    }}{{ Number(usage.resUsedAmount).toLocaleString() }}원
+                    <div
+                      v-if="usage.resCancelYN !== '0'"
+                      class="text-xs text-app-green font-normal"
+                    >
+                      취소
+                    </div>
                   </div>
                 </div>
               </div>
@@ -71,21 +86,13 @@
       </div>
 
       <!-- 빈 상태 -->
-      <div v-else class="bg-white rounded-xl p-8 text-center border border-slate-200">
-        <div
-          class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
-        >
-          <svg class="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fill-rule="evenodd"
-              d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <div class="text-slate-800 text-lg font-medium mb-2">이용내역이 없습니다</div>
-        <div class="text-slate-500 text-sm">이번 달 카드 이용내역이 없습니다</div>
-      </div>
+      <CardComponent v-else>
+        <EmptyState
+          size="large"
+          title="사용내역이 없습니다"
+          description="아직 이번 달에 카드를 사용하지 않으셨어요!"
+        />
+      </CardComponent>
     </div>
   </div>
 </template>
@@ -96,9 +103,10 @@ import { useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import { mapCategoryToMainCategory } from '@/utils/category'
 import { storeToRefs } from 'pinia'
-import now from '@/utils/date.ts'
+import now from '@/utils/dateUtils'
 
 const route = useRoute()
 const cardsStore = useCardsStore()

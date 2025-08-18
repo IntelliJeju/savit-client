@@ -3,120 +3,61 @@
     <span>예산 설정</span>
   </Teleport>
 
-  <div class="max-w-4xl mx-auto min-h-screen px-4">
-    <div class="py-5"></div>
-    <CardComponent>
-      <p class="font-bold text-lg mb-4">이번 달 예산 금액</p>
-      <div class="relative flex items-center">
-        <InputField
-          v-model="displayAmount"
-          placeholder="설정할 예산액을 입력해주세요."
-          type="text"
-          class="text-3xl font-bold text-right pr-12"
-          @input="handleAmountInput"
-        />
-        <span class="absolute right-2 text-3xl font-bold text-app-dark-gray">원</span>
-      </div>
-    </CardComponent>
-    <div class="m-5" />
-    <CardComponent>
-      <p class="font-bold text-lg mb-6">나의 지출 / 예산 이력</p>
+  <div class="h-full grid grid-rows-[1fr_auto]">
+    <div class="py-4">
+      <BudgetAmountCard
+        v-model="inputBudgetAmount"
+        title="이번 달 예산 금액"
+        placeholder="설정할 예산액을 입력해주세요."
+      />
+      <BudgetHistoryCard class="mt-4" :last-month="lastMonth" :two-months-ago="twoMonthsAgo" />
+    </div>
 
-      <div class="flex justify-between items-center mb-4">
-        <span class="text-lg font-medium">{{ lastMonth.name }}</span>
-        <div class="text-right">
-          <span
-            :class="lastMonth.spending > lastMonth.budget ? 'text-app-red' : 'text-app-blue'"
-            class="font-bold"
-          >
-            {{ formatCurrency(lastMonth.spending) }}
-          </span>
-          <span class="text-app-dark-gray"> / {{ formatCurrency(lastMonth.budget) }}</span>
-        </div>
-      </div>
-
-      <div class="flex justify-between items-center mb-6">
-        <span class="text-lg font-medium">{{ twoMonthsAgo.name }}</span>
-        <div class="text-right">
-          <span
-            :class="twoMonthsAgo.spending > twoMonthsAgo.budget ? 'text-app-red' : 'text-app-blue'"
-            class="font-bold"
-          >
-            {{ formatCurrency(twoMonthsAgo.spending) }}
-          </span>
-          <span class="text-app-dark-gray"> / {{ formatCurrency(twoMonthsAgo.budget) }}</span>
-        </div>
-      </div>
-
-      <div class="flex items-center text-app-dark-gray text-sm">
-        <v-icon name="hi-information-circle" class="w-6 mr-2" />
-        <span>지난 지출/예산 내역을 참고해서 설정해보세요</span>
-      </div>
-    </CardComponent>
-
-    <div class="fixed bottom-16 left-0 right-0 p-4 bg-white border-t">
-      <div class="max-w-4xl mx-auto">
-        <ButtonItem @click="saveBudget" text="설정" />
-      </div>
+    <div class="py-4">
+      <ButtonItem text="예산 설정" @click="saveBudget" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import InputField from '@/components/input/InputField.vue'
-import { useBudgetsStore } from '@/stores/budgets'
 import { useRouter } from 'vue-router'
+import { useBudget } from '@/composables/budget/useBudget'
+import { getCurrentMonth } from '@/utils/dateUtils'
+import { formatCurrency } from '@/utils/calculations'
+import BudgetAmountCard from '@/components/budget/BudgetAmountCard.vue'
+import BudgetHistoryCard from '@/components/budget/BudgetHistoryCard.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
-import CardComponent from '@/components/card/CardComponent.vue'
-import { formatCurrency, formatNumber } from '@/utils/calculations'
 
-const budgetsStore = useBudgetsStore()
-const isLoading = ref(false)
 const router = useRouter()
+const { budgetsStore } = useBudget()
 
-// 기존 예산이 있으면 그 값을 기본으로 설정
-const getExistingBudget = (): string => {
-  if (budgetsStore.currentBudget?.totalBudget) {
-    return budgetsStore.currentBudget.totalBudget.toString()
-  }
-  return ''
+// 이전 월 데이터 인터페이스
+interface MonthData {
+  name: string
+  spending: number
+  budget: number
 }
 
-const budgetAmount = ref(getExistingBudget())
-
-// 표시용 값 (쉼표 포함)
-const displayAmount = computed({
-  get: () => formatNumber(parseInt(budgetAmount.value) || 0),
-  set: (value: string) => {
-    // 숫자만 추출해서 저장
-    budgetAmount.value = value.replace(/[^\d]/g, '')
-  },
-})
-
-// 입력 처리 함수
-const handleAmountInput = (value: string) => {
-  const numericValue = value.replace(/[^\d]/g, '')
-  budgetAmount.value = numericValue
-}
-
-const lastMonth = ref({
+// 이전 월 데이터 관리
+const lastMonth = ref<MonthData>({
   name: '',
   spending: 0,
   budget: 0,
 })
 
-const twoMonthsAgo = ref({
+const twoMonthsAgo = ref<MonthData>({
   name: '',
   spending: 0,
   budget: 0,
 })
 
-// 과거 데이터 로드
 const loadPreviousData = async () => {
   try {
-    const lastMonthData = await budgetsStore.getPreviousMonthsSummary(1)
-    const twoMonthsAgoData = await budgetsStore.getPreviousMonthsSummary(2)
+    const [lastMonthData, twoMonthsAgoData] = await Promise.all([
+      budgetsStore.getPreviousMonthsSummary(1),
+      budgetsStore.getPreviousMonthsSummary(2),
+    ])
 
     lastMonth.value = {
       name: lastMonthData.monthName,
@@ -131,33 +72,30 @@ const loadPreviousData = async () => {
     }
   } catch (error) {
     console.error('Failed to load previous data:', error)
+    throw error
   }
 }
 
-// 컴포넌트 마운트 시 데이터 로드
-onMounted(() => {
-  loadPreviousData()
+const isLoading = ref(false)
+
+// Reactive 예산 금액 (store와 자동 동기화)
+const budgetAmount = computed({
+  get: () => budgetsStore.currentBudget?.totalBudget?.toString() || '',
+  set: (value: string) => {
+    // 필요시 별도 ref로 관리 가능
+  },
 })
 
-// 예산 저장 함수
+// 입력용 별도 ref
+const inputBudgetAmount = ref('')
+
+// 예산 저장 함수 (store 검증 사용)
 const saveBudget = async () => {
-  if (!budgetAmount.value) {
-    alert('예산 금액을 입력해주세요.')
-    return
-  }
-
-  const amount = parseInt(budgetAmount.value)
-
-  if (isNaN(amount) || amount <= 0) {
-    alert('올바른 금액을 입력해주세요.')
-    return
-  }
-
+  const amount = parseInt(inputBudgetAmount.value || budgetAmount.value)
   isLoading.value = true
 
   try {
-    const currentDate = new Date()
-    const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`
+    const currentMonth = getCurrentMonth()
     const result = await budgetsStore.setTotalBudget(currentMonth, amount)
 
     if (result && result.success) {
@@ -182,12 +120,11 @@ const saveBudget = async () => {
 
 onMounted(async () => {
   try {
-    await budgetsStore.initializeCurrentMonthBudget()
-    if (budgetsStore.currentBudget?.totalBudget && !budgetAmount.value) {
-      budgetAmount.value = budgetsStore.currentBudget.totalBudget.toString()
-    }
+    await loadPreviousData()
+    // budgetAmount는 이제 computed로 자동 동기화됨
+    inputBudgetAmount.value = budgetAmount.value
   } catch (error) {
-    console.error('예산 데이터 로드 실패:', error)
+    console.error('데이터 로드 실패:', error)
   }
 })
 </script>
