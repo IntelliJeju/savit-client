@@ -65,6 +65,7 @@
 <script setup lang="ts">
 import CardComponent from '@/components/card/CardComponent.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
+import LabelItem from '@/components/label/LabelItem.vue'
 import CurrentChallengeCard from '@/components/challenge/CurrentChallengeCard.vue'
 import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'

@@ -110,18 +110,28 @@ export function useCardForm() {
     try {
       const response = await cardsStore.registerCard(cardData.value)
 
-      // 등록된 카드들의 사용내역을 가져오기
+      // 등록 후 카드 목록을 다시 가져와서 사용내역 조회
       if (response?.cards && response.cards.length > 0) {
         isProcessingTransactions.value = true
 
-        for (const card of response.cards) {
-          try {
-            // POST 방식으로 최초 사용내역 가져오기 (약 10초 소요)
-            await cardsStore.fetchTransactions(card.id, 'POST')
-          } catch (transactionError) {
-            console.warn(`카드 ${card.id}의 사용내역 조회 실패:`, transactionError)
-            // 사용내역 조회 실패해도 카드 등록은 성공으로 처리
+        try {
+          // 먼저 카드 목록을 다시 가져오기
+          await cardsStore.fetchCards()
+          
+          // 새로 등록된 카드들의 사용내역 가져오기
+          const cardsList = cardsStore.cardsList
+          
+          for (const card of cardsList) {
+            try {
+              // POST 방식으로 최초 사용내역 가져오기 (약 10초 소요)
+              await cardsStore.fetchTransactions(card.cardId, 'POST')
+            } catch (transactionError) {
+              console.warn(`카드 ${card.cardId}의 사용내역 조회 실패:`, transactionError)
+              // 사용내역 조회 실패해도 카드 등록은 성공으로 처리
+            }
           }
+        } catch (error) {
+          console.warn('카드 목록 조회 실패:', error)
         }
 
         isProcessingTransactions.value = false
@@ -136,6 +146,13 @@ export function useCardForm() {
       console.error('카드 등록 에러:', error)
       throw error
     }
+  }
+
+  /**
+   * 카드 데이터 업데이트
+   */
+  const updateCardData = (field: keyof registerCardForm, value: string): void => {
+    cardData.value[field] = value
   }
 
   /**
@@ -170,6 +187,7 @@ export function useCardForm() {
     setCardNumberFromOCR,
     fillFormFromOCR,
     handleRegisterCard,
+    updateCardData,
     resetForm,
 
     // 유틸리티
