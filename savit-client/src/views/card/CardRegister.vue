@@ -5,7 +5,10 @@
 
   <div class="min-h-screen bg-app-light-gray my-4">
     <!-- 로딩 화면 -->
-    <SplashScreen v-if="loading || isProcessingTransactions" />
+    <SplashScreen
+      v-if="loading || isProcessingTransactions"
+      :message="'카드 정보를 불러오는 중...' + '\n' + '10초 이상 소요될 수 있습니다.'"
+    />
 
     <div class="max-w-sm mx-auto">
       <!-- 카드 이미지 인식 섹션 -->
@@ -155,7 +158,6 @@ const handleGalleryUpload = (event: Event) => {
 
   checkImagePreview()
 }
-
 </script>
 
 <style scoped>
