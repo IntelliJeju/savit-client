@@ -29,11 +29,11 @@ export const CATEGORY_ID_MAP: Record<MainCategory, number> = {
 } as const
 
 export const DEFAULT_BUDGET_AMOUNTS: Record<MainCategory, number> = {
-  식비: 400000,
-  교통: 100000,
-  생활: 300000,
-  문화: 150000,
-  기타: 50000
+  식비: 520000,
+  교통: 87000,
+  생활: 490000,
+  문화: 320000,
+  기타: 570000
 }
 
 export const STORAGE_KEYS = {

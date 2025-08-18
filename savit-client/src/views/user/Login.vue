@@ -44,7 +44,9 @@
 
         <!-- 푸터 -->
         <div class="text-center">
-          <p class="text-white/60 text-sm">© 2024 SAVIT • MZ세대의 금융 파트너 ✨</p>
+          <p class="text-white/60 text-sm">
+            © 2025 SAVIT • MZ세대의 금융 파트너 ✨
+          </p>
         </div>
       </div>
     </div>
