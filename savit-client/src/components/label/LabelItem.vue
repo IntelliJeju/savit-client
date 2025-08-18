@@ -35,6 +35,8 @@ const buttonClasses = computed(() => {
     return 'bg-[#FECACA] text-app-red font-bold rounded-lg py-0.4 px-1'
   } else if (props.variant === 'grey') {
     return 'bg-[#EFEFF0] text-[#888888] font-bold rounded-lg py-0.4 px-1'
+  } else if (props.variant === 'purple') {
+    return 'bg-app-purple text-[#FFFFFF] rounded-3xl py-1 px-3'
   }
   // 기본 버튼
   return 'bg-app-green text-[#FFFFFF] rounded-3xl py-1 px-3'

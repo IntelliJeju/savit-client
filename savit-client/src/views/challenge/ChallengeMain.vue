@@ -15,42 +15,12 @@
         >
           <span class="text-gray-500">참여중인 챌린지가 없습니다</span>
         </card-component>
-        <div
+        <CurrentChallengeCard
           v-for="challenge in getParticipatingChallengeList"
           :key="challenge.challengeId"
-          class="my-challenge-item mt-4"
-          @click="routeCurrent(challenge.challengeId)"
-        >
-          <card-component>
-            <div class="my-challenge-title flex justify-between gap-2 items-center font-bold">
-              <div class="text-2xl">{{ challenge.title }}</div>
-              <div class="my-challenge-label">
-                <label-item>{{ getChallengeStatus(challenge.startDate) }}</label-item>
-              </div>
-            </div>
-            <div class="my-challenge-progress mt-4">
-              <div class="text-xs font-medium text-slate-600">
-                <template v-if="getChallengeStatus(challenge.startDate) === '대기중'">
-                  대기중
-                </template>
-                <template v-else>
-                  {{ calculateDaysProgressWithStatus(challenge.startDate) }}일째 진행중
-                </template>
-              </div>
-              <div class="mt-1">
-                <ProgressBar name="myChallenge" :min-value="0" :max-value="100" :value="30" />
-              </div>
-              <div class="mt-1 flex justify-between">
-                <span class="font-semibold"
-                  >{{ calculateProgress(challenge.startDate, challenge.endDate) }}%</span
-                >
-                <span class="text-xs text-slate-500"
-                  >{{ challenge.startDate }} ~ {{ challenge.endDate }}</span
-                >
-              </div>
-            </div>
-          </card-component>
-        </div>
+          :challenge="challenge"
+          @click="routeCurrent"
+        />
       </div>
       <div class="avail-challenge-container mt-8">
         <div class="avail-challenge-header">
@@ -95,17 +65,10 @@
 <script setup lang="ts">
 import CardComponent from '@/components/card/CardComponent.vue'
 import ButtonItem from '@/components/button/ButtonItem.vue'
-import LabelItem from '@/components/label/LabelItem.vue'
-import ProgressBar from '@/components/progressBar/ProgressBar.vue'
+import CurrentChallengeCard from '@/components/challenge/CurrentChallengeCard.vue'
 import router from '@/router/index.ts'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import { storeToRefs } from 'pinia'
-import now from '@/utils/dateUtils'
-import {
-  calculateProgress,
-  getChallengeStatus,
-  calculateDaysProgressWithStatus,
-} from '@/utils/common.ts'
 
 const challengeStore = useChallengeStore()
 

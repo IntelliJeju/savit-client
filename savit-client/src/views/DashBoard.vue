@@ -29,32 +29,13 @@
               class="flex transition-transform duration-300 ease-in-out"
               :style="{ transform: `translateX(-${currentChallengeIndex * 100}%)` }"
             >
-              <div
-                v-for="(challenge, index) in participatingChallenges"
+              <CurrentChallengeCard
+                v-for="challenge in participatingChallenges"
                 :key="challenge.challengeId"
-                class="w-full flex-shrink-0 px-4"
-                @click="currentChallenge(challenge.challengeId)"
-              >
-                <div>
-                  <span class="my-challenge-title text-xl font-semibold whitespace-nowrap">
-                    {{ challenge.title }}
-                  </span>
-                </div>
-                <div class="my-challenge-progress">
-                  <div class="mt-1 flex justify-between text-sm font-regular">
-                    <span>{{ calculateDaysProgress(challenge.startDate) }}일째 진행중</span>
-                    <span>{{ Math.floor(challenge.progress) }}%</span>
-                  </div>
-                  <div class="mt-1">
-                    <ProgressBar
-                      name="myChallenge"
-                      :min-value="0"
-                      :max-value="100"
-                      :value="challenge.progress"
-                    />
-                  </div>
-                </div>
-              </div>
+                :challenge="challenge"
+                variant="slide"
+                @click="currentChallenge"
+              />
             </div>
           </div>
 
@@ -156,14 +137,14 @@
 import { computed, ref } from 'vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import DoughnutChart from '@/components/chart/DoughnutChart.vue'
+import CurrentChallengeCard from '@/components/challenge/CurrentChallengeCard.vue'
 import { useCardsStore } from '@/stores/cards'
 import { useChallengeStore } from '@/stores/challenges'
 import { useBudgetsStore } from '@/stores/budgets'
 import ButtonItem from '@/components/button/ButtonItem.vue'
 import router from '@/router'
-import ProgressBar from '@/components/progressBar/ProgressBar.vue'
 import { storeToRefs } from 'pinia'
-import { calculateDaysProgress, calculateProgress } from '@/utils/common.ts'
+import { calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import ProfileImage from '@/components/user/ProfileImage.vue'
 
