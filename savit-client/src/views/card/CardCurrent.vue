@@ -5,19 +5,7 @@
 
   <div class="bg-app-light-gray py-4">
     <!-- 카드 슬라이더 -->
-    <CardSlider
-      :cards="cardsList"
-      :current-card-index="currentCardIndex"
-      :is-editing-nickname="isEditingNickname"
-      :editing-nickname="editingNickname"
-      :totalAmount="thisMonthUsage"
-      @slide-change="onSlideChange"
-      @edit-nickname="startEditNickname"
-      @update-nickname="editingNickname = $event"
-      @save-nickname="saveNickname"
-      @cancel-edit="cancelEditNickname"
-      ref="cardSliderRef"
-    />
+    <CardSlider :cards="cardsList" :totalAmount="thisMonthUsage" @slide-change="onSlideChange" />
 
     <!-- 저번 달 대비 변화량 -->
     <CardComponent v-if="cardsList.length > 0 && !isRegistrationCard" class="p-5 mb-6">
@@ -136,11 +124,6 @@ const cardsStore = useCardsStore()
 const { cardsList, getTransactionsByCard, getTotalUsageByIdMonth } = storeToRefs(cardsStore)
 
 const currentCardIndex = ref(0)
-const cardSliderRef = ref<InstanceType<typeof CardSlider> | null>(null)
-
-// 별칭 편집 관련 상태
-const isEditingNickname = ref(false)
-const editingNickname = ref('')
 
 // 최근 거래내역 (현재 카드의 실제 데이터)
 const recentTransactions = computed(() => {
@@ -197,37 +180,6 @@ const formatDate = (dateString: string) => {
 const currentCard = computed(() => {
   return cardsList.value[currentCardIndex.value]
 })
-
-// 별칭 편집 기능
-const startEditNickname = (index: number) => {
-  currentCardIndex.value = index
-  const targetCard = cardsList.value[currentCardIndex.value]
-  if (!targetCard) return
-
-  isEditingNickname.value = true
-  // editingNickname.value = targetCard.cardNickname || ''
-}
-
-const saveNickname = async () => {
-  const targetCard = cardsList.value[currentCardIndex.value]
-  if (!targetCard || !editingNickname.value.trim()) {
-    cancelEditNickname()
-    return
-  }
-
-  try {
-    // await cardsStore.updateCardNickname(targetCard.cardId, editingNickname.value.trim())
-    isEditingNickname.value = false
-  } catch (error) {
-    console.error('별칭 수정 실패:', error)
-    cancelEditNickname()
-  }
-}
-
-const cancelEditNickname = () => {
-  isEditingNickname.value = false
-  editingNickname.value = ''
-}
 </script>
 
 <style scoped>

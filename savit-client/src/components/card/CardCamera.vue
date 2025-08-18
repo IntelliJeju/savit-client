@@ -130,9 +130,6 @@
     <div v-if="ocrResult" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
       <div class="flex items-center justify-between mb-2">
         <span class="text-sm font-medium text-green-800">✓ 카드 정보가 인식되었습니다</span>
-        <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">
-          신뢰도: {{ ocrResult.confidence || 0 }}%
-        </span>
       </div>
       <div class="text-xs text-green-700">
         <p v-if="ocrResult.cardNumber">카드번호: {{ ocrResult.cardNumber }}</p>

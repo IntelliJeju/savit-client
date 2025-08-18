@@ -1,6 +1,7 @@
 <template>
   <div class="mb-6">
     <swiper
+      v-if="cards.length > 0"
       :modules="[Navigation, Pagination]"
       :slides-per-view="1"
       :space-between="20"
@@ -32,29 +33,9 @@
           <div class="relative z-10 h-full flex flex-col justify-between p-6 text-white">
             <div>
               <div class="flex items-center justify-between">
-                <div
-                  v-if="!isEditingNickname || currentCardIndex !== index"
-                  class="text-sm opacity-90 flex items-center gap-2 drop-shadow-lg"
-                >
+                <div class="text-sm opacity-90 drop-shadow-lg">
                   {{ card.cardName || '카드별칭' }}
-                  <button
-                    @click="$emit('edit-nickname', index)"
-                    class="p-1 rounded-full hover:bg-white hover:bg-opacity-20 transition-all opacity-70 hover:opacity-100"
-                  >
-                    <v-icon name="hi-solid-pencil" scale="1" />
-                  </button>
                 </div>
-                <input
-                  v-else-if="isEditingNickname && currentCardIndex === index"
-                  :value="editingNickname"
-                  @input="$emit('update-nickname', ($event.target as HTMLInputElement).value)"
-                  @blur="$emit('save-nickname')"
-                  @keyup.enter="$emit('save-nickname')"
-                  @keyup.escape="$emit('cancel-edit')"
-                  class="text-sm opacity-90 bg-transparent border-b border-white border-opacity-50 outline-none px-1 py-0.5 min-w-0 flex-1"
-                  ref="nicknameInput"
-                  maxlength="20"
-                />
               </div>
               <div class="text-3xl font-bold mt-8 drop-shadow-lg">
                 {{ totalAmount.toLocaleString() }}원
@@ -95,8 +76,35 @@
       </swiper-slide>
     </swiper>
 
+    <!-- 카드가 없을 때 새 카드 추가 버튼만 표시 -->
+    <div v-else class="w-full max-w-80 mx-auto">
+      <router-link
+        to="/card/register"
+        class="block w-full aspect-[16/10] rounded-3xl p-6 relative overflow-hidden border-2 border-dashed border-slate-300 bg-white hover:bg-slate-50 active:scale-95 transition-all"
+      >
+        <div class="relative z-10 h-full flex flex-col justify-center items-center text-center">
+          <div
+            class="w-16 h-16 bg-app-light-gray rounded-2xl flex items-center justify-center mx-auto mb-4"
+          >
+            <svg class="w-8 h-8 text-app-green" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="text-slate-800 text-lg font-semibold mb-2">새 카드 등록</div>
+          <div class="text-slate-500 text-sm">카드를 추가해보세요</div>
+        </div>
+      </router-link>
+    </div>
+
     <!-- 외부 네비게이션 -->
-    <div class="relative flex justify-center items-center mt-4" v-if="totalSlots > 1">
+    <div
+      class="relative flex justify-center items-center mt-4"
+      v-if="cards.length > 0 && totalSlots > 1"
+    >
       <!-- 이전 버튼 -->
       <button
         class="custom-prev absolute left-0 w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all hover:bg-slate-50 shadow-sm"
@@ -130,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination } from 'swiper/modules'
 import type { Swiper as SwiperType } from 'swiper'
@@ -141,25 +149,17 @@ import 'swiper/css/pagination'
 
 interface Props {
   cards: Card[]
-  currentCardIndex: number
-  isEditingNickname: boolean
-  editingNickname: string
   totalAmount: number
 }
 
 interface Emits {
   (e: 'slide-change', index: number): void
-  (e: 'edit-nickname', index: number): void
-  (e: 'update-nickname', value: string): void
-  (e: 'save-nickname'): void
-  (e: 'cancel-edit'): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const swiperInstance = ref<SwiperType | null>(null)
-const nicknameInput = ref<HTMLInputElement | null>(null)
 
 const totalSlots = computed(() => props.cards.length + 1)
 
@@ -171,43 +171,6 @@ const onSwiper = (swiper: SwiperType) => {
 const onSlideChange = (swiper: SwiperType) => {
   emit('slide-change', swiper.activeIndex)
 }
-
-// 카드 배경색 함수
-const getCardBgColor = (organization: string) => {
-  const colorMap: { [key: string]: string } = {
-    국민카드: '#FFD700',
-    신한카드: '#1E40AF',
-    하나카드: '#16A34A',
-    삼성카드: '#6366F1',
-  }
-  return colorMap[organization] || '#4ade80'
-}
-
-// 외부에서 슬라이드 이동을 위한 메서드
-const slideTo = (index: number) => {
-  if (swiperInstance.value) {
-    swiperInstance.value.slideTo(index)
-  }
-}
-
-// 편집 모드일 때 input에 포커스
-watch(
-  () => props.isEditingNickname,
-  async (newVal) => {
-    if (newVal) {
-      await nextTick()
-      if (nicknameInput.value) {
-        nicknameInput.value.focus()
-        nicknameInput.value.select()
-      }
-    }
-  },
-)
-
-// 외부에서 접근 가능한 메서드들 expose
-defineExpose({
-  slideTo,
-})
 </script>
 
 <style scoped>
@@ -227,12 +190,6 @@ defineExpose({
 .custom-prev,
 .custom-next {
   cursor: pointer;
-}
-
-.custom-prev:disabled,
-.custom-next:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 /* 외부 페이지네이션 스타일 */
