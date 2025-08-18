@@ -109,6 +109,7 @@ const {
   handlePasswordInput,
   fillFormFromOCR,
   handleRegisterCard,
+  updateCardData,
   organization,
 } = useCardForm()
 
@@ -155,10 +156,6 @@ const handleGalleryUpload = (event: Event) => {
   checkImagePreview()
 }
 
-// 카드 데이터 업데이트 헬퍼 함수
-const updateCardData = (field: keyof typeof cardData.value, value: string) => {
-  ;(cardData.value as any)[field] = value
-}
 </script>
 
 <style scoped>
