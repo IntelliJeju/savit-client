@@ -102,38 +102,54 @@
             / {{ totalBudget.toLocaleString() }} 원
           </div>
 
-          <div class="flex justify-center gap-8 text-[1.5rem] mx-8 my-10">
+          <!-- 남은 한도와 일평균 사용 표시 -->
+          <div class="flex justify-center gap-8 text-[1.5rem] mx-8 mb-6">
             <div class="flex flex-col items-center w-1/2">
-              <div class="text-center mb-4">
+              <div class="text-center">
                 <div class="font-semibold whitespace-nowrap">
                   {{ (totalBudget - totalAmount).toLocaleString() }} 원
                 </div>
                 <div class="text-[0.9rem] text-app-dark-gray/70 mt-1">남은 한도</div>
               </div>
-              <ButtonItem class="w-full min-w-32 h-28 font-semibold" @click="BudgetCheck">
-                <div class="text-center">이번 달 예산의 30%를</div>
-                <div class="text-center">쇼핑 카테고리에</div>
-                <div class="text-center">사용했어요!</div>
-              </ButtonItem>
             </div>
             <div class="flex flex-col items-center w-1/2">
-              <div class="text-center mb-4">
+              <div class="text-center">
                 <div class="font-semibold whitespace-nowrap">
                   {{ Math.round(totalAmount / new Date().getDate()).toLocaleString() }} 원
                 </div>
                 <div class="text-[0.9rem] text-app-dark-gray/70 mt-1">일평균 사용</div>
               </div>
-              <ButtonItem
-                variant="purple"
-                class="w-full min-w-32 h-28 font-semibold"
-                @click="BudgetCheck"
-              >
-                <div class="text-center">지난 달 보다</div>
-                <div class="text-center">문화 카테고리에</div>
-                <div class="text-center">10% 더</div>
-                <div class="text-center">사용했어요!</div>
-              </ButtonItem>
             </div>
+          </div>
+
+          <!-- 분석 버튼 영역 -->
+          <div class="flex justify-center mx-8 mb-6">
+            <template v-if="totalAmount > 0">
+              <div class="flex gap-8 w-full">
+                <ButtonItem class="flex-1 min-w-32 h-28 font-semibold" @click="BudgetCheck">
+                  <div class="text-center">이번 달 예산의 30%를</div>
+                  <div class="text-center">쇼핑 카테고리에</div>
+                  <div class="text-center">사용했어요!</div>
+                </ButtonItem>
+                <ButtonItem
+                  variant="purple"
+                  class="flex-1 min-w-32 h-28 font-semibold"
+                  @click="BudgetCheck"
+                >
+                  <div class="text-center">지난 달 보다</div>
+                  <div class="text-center">문화 카테고리에</div>
+                  <div class="text-center">10% 더</div>
+                  <div class="text-center">사용했어요!</div>
+                </ButtonItem>
+              </div>
+            </template>
+            
+            <template v-else>
+              <ButtonItem class="w-full max-w-80 h-28 font-semibold" @click="BudgetCheck">
+                <div class="text-center">카드 사용 후</div>
+                <div class="text-center">분석 결과를 확인하세요</div>
+              </ButtonItem>
+            </template>
           </div>
         </template>
       </CardComponent>
