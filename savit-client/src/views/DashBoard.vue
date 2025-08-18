@@ -15,38 +15,46 @@
       <div class="max-w-4xl mx-auto">
         <div class="text-center bg-app-green/30 font-medium">진행 중인 챌린지</div>
         <div class="flex justify-between items-center text-center w-full h-20 mx-auto">
-          <button
-            class="pl-2"
-            @click="previousChallenge"
-            :disabled="currentChallengeIndex === 0"
-            :class="{ 'opacity-50': currentChallengeIndex === 0 }"
-          >
-            <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
-          </button>
-
-          <div ref="challengeContainer" class="flex-1 overflow-hidden relative">
-            <div
-              class="flex transition-transform duration-300 ease-in-out"
-              :style="{ transform: `translateX(-${currentChallengeIndex * 100}%)` }"
+          <template v-if="participatingChallenges.length > 0">
+            <button
+              class="pl-2"
+              @click="previousChallenge"
+              :disabled="currentChallengeIndex === 0"
+              :class="{ 'opacity-50': currentChallengeIndex === 0 }"
             >
-              <CurrentChallengeCard
-                v-for="challenge in participatingChallenges"
-                :key="challenge.challengeId"
-                :challenge="challenge"
-                variant="slide"
-                @click="currentChallenge"
-              />
-            </div>
-          </div>
+              <v-icon name="hi-chevron-left" scale="1.5"></v-icon>
+            </button>
 
-          <button
-            class="pr-2"
-            @click="nextChallenge"
-            :disabled="currentChallengeIndex === participatingChallenges.length - 1"
-            :class="{ 'opacity-50': currentChallengeIndex === participatingChallenges.length - 1 }"
-          >
-            <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
-          </button>
+            <div ref="challengeContainer" class="flex-1 overflow-hidden relative">
+              <div
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentChallengeIndex * 100}%)` }"
+              >
+                <CurrentChallengeCard
+                  v-for="challenge in participatingChallenges"
+                  :key="challenge.challengeId"
+                  :challenge="challenge"
+                  variant="slide"
+                  @click="currentChallenge"
+                />
+              </div>
+            </div>
+
+            <button
+              class="pr-2"
+              @click="nextChallenge"
+              :disabled="currentChallengeIndex === participatingChallenges.length - 1"
+              :class="{ 'opacity-50': currentChallengeIndex === participatingChallenges.length - 1 }"
+            >
+              <v-icon name="hi-chevron-right" scale="1.5"></v-icon>
+            </button>
+          </template>
+          
+          <template v-else>
+            <div class="flex-1 flex items-center justify-center text-app-dark-gray/70">
+              진행중인 챌린지가 없습니다
+            </div>
+          </template>
         </div>
 
         <!-- 챌린지 인디케이터 점들 -->
