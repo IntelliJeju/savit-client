@@ -9,6 +9,7 @@ import {
   adjustCategoriesProportionally,
   adjustCategoriesForSlider,
   redistributeExcessPercentage,
+  roundAndAdjustRatios,
 } from '@/utils/calculations'
 
 const BUDGET_STORAGE_KEY = 'budget-category-settings'
@@ -134,9 +135,10 @@ export function useBudgetCategories(totalBudget: Ref<number>) {
 
   const applyRecommendedRatios = (): void => {
     const defaultRatios = calculateDefaultRatios()
+    const adjustedRatios = roundAndAdjustRatios(defaultRatios)
 
     categories.value.forEach((cat, idx) => {
-      cat.percentage = Math.round(defaultRatios[idx] * 10) / 10
+      cat.percentage = adjustedRatios[idx]
     })
 
     saveCategoriesData(categories.value)
