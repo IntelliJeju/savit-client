@@ -199,7 +199,7 @@ export const normalizeRatiosToHundredPercent = (ratios: number[]): number[] => {
   return ratios.map(ratio => (ratio / total) * 100)
 }
 
-// 비율 반올림 및 총합 조정
+// 비율 및 총합 조정
 export const roundAndAdjustRatios = (ratios: number[]): number[] => {
   let roundedRatios = ratios.map(ratio => Math.round(ratio * 10) / 10)
   
