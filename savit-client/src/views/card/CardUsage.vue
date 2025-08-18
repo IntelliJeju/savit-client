@@ -85,21 +85,13 @@
       </div>
 
       <!-- 빈 상태 -->
-      <div v-else class="bg-white rounded-xl p-8 text-center border border-slate-200">
-        <div
-          class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
-        >
-          <svg class="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fill-rule="evenodd"
-              d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <div class="text-slate-800 text-lg font-medium mb-2">이용내역이 없습니다</div>
-        <div class="text-slate-500 text-sm">이번 달 카드 이용내역이 없습니다</div>
-      </div>
+      <CardComponent v-else>
+        <EmptyState
+          size="large"
+          title="사용내역이 없습니다"
+          description="아직 이번 달에 카드를 사용하지 않으셨어요!"
+        />
+      </CardComponent>
     </div>
   </div>
 </template>
@@ -110,6 +102,7 @@ import { useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import CardComponent from '@/components/card/CardComponent.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import { mapCategoryToMainCategory } from '@/utils/category'
 import { storeToRefs } from 'pinia'
 import now from '@/utils/dateUtils'
