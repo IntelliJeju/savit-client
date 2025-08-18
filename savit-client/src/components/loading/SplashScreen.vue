@@ -20,15 +20,20 @@
     </div>
 
     <!-- 로딩 텍스트 -->
-    <div class="mt-6 text-app-dark-gray text-sm animate-pulse">데이터를 불러오는 중...</div>
-
-    <!-- 하단 버전 정보 (선택사항) -->
-    <div class="absolute bottom-8 text-xs text-app-dark-gray/50">v1.0.0</div>
+    <div class="mt-6 text-app-dark-gray text-sm animate-pulse whitespace-pre-line text-center">
+      {{ message }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// props나 로직이 필요하면 여기에 추가
+interface Props {
+  message?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  message: '데이터를 불러오는 중...',
+})
 </script>
 
 <style scoped>
