@@ -77,11 +77,11 @@
                 <div
                   class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray flex-shrink-0"
                 >
-                  <!-- <CategoryIcon
-                      :category="mapCategoryToMainCategory(transaction.category)"
-                      :color="'#028174'"
-                      :size="20"
-                    /> -->
+                  <CategoryIcon
+                    :category="mapCategoryToMainCategory(transaction.resMemberStoreType)"
+                    :color="'#028174'"
+                    :size="20"
+                  />
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="font-medium text-slate-800 truncate">
@@ -108,7 +108,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 거래내역이 없을 때 빈 상태 -->
         <EmptyState
           v-else

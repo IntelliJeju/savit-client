@@ -4,7 +4,7 @@
   </Teleport>
 
   <div class="min-h-screen bg-app-light-gray">
-    <div class="max-w-sm mx-auto p-4">
+    <div class="max-w-sm mx-auto py-4">
       <!-- 이번 달 청구 금액 -->
       <CardComponent class="mb-6">
         <div class="flex items-center justify-between">
@@ -48,8 +48,9 @@
                   <div
                     class="w-10 h-10 bg-app-light-gray rounded-lg flex items-center justify-center flex-shrink-0"
                   >
+                    {{ console.log(usage) }}
                     <CategoryIcon
-                      :category="mapCategoryToMainCategory(usage.category)"
+                      :category="mapCategoryToMainCategory(usage.resMemberStoreType)"
                       :color="'#028174'"
                       :size="20"
                     />
@@ -68,7 +69,7 @@
                     class="font-semibold whitespace-nowrap"
                     :class="usage.resCancelYN !== '0' ? 'text-app-green' : ''"
                   >
-                    {{ usage.resCancelYN === '0' ? '-' : '+-'
+                    {{ usage.resCancelYN === '0' ? '-' : '+'
                     }}{{ Number(usage.resUsedAmount).toLocaleString() }}원
                     <div
                       v-if="usage.resCancelYN !== '0'"
