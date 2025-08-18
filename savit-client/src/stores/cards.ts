@@ -7,10 +7,8 @@ import type {
   Transaction,
   registerCardForm,
   BillingInfo,
-  UsageDetail,
   RegisterResponse,
 } from '@/types/card'
-import { saveTransaction } from '@/utils/category'
 
 export const useCardsStore = defineStore('cards', () => {
   const { request, loading } = useApi()
@@ -132,7 +130,7 @@ export const useCardsStore = defineStore('cards', () => {
   // 거래 서비스에 데이터 제공자 등록
   transactionService.registerDataProvider(() => ({
     cards: cards.value,
-    transactions: transactions.value
+    transactions: transactions.value,
   }))
 
   // ===== 반환값 =====
@@ -155,9 +153,6 @@ export const useCardsStore = defineStore('cards', () => {
     // 데이터 관리
     fetchTransactions,
     // fetchBillingInfo,
-
-    // 거래 카테고리 관리
-    saveTransaction,
 
     // 유틸리티
     syncPendingNicknames,
