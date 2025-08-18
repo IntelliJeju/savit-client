@@ -71,31 +71,73 @@ export const useBudgetsStore = defineStore('budgets', () => {
       }
     })
 
-  // ===== 로컬 스토리지 관리 =====
-  const updateBudgetInStore = (budget: MonthlyBudget, month: string): void => {
-    if (!budget?.month) return console.warn('Invalid budget object:', budget)
-
-    const existingIndex = monthlyBudgets.value.findIndex((b) => b?.month === month)
-
-    existingIndex !== -1
-      ? (monthlyBudgets.value[existingIndex] = budget)
-      : monthlyBudgets.value.push(budget)
-
-    if (month === getCurrentMonth()) {
-      currentBudget.value = budget
-      saveToStorage(STORAGE_KEYS.CURRENT_BUDGET, budget)
+  // ===== API 호출 로직 (useBudgetApi에서 이동) =====
+  const apiCall = async <T>(url: string, fallback: T): Promise<T> => {
+    try {
+      const response = await request({ method: 'GET', url })
+      return response.data
+    } catch {
+      return fallback
     }
-
-    saveToStorage(STORAGE_KEYS.MONTHLY_BUDGETS, monthlyBudgets.value)
   }
 
-  const getBudgetByMonth = (month: string): MainCategoryBudgetStatus[] =>
-    monthlyBudgets.value.find((b) => b.month === month)?.mainCategoryBudgets ||
-    currentBudget.value?.mainCategoryBudgets ||
-    []
+  const getDefaultTotalBudget = (): Promise<number> => 
+    apiCall('/budget', Object.values(DEFAULT_BUDGET_AMOUNTS).reduce((sum, amount) => sum + amount, 0))
+      .then(data => (data as any).totalBudget || data)
 
-  // ===== API 호출 로직 =====
-  const apiCall = async <T>(url: string, fallback?: T): Promise<T | null> => {
+  const getDefaultCategoryBudgets = (): Promise<Record<MainCategory, number>> => 
+    apiCall('/budget/categories', { ...DEFAULT_BUDGET_AMOUNTS })
+      .then(data => (data as any).categoryBudgets || data)
+
+  const getPeerAvgForAllCategories = async (): Promise<Record<MainCategory, number>> => {
+    const results: Record<MainCategory, number> = {} as Record<MainCategory, number>
+    
+    // 타임아웃을 방지하기 위해 Promise.allSettled 사용
+    const promises = Object.entries(CATEGORY_ID_MAP).map(async ([category, categoryId]) => {
+      try {
+        const response = await request({ 
+          method: 'GET', 
+          url: `/budget/peer-avg/${categoryId}` 
+        })
+        return { 
+          category: category as MainCategory, 
+          amount: response.amount || 0 
+        }
+      } catch (error) {
+        console.warn(`카테고리 ${category} 또래 평균 조회 실패:`, error)
+        return { 
+          category: category as MainCategory, 
+          amount: DEFAULT_BUDGET_AMOUNTS[category as MainCategory] || 0 
+        }
+      }
+    })
+    
+    const settledResults = await Promise.allSettled(promises)
+    
+    // 성공한 결과들로 객체 구성
+    settledResults.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        results[result.value.category] = result.value.amount
+      }
+    })
+    
+    // 실패한 카테고리는 기본값으로 설정
+    Object.keys(CATEGORY_ID_MAP).forEach(category => {
+      if (!(category as MainCategory in results)) {
+        results[category as MainCategory] = DEFAULT_BUDGET_AMOUNTS[category as MainCategory] || 0
+      }
+    })
+    
+    return results
+  }
+
+  const transformBudgetRequestToCategoryData = (budgetRequest: BudgetSettingRequest) =>
+    budgetRequest.mainCategoryBudgets.map(item => ({
+      categoryId: CATEGORY_ID_MAP[item.mainCategory as MainCategory],
+      targetAmount: item.budgetAmount
+    }))
+
+  async function fetchBudgetData(url: string) {
     try {
       const response = await request({ method: 'GET', url })
       return response.data
@@ -244,6 +286,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     getBudgetByMonth,
     getDefaultTotalBudget,
     getDefaultCategoryBudgets,
+    getPeerAvgForAllCategories,
     validateBudgetSettings,
     createBudgetFromSettings,
   }
