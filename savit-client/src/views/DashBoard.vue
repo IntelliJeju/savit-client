@@ -168,6 +168,8 @@ import { storeToRefs } from 'pinia'
 import { calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import ProfileImage from '@/components/user/ProfileImage.vue'
+import { transactionService } from '@/services/transactionService'
+import { getCurrentMonth } from '@/utils/dateUtils'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()
@@ -184,7 +186,9 @@ const currentChallengeIndex = ref(0)
 const challengeContainer = ref<HTMLElement | null>(null)
 
 const totalAmount = computed(() => {
-  return cardsList.value.reduce((acc, cur) => acc + cur.usageAmount, 0)
+  const currentMonth = getCurrentMonth()
+  const spendingData = transactionService.getSpendingByMonth(currentMonth)
+  return Object.values(spendingData).reduce((sum, amount) => sum + amount, 0)
 })
 
 const totalBudget = computed(() => {

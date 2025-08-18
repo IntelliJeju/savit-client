@@ -16,6 +16,7 @@ import {
   HiArrowNarrowUp,
   HiArrowNarrowDown,
   HiSolidPencil,
+  HiChartPie,
 } from 'oh-vue-icons/icons'
 
 import App from './App.vue'
@@ -33,6 +34,7 @@ addIcons(
   HiArrowNarrowUp,
   HiArrowNarrowDown,
   HiSolidPencil,
+  HiChartPie,
 )
 
 const app = createApp(App)

@@ -33,7 +33,7 @@ export interface CardFormEvents {
 // 카메라 이벤트 타입
 export interface CameraEvents {
   start: []
-  capture: []
+  capture: [imageDataUrl: string]
   retake: []
   upload: [event: Event]
   processOCR: []

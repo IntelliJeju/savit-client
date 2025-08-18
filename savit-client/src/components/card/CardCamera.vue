@@ -9,50 +9,24 @@
           autoplay
           playsinline
           muted
-          class="w-full h-64 object-cover rounded-lg bg-black"
+          class="w-full h-48 object-cover rounded-lg bg-black"
+          style="aspect-ratio: 1.59 / 1"
         ></video>
 
-        <!-- 카드 인식 가이드라인 오버레이 -->
+        <!-- 카드 촬영 안내 오버레이 -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div class="relative">
-            <!-- 카드 프레임 -->
-            <div
-              class="w-60 h-36 border-2 border-white rounded-lg shadow-lg bg-transparent relative"
-            >
-              <!-- 모서리 표시 -->
-              <div
-                class="absolute top-0 left-0 w-6 h-6 border-l-4 border-t-4 border-green-400 rounded-tl-lg"
-              ></div>
-              <div
-                class="absolute top-0 right-0 w-6 h-6 border-r-4 border-t-4 border-green-400 rounded-tr-lg"
-              ></div>
-              <div
-                class="absolute bottom-0 left-0 w-6 h-6 border-l-4 border-b-4 border-green-400 rounded-bl-lg"
-              ></div>
-              <div
-                class="absolute bottom-0 right-0 w-6 h-6 border-r-4 border-b-4 border-green-400 rounded-br-lg"
-              ></div>
-            </div>
-
-            <!-- 안내 텍스트 -->
-            <div
-              class="absolute -bottom-12 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded"
-            >
-              카드를 프레임 안에 맞춰주세요
+          <div class="text-white text-center bg-black bg-opacity-50 px-6 py-3 rounded-lg">
+            <div class="text-sm leading-relaxed">
+              카드를 화면에<br />
+              맞춰 촬영하세요
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- 촬영 버튼 -->
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-          <button
-            @click="$emit('capture')"
-            type="button"
-            class="w-16 h-16 bg-white rounded-full border-4 border-gray-300 flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
-          >
-            <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
-          </button>
-        </div>
+      <!-- 촬영 버튼 (카메라 화면 외부) -->
+      <div v-if="!capturedImage && showCamera" class="mt-6">
+        <ButtonItem @click="capturePhoto"> 촬영 </ButtonItem>
       </div>
 
       <!-- 촬영된 이미지 미리보기 -->
@@ -60,10 +34,11 @@
         <img
           :src="capturedImage"
           alt="촬영된 카드 이미지"
-          class="w-full h-64 object-cover rounded-lg"
+          class="w-full h-48 object-cover rounded-lg"
+          style="aspect-ratio: 1.59 / 1"
         />
         <button
-          @click="$emit('retake')"
+          @click="retakePhoto"
           type="button"
           class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm shadow-lg"
         >
@@ -87,7 +62,7 @@
         <p class="text-red-600 text-sm mb-4 font-medium">카메라를 시작할 수 없습니다</p>
         <p class="text-xs text-gray-600 mb-4">브라우저에서 카메라 권한을 허용해주세요</p>
         <button
-          @click="$emit('start')"
+          @click="startCamera"
           type="button"
           class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
         >
@@ -139,17 +114,102 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import type { OCRResult, CameraEvents } from '@/types/card.composables'
+import ButtonItem from '@/components/button/ButtonItem.vue'
 
 interface Props {
-  showCamera: boolean
   capturedImage: string | null
-  isStartingCamera: boolean
   isProcessingOCR: boolean
   ocrResult: OCRResult | null
-  videoElement?: HTMLVideoElement | null
 }
 
-defineProps<Props>()
-defineEmits<CameraEvents>()
+const props = defineProps<Props>()
+const emit = defineEmits<CameraEvents>()
+
+// 내부 상태 관리
+const videoElement = ref<HTMLVideoElement | null>(null)
+const showCamera = ref(false)
+const isStartingCamera = ref(false)
+const mediaStream = ref<MediaStream | null>(null)
+
+// 카메라 시작
+const startCamera = async () => {
+  if (isStartingCamera.value) return
+
+  isStartingCamera.value = true
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+      },
+    })
+
+    mediaStream.value = stream
+    showCamera.value = true
+
+    // DOM 업데이트 후 스트림 연결
+    await nextTick()
+
+    if (videoElement.value) {
+      videoElement.value.srcObject = stream
+    }
+  } catch (error) {
+    console.error('카메라 접근 실패:', error)
+    showCamera.value = false
+    alert('카메라 접근에 실패했습니다.')
+  } finally {
+    isStartingCamera.value = false
+  }
+}
+
+// 카메라 중지
+const stopCamera = () => {
+  if (mediaStream.value) {
+    mediaStream.value.getTracks().forEach((track) => track.stop())
+    mediaStream.value = null
+  }
+  showCamera.value = false
+}
+
+// 사진 촬영
+const capturePhoto = () => {
+  if (!videoElement.value) return
+
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d')
+
+  if (!context) return
+
+  canvas.width = videoElement.value.videoWidth
+  canvas.height = videoElement.value.videoHeight
+  context.drawImage(videoElement.value, 0, 0)
+
+  const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+  stopCamera()
+
+  emit('capture', imageDataUrl)
+}
+
+// 다시 촬영
+const retakePhoto = () => {
+  emit('retake')
+  startCamera()
+}
+
+// 컴포넌트 마운트 시 카메라 자동 시작
+onMounted(async () => {
+  await nextTick()
+  setTimeout(() => {
+    startCamera()
+  }, 100)
+})
+
+// 언마운트 시 정리
+onUnmounted(() => {
+  stopCamera()
+})
 </script>
