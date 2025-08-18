@@ -146,6 +146,11 @@ export const useBudgetsStore = defineStore('budgets', () => {
     return (data as any)?.categoryBudgets || data || fallbackBudgets
   }
 
+  const getPeerAvgByCategoryId = async (categoryId: number): Promise<number> => {
+    const data = await apiCall(`/budget/peer-avg/${categoryId}`, { amount: 0 })
+    return (data as any)?.amount || 0
+  }
+
   async function fetchBudgetsByMonth(month: string): Promise<void> {
     const data = await apiCall('/budget')
     if (data) {
@@ -244,6 +249,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     getBudgetByMonth,
     getDefaultTotalBudget,
     getDefaultCategoryBudgets,
+    getPeerAvgByCategoryId,
     validateBudgetSettings,
     createBudgetFromSettings,
   }

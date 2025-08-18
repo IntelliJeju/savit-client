@@ -66,7 +66,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createInputHandlers, formatCurrency, calculateAmount } from '@/utils/calculations'
 import { useBudgetsStore } from '@/stores/budgets'
-import { DEFAULT_BUDGET_AMOUNTS } from '@/types/budgets'
+import { DEFAULT_BUDGET_AMOUNTS, CATEGORY_ID_MAP } from '@/types/budgets'
 import { calculateDefaultTotalBudget } from '@/utils/budgetUtils'
 import { getCurrentMonth } from '@/utils/dateUtils'
 import CardComponent from '@/components/card/CardComponent.vue'
@@ -78,8 +78,6 @@ const route = useRoute()
 const router = useRouter()
 const budgetsStore = useBudgetsStore()
 const isLoading = ref(false)
-
-const RECOMMENDATION_API_DELAY = 1000
 
 // 초기 예산 계산
 const getInitialTotalBudget = (): number => {
@@ -127,18 +125,43 @@ const saveBudget = async () => {
   }
 }
 
-// 추천 버튼 처리 (단순화)
+// 추천 버튼 처리
 const applyRecommendation = async () => {
   if (isLoading.value) return
 
   isLoading.value = true
   try {
-    await new Promise((resolve) => setTimeout(resolve, RECOMMENDATION_API_DELAY))
-    applyRecommendedRatios()
-    alert('기본 추천 비율로 설정되었습니다!')
+    // 각 카테고리별 또래 평균 금액 가져오기
+    const peerAvgPromises = categories.value.map(async (category) => {
+      const categoryId = CATEGORY_ID_MAP[category.name]
+      const peerAvg = await budgetsStore.getPeerAvgByCategoryId(categoryId)
+      return { category: category.name, amount: peerAvg }
+    })
+
+    const peerAvgResults = await Promise.all(peerAvgPromises)
+    
+    // 총 또래 평균 금액 계산
+    const totalPeerAvg = peerAvgResults.reduce((sum, result) => sum + result.amount, 0)
+    
+    if (totalPeerAvg > 0) {
+      // 또래 평균 기반으로 비율 계산
+      categories.value.forEach((category) => {
+        const peerData = peerAvgResults.find(result => result.category === category.name)
+        if (peerData && peerData.amount > 0) {
+          category.percentage = (peerData.amount / totalPeerAvg) * 100
+        }
+      })
+      alert('또래 평균 데이터 기반으로 추천 비율이 설정되었습니다!')
+    } else {
+      // 또래 데이터가 없으면 기본 추천 비율 사용
+      applyRecommendedRatios()
+      alert('기본 추천 비율로 설정되었습니다!')
+    }
   } catch (error) {
     console.error('추천 실패:', error)
-    alert('추천 비율을 가져오는 중 오류가 발생했습니다. 다시 시도해주세요.')
+    // 에러 발생 시 기본 추천 비율로 폴백
+    applyRecommendedRatios()
+    alert('추천 비율을 가져오는 중 오류가 발생하여 기본 추천 비율로 설정되었습니다.')
   } finally {
     isLoading.value = false
   }
