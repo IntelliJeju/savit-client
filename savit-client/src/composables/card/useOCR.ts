@@ -43,6 +43,62 @@ export function useOCR() {
   }
 
   /**
+   * 이미지 압축 함수
+   */
+  const compressImage = (file: File, maxWidth = 800, quality = 0.8): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')!
+      const img = new Image()
+      
+      img.onload = () => {
+        // 비율 유지하며 리사이징
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height)
+        canvas.width = img.width * ratio
+        canvas.height = img.height * ratio
+        
+        // 이미지 그리기
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        
+        // Blob으로 변환
+        canvas.toBlob((blob) => {
+          resolve(blob!)
+        }, 'image/jpeg', quality)
+      }
+      
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  /**
+   * Data URL을 압축된 Blob으로 변환
+   */
+  const dataUrlToCompressedBlob = (dataUrl: string, maxWidth = 800, quality = 0.8): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')!
+      const img = new Image()
+      
+      img.onload = () => {
+        // 비율 유지하며 리사이징
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height)
+        canvas.width = img.width * ratio
+        canvas.height = img.height * ratio
+        
+        // 이미지 그리기
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        
+        // Blob으로 변환
+        canvas.toBlob((blob) => {
+          resolve(blob!)
+        }, 'image/jpeg', quality)
+      }
+      
+      img.src = dataUrl
+    })
+  }
+
+  /**
    * OCR 처리 (촬영된 이미지 또는 업로드된 파일)
    */
   const processOCR = async (capturedImageUrl?: string): Promise<OCRResult> => {
@@ -54,15 +110,16 @@ export function useOCR() {
 
     try {
       const formData = new FormData()
+      let compressedBlob: Blob
 
       if (selectedImage.value) {
-        // 파일에서 선택한 경우
-        formData.append('cardImage', selectedImage.value)
+        // 파일에서 선택한 경우 - 압축
+        compressedBlob = await compressImage(selectedImage.value)
+        formData.append('cardImage', compressedBlob, 'card.jpg')
       } else if (capturedImageUrl) {
-        // 카메라에서 촬영한 경우 - Data URL을 Blob으로 변환
-        const response = await fetch(capturedImageUrl)
-        const blob = await response.blob()
-        formData.append('cardImage', blob, 'card.jpg')
+        // 카메라에서 촬영한 경우 - 압축된 Blob으로 변환
+        compressedBlob = await dataUrlToCompressedBlob(capturedImageUrl)
+        formData.append('cardImage', compressedBlob, 'card.jpg')
       }
 
       const result = await request({
@@ -78,6 +135,9 @@ export function useOCR() {
       return result
     } catch (error) {
       console.error('OCR 처리 실패:', error)
+      if (error instanceof Error && error.message.includes('413')) {
+        throw new Error('이미지 파일이 너무 큽니다. 다른 이미지를 선택해주세요.')
+      }
       throw new Error('카드 정보 인식에 실패했습니다. 다시 시도해주세요.')
     } finally {
       isProcessingOCR.value = false
