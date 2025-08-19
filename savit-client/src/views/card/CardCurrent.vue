@@ -66,7 +66,7 @@
                   class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray flex-shrink-0"
                 >
                   <CategoryIcon
-                    :category="mapCategoryToMainCategory(transaction.resMemberStoreType)"
+                    :category="mapCategoryToMainCategory(transaction.categoryId)"
                     :color="'#028174'"
                     :size="20"
                   />

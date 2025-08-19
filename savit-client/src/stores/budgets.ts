@@ -41,7 +41,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
   // ===== 유틸리티 함수 =====
   const transformBudgetRequestToCategoryData = (budgetRequest: BudgetSettingRequest) =>
     budgetRequest.mainCategoryBudgets.map((item) => ({
-      categoryId: CATEGORY_ID_MAP[item.mainCategory as MainCategory],
+      categoryId: CATEGORY_ID_MAP[item.mainCategory as MainCategory][0], // 첫 번째 ID 사용
       targetAmount: item.budgetAmount,
     }))
 

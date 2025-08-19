@@ -108,6 +108,9 @@ export function useCardForm() {
    */
   const handleRegisterCard = async (): Promise<void> => {
     try {
+      // 등록 전 기존 카드 목록 저장
+      const existingCardIds = new Set(cardsStore.cardsList.map(card => card.cardId))
+      
       const response = await cardsStore.registerCard(cardData.value)
 
       // 등록 후 카드 목록을 다시 가져와서 사용내역 조회
@@ -118,16 +121,22 @@ export function useCardForm() {
           // 먼저 카드 목록을 다시 가져오기
           await cardsStore.fetchCards()
           
-          // 새로 등록된 카드들의 사용내역 가져오기
-          const cardsList = cardsStore.cardsList
+          // 새로 등록된 카드만 식별
+          const updatedCardsList = cardsStore.cardsList
+          const newCards = updatedCardsList.filter(card => !existingCardIds.has(card.cardId))
           
-          for (const card of cardsList) {
+          console.log('기존 카드 ID들:', Array.from(existingCardIds))
+          console.log('업데이트된 카드 목록:', updatedCardsList.map(c => c.cardId))
+          console.log('새로 등록된 카드들:', newCards.map(c => c.cardId))
+          
+          // 새로 등록된 카드만 POST로 사용내역 가져오기 (약 10초 소요)
+          for (const card of newCards) {
             try {
-              // POST 방식으로 최초 사용내역 가져오기 (약 10초 소요)
+              console.log(`새 카드 ${card.cardId}의 사용내역 불러오기 시작`)
               await cardsStore.fetchTransactions(card.cardId, 'POST')
+              console.log(`새 카드 ${card.cardId}의 사용내역 불러오기 완료`)
             } catch (transactionError) {
-              console.warn(`카드 ${card.cardId}의 사용내역 조회 실패:`, transactionError)
-              // 사용내역 조회 실패해도 카드 등록은 성공으로 처리
+              console.warn(`새 카드 ${card.cardId}의 사용내역 조회 실패:`, transactionError)
             }
           }
         } catch (error) {

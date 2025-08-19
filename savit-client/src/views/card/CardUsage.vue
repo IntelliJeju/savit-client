@@ -48,9 +48,8 @@
                   <div
                     class="w-10 h-10 bg-app-light-gray rounded-lg flex items-center justify-center flex-shrink-0"
                   >
-                    {{ console.log(usage) }}
                     <CategoryIcon
-                      :category="mapCategoryToMainCategory(usage.resMemberStoreType)"
+                      :category="mapCategoryToMainCategory(usage.categoryId)"
                       :color="'#028174'"
                       :size="20"
                     />
