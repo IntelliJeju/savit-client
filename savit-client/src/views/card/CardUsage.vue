@@ -34,13 +34,13 @@
       <div v-if="groupedUsage.length > 0" class="space-y-4">
         <CardComponent v-for="group in groupedUsage" :key="group.date">
           <div class="px-4 py-3 bg-slate-50 border-b border-slate-200">
-            <h4 class="text-sm font-medium text-slate-700">{{ formatDateHeader(group.date) }}</h4>
+            <h4 class="text-sm font-medium text-slate-700">{{ formatTransactionDate(group.date, true) }}</h4>
           </div>
           <div>
             <div
               v-for="(usage, index) in group.items"
               :key="usage.id"
-              class="p-4"
+              class="py-4 px-2"
               :class="{ 'border-b border-slate-200': index < group.items.length - 1 }"
             >
               <div class="flex items-center justify-between gap-2">
@@ -105,7 +105,7 @@ import CardComponent from '@/components/card/CardComponent.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import { mapCategoryToMainCategory } from '@/utils/category'
 import { storeToRefs } from 'pinia'
-import now from '@/utils/dateUtils'
+import now, { formatTransactionDate } from '@/utils/dateUtils'
 
 const route = useRoute()
 const cardsStore = useCardsStore()
@@ -184,25 +184,6 @@ const getCurrentMonthRange = () => {
   return `${shortYear}.${month}.${firstDate} ~ ${shortYear}.${month}.${lastDate}`
 }
 
-const formatDateHeader = (dateString: string) => {
-  const date = new Date(
-    dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 8),
-  )
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-
-  if (date.toDateString() === today.toDateString()) {
-    return '오늘'
-  } else if (date.toDateString() === yesterday.toDateString()) {
-    return '어제'
-  } else {
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    return `${year}년 ${month}월 ${day}일`
-  }
-}
 </script>
 
 <style scoped>
