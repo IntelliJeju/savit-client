@@ -206,6 +206,8 @@ const { currentBudgetSummary } = storeToRefs(budgetsStore)
 // Dashboard 분석 composable 사용
 const { highestSpendingCategory, categoryComparison } = useDashboardAnalytics()
 
+// 예산 데이터는 App.vue에서 이미 로드됨
+
 // 챌린지 슬라이드
 const currentChallengeIndex = ref(0)
 const challengeContainer = ref<HTMLElement | null>(null)
