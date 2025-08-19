@@ -127,10 +127,14 @@
                 <div class="flex items-center justify-between w-full">
                   <div class="text-left">
                     <div class="text-sm text-white/80">이번 달 최다 지출</div>
-                    <div class="text-lg font-bold text-white">{{ highestSpendingCategory.category }}</div>
+                    <div class="text-lg font-bold text-white">
+                      {{ highestSpendingCategory.category }}
+                    </div>
                   </div>
                   <div class="text-right">
-                    <div class="text-2xl font-bold text-white">{{ highestSpendingCategory.ratio }}%</div>
+                    <div class="text-2xl font-bold text-white">
+                      {{ highestSpendingCategory.ratio }}%
+                    </div>
                     <div class="text-xs text-white/70">총 예산 중</div>
                   </div>
                 </div>
@@ -141,11 +145,14 @@
                 <div class="flex items-center justify-between w-full">
                   <div class="text-left">
                     <div class="text-sm text-white/80">전월 대비</div>
-                    <div class="text-lg font-bold text-white">{{ categoryComparison.category }}</div>
+                    <div class="text-lg font-bold text-white">
+                      {{ categoryComparison.category }}
+                    </div>
                   </div>
                   <div class="text-right">
                     <div class="text-2xl font-bold text-white">
-                      {{ categoryComparison.isIncrease ? '+' : '-' }}{{ categoryComparison.changeRatio }}%
+                      {{ categoryComparison.isIncrease ? '+' : '-'
+                      }}{{ categoryComparison.changeRatio }}%
                     </div>
                     <div class="text-xs text-white/70">
                       {{ categoryComparison.isIncrease ? '증가' : '절약' }}
@@ -169,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import CardComponent from '@/components/card/CardComponent.vue'
 import DoughnutChart from '@/components/chart/DoughnutChart.vue'
 import CurrentChallengeCard from '@/components/challenge/CurrentChallengeCard.vue'
@@ -183,8 +190,8 @@ import { calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import ProfileImage from '@/components/user/ProfileImage.vue'
 import { transactionService } from '@/services/transactionService'
-import { getCurrentMonth, getRelativeMonth } from '@/utils/dateUtils'
-import { CATEGORIES } from '@/types/budgets'
+import { getCurrentMonth } from '@/utils/dateUtils'
+import { useDashboardAnalytics } from '@/composables/dashboard/useDashboardAnalytics'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()
@@ -195,6 +202,9 @@ const { getUser } = storeToRefs(authStore)
 const { cardsList } = storeToRefs(cardsStore)
 const { getParticipatingChallengeList } = storeToRefs(challengeStore)
 const { currentBudgetSummary } = storeToRefs(budgetsStore)
+
+// Dashboard 분석 composable 사용
+const { highestSpendingCategory, categoryComparison } = useDashboardAnalytics()
 
 // 챌린지 슬라이드
 const currentChallengeIndex = ref(0)
@@ -208,107 +218,6 @@ const totalAmount = computed(() => {
 
 const totalBudget = computed(() => {
   return currentBudgetSummary.value?.totalBudget || 0
-})
-
-// 총 예산에서 가장 많이 지출한 카테고리 찾기
-const highestSpendingCategory = computed(() => {
-  const budgetSummary = currentBudgetSummary.value
-  if (!budgetSummary || budgetSummary.mainCategoryBudgets.length === 0 || budgetSummary.totalBudget === 0) {
-    return { category: '쇼핑', ratio: 30 } // 기본값
-  }
-
-  // 지출액이 가장 많은 카테고리 찾기
-  const categoryWithHighestSpending = budgetSummary.mainCategoryBudgets.reduce((prev, current) => {
-    return current.totalSpent > prev.totalSpent ? current : prev
-  })
-
-  // 총 예산에서 해당 카테고리 지출이 차지하는 비율 계산
-  const ratio = budgetSummary.totalBudget > 0 
-    ? (categoryWithHighestSpending.totalSpent / budgetSummary.totalBudget) * 100 
-    : 0
-
-  return {
-    category: categoryWithHighestSpending.mainCategory,
-    ratio: Math.round(ratio)
-  }
-})
-
-// 전월 대비 변화 계산 (기존 유틸리티 활용)
-const categoryComparison = computed(() => {
-  try {
-    const budgetSummary = currentBudgetSummary.value
-    if (!budgetSummary || budgetSummary.mainCategoryBudgets.length === 0) {
-      return { category: '문화', changeRatio: 10, isIncrease: false }
-    }
-
-    // 기존 유틸리티 활용
-    const currentMonth = getCurrentMonth()
-    const previousMonth = getRelativeMonth(1).string // 1달 전
-
-    const currentSpending = transactionService.getSpendingByMonth(currentMonth)
-    const previousSpending = transactionService.getSpendingByMonth(previousMonth)
-
-    // 현재월 카테고리별 지출 (이미 계산된 데이터 활용)
-    const currentCategorySpending = new Map(
-      budgetSummary.mainCategoryBudgets.map(cat => [cat.mainCategory, cat.totalSpent])
-    )
-
-    // 전월 카테고리별 지출 (CATEGORIES 타입 활용)
-    const previousCategorySpending = new Map()
-    Object.entries(previousSpending).forEach(([subCategory, amount]) => {
-      // CATEGORIES.SUB에서 MainCategory 찾기
-      let mainCategory = '기타'
-      for (const [main, subs] of Object.entries(CATEGORIES.SUB)) {
-        if (subs.includes(subCategory as any)) {
-          mainCategory = main
-          break
-        }
-      }
-      
-      const current = previousCategorySpending.get(mainCategory) || 0
-      previousCategorySpending.set(mainCategory, current + amount)
-    })
-
-    // 카테고리별 변화 계산
-    const changes = Array.from(currentCategorySpending.entries()).map(([category, currentAmount]) => {
-      const previousAmount = previousCategorySpending.get(category) || 0
-      const change = currentAmount - previousAmount
-      const changeRatio = previousAmount > 0 ? (change / previousAmount) * 100 : (currentAmount > 0 ? 100 : 0)
-
-      return { category, change, changeRatio }
-    })
-
-    // 가장 증가한 카테고리 또는 가장 적게 감소한 카테고리 찾기
-    const increasedCategories = changes.filter(c => c.change > 0)
-    if (increasedCategories.length > 0) {
-      const maxIncrease = increasedCategories.reduce((prev, curr) => 
-        curr.changeRatio > prev.changeRatio ? curr : prev)
-      
-      return {
-        category: maxIncrease.category,
-        changeRatio: Math.round(Math.abs(maxIncrease.changeRatio)),
-        isIncrease: true
-      }
-    }
-
-    // 모두 감소했다면 가장 적게 감소한 카테고리
-    const validChanges = changes.filter(c => c.changeRatio !== 0)
-    if (validChanges.length > 0) {
-      const leastDecrease = validChanges.reduce((prev, curr) => 
-        curr.changeRatio > prev.changeRatio ? curr : prev)
-      
-      return {
-        category: leastDecrease.category,
-        changeRatio: Math.round(Math.abs(leastDecrease.changeRatio)),
-        isIncrease: false
-      }
-    }
-
-    return { category: '문화', changeRatio: 10, isIncrease: false }
-  } catch (error) {
-    console.error('categoryComparison 오류:', error)
-    return { category: '문화', changeRatio: 10, isIncrease: false }
-  }
 })
 
 const BudgetCheck = () => {
