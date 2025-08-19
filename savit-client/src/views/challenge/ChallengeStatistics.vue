@@ -68,9 +68,9 @@
           class="info-record-item flex gap-2 items-center py-4 border-b border-[#F1F3F4] last:border-0 last:pb-0"
           @click="() => router.push(`/challenge/result/${item.challengeId}`)"
         >
-          <div class="info-item-logo">
+          <!-- <div class="info-item-logo">
             <div class="w-[2rem] h-[2rem] bg-black rounded-full"></div>
-          </div>
+          </div> -->
           <div class="info-item-header flex flex-col flex-1">
             <span>{{ item.title }}</span>
             <span class="text-[0.75rem] text-[#8B95A1]"

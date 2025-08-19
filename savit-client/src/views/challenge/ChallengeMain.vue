@@ -39,9 +39,9 @@
           @click="routeDetail(item.challengeId)"
         >
           <card-component>
-            <div class="avail-challenge-title flex justify-between font-semibold">
-              <div class="text-xl">{{ item.title }}</div>
-              <div class="avail-challenge-label">
+            <div class="avail-challenge-title flex justify-between items-start font-semibold">
+              <div class="text-xl flex-1 mr-2">{{ item.title }}</div>
+              <div class="avail-challenge-label flex-shrink-0">
                 <label-item>{{ item.categoryName }}</label-item>
               </div>
             </div>

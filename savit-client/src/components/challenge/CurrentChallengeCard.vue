@@ -31,8 +31,8 @@
   <div v-else class="my-challenge-item mt-4" @click="$emit('click', challenge.challengeId)">
     <card-component>
       <div class="my-challenge-title flex justify-between gap-2 items-center font-bold">
-        <div class="text-2xl">{{ challenge.title }}</div>
-        <div class="my-challenge-label">
+        <div class="text-xl flex-1 mr-2">{{ challenge.title }}</div>
+        <div class="my-challenge-label flex-shrink-0">
           <label-item :variant="challengeStatus === '대기중' ? 'purple' : 'default'">
             {{ challengeStatus }}
           </label-item>
