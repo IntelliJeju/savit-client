@@ -93,15 +93,11 @@ const handleJoinChallenge = async () => {
   try {
     isProcessingPayment.value = true
 
-    console.log('결제 시작:', {
-      desiredAmount: selectedDeposit.value,
-    })
 
     // 새로운 통합 결제 프로세스 사용
     const result = await processPayment(id, selectedDeposit.value)
 
     if (result.success) {
-      console.log(`결제 및 참가 완료 (${result.method} 방식):`, result.data)
       alert('결제가 완료되어 챌린지에 참가되었습니다!')
 
       // 챌린지 목록 새로고침 (참가 상태 반영)

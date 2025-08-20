@@ -48,8 +48,6 @@ export async function sendTokenToServer(token: string): Promise<void> {
       },
     })
 
-    // 성공적으로 토큰이 서버에 저장됨
-    console.log('FCM token sent to server successfully')
   } catch (error) {
     /**
      * 에러 처리

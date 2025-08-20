@@ -22,7 +22,6 @@ onMounted(async () => {
   // 로그인 완료 후 FCM 토큰 전송
   try {
     await handleAllowNotification()
-    console.log('FCM 토큰 설정 완료')
   } catch (error) {
     console.error('FCM 토큰 설정 실패:', error)
     // FCM 토큰 설정 실패해도 로그인은 계속 진행

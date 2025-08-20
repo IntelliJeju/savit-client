@@ -41,7 +41,6 @@ export function setupForegroundMessaging(): void {
    * @param {string} payload.data.icon - 알림 아이콘 경로
    */
   onMessage(messaging, (payload) => {
-    console.log('[foregroundListener] 포어그라운드 메시지 수신:', payload)
 
     // 백엔드에서 data 페이로드로 전송된 정보 추출
     const messageData = payload.data || {}
@@ -82,7 +81,6 @@ export function setupForegroundMessaging(): void {
        * Service Worker의 notificationclick 이벤트와 동일한 동작을 수행합니다.
        */
       notification.onclick = function(event) {
-        console.log('[foregroundListener] 포어그라운드 알림 클릭됨')
         
         // 알림 닫기
         notification.close()
@@ -102,9 +100,7 @@ export function setupForegroundMessaging(): void {
     } else {
       // 알림 권한이 없는 경우 콘솔에만 출력
       console.warn('[foregroundListener] 알림 권한이 없어 알림을 표시할 수 없습니다.')
-      console.log('메시지 내용:', notificationTitle, '-', notificationBody)
     }
   })
 
-  console.log('✅ 포어그라운드 메시징 리스너가 설정되었습니다.')
 }

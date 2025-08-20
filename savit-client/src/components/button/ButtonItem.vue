@@ -30,7 +30,6 @@ const emit = defineEmits<{
 }>()
 
 const handleClick = (event: MouseEvent) => {
-  console.log('버튼 클릭')
   emit('click', event)
 }
 
