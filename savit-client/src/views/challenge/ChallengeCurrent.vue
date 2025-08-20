@@ -89,10 +89,7 @@
           :class="{ 'opacity-40 grayscale': participant.status === 'FAIL' }"
         >
           <div class="profile-imgae">
-            <div
-              class="w-12 h-12 rounded-full"
-              :class="participant.status === 'FAIL' ? 'bg-gray-400' : 'bg-black'"
-            ></div>
+            <ProfileImage :nickname="participant.nickName" variant="others" :isAnonymous="true" />
           </div>
           <div class="progress flex-1">
             <div class="flex justify-between">
@@ -132,6 +129,7 @@
 
 <script setup lang="ts">
 import ProgressBar from '@/components/progressBar/ProgressBar.vue'
+import ProfileImage from '@/components/user/ProfileImage.vue'
 import { useChallengeStore } from '@/stores/challenges.ts'
 import type { Participants } from '@/types/challenges'
 import { storeToRefs } from 'pinia'

@@ -1,10 +1,9 @@
 <template>
   <Teleport to="#header-content">
     <div class="flex items-center gap-2">
-      <ProfileImage />
+      <UserProfileButton />
       <div>
-        <span class="text-app-green">{{ getUser?.nickname }}</span
-        >님 안녕하세요!
+        <span class="text-app-green">{{ getUser?.nickname }}</span>님 안녕하세요!
       </div>
     </div>
   </Teleport>
@@ -188,7 +187,7 @@ import router from '@/router'
 import { storeToRefs } from 'pinia'
 import { calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
-import ProfileImage from '@/components/user/ProfileImage.vue'
+import UserProfileButton from '@/components/user/UserProfileButton.vue'
 import { transactionService } from '@/services/transactionService'
 import { getCurrentMonth } from '@/utils/dateUtils'
 import { useDashboardAnalytics } from '@/composables/dashboard/useDashboardAnalytics'

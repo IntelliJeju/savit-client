@@ -5,7 +5,7 @@
   <div class="flex flex-col items-center justify-center h-full overflow-hidden -mt-8">
       <div class="flex flex-col items-center">
         <div class="profile-large">
-          <ProfileImage class="rounded-lg" />
+          <UserProfileButton />
         </div>
         <div class="mt-4 text-center">
           <div class="font-bold text-lg">{{ getUser?.nickname }}</div>
@@ -25,7 +25,7 @@ import ButtonItem from '@/components/button/ButtonItem.vue'
 import router from '@/router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth.ts'
-import ProfileImage from '@/components/user/ProfileImage.vue'
+import UserProfileButton from '@/components/user/UserProfileButton.vue'
 
 const authStore = useAuthStore()
 
@@ -49,9 +49,17 @@ const handleWithdraw = async () => {
 </script>
 
 <style scoped>
-.profile-large :deep(img) {
+.profile-large :deep(div) {
   width: 160px !important;
   height: 160px !important;
   border-radius: 50% !important;
+}
+
+.profile-large :deep(img) {
+  border-radius: 50% !important;
+}
+
+.profile-large :deep(.bg-app-purple) {
+  font-size: 3rem !important;
 }
 </style>
