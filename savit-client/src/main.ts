@@ -21,6 +21,7 @@ import {
 
 import App from './App.vue'
 import router from './router'
+import { setupForegroundMessaging } from './service/firebase/foregroundListener'
 
 addIcons(
   HiSolidHome,
@@ -43,5 +44,8 @@ app.component('v-icon', OhVueIcon)
 
 app.use(createPinia())
 app.use(router)
+
+// 포어그라운드 FCM 메시징 리스너 설정
+setupForegroundMessaging()
 
 app.mount('#app')

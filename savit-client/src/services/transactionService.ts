@@ -1,6 +1,6 @@
 import type { SubCategory, MainCategory } from '@/types/budgets'
 import type { Transaction, Card } from '@/types/card'
-import { ID_TO_CATEGORY_MAP } from '@/types/budgets'
+import { ID_TO_CATEGORY_MAP, ID_TO_SUBCATEGORY_MAP } from '@/types/budgets'
 
 // 거래 데이터 처리 서비스
 export class TransactionService {
@@ -57,10 +57,9 @@ export class TransactionService {
 
   // categoryId 기반 분류 로직
   private categorizeTransaction(transaction: Transaction): SubCategory {
-    // categoryId가 있는 경우 직접 매핑 (우선순위)
-    if (transaction.categoryId && ID_TO_CATEGORY_MAP[transaction.categoryId]) {
-      const mainCategory = ID_TO_CATEGORY_MAP[transaction.categoryId]
-      return this.getDefaultSubCategoryForMain(mainCategory)
+    // categoryId가 있는 경우 직접 서브카테고리 매핑
+    if (transaction.categoryId && ID_TO_SUBCATEGORY_MAP[transaction.categoryId]) {
+      return ID_TO_SUBCATEGORY_MAP[transaction.categoryId]
     }
     
     // categoryId가 없는 경우 간단한 fallback

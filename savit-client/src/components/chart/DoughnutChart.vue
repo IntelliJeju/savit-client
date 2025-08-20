@@ -177,7 +177,6 @@ const loadScript = (src: string): Promise<void> => {
     script.async = false
 
     script.onload = () => {
-      console.log(`Successfully loaded: ${src}`)
       resolve()
     }
 

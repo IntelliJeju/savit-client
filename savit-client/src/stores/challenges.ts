@@ -47,7 +47,6 @@ export const useChallengeStore = defineStore('challenge', () => {
   const fetchParticipateChallenges = async () => {
     try {
       const res = await request({ method: 'GET', url: '/challenge/participating' })
-      console.log(res)
       participatingChallengeList.value = res
     } catch (err) {
       console.error('fetchParticipateChallenges error: ', err)
@@ -58,8 +57,6 @@ export const useChallengeStore = defineStore('challenge', () => {
   const fetchParticipateChallengeDetail = async (id: number) => {
     try {
       const res = await request({ method: 'GET', url: `/challenge/participating/${id}` })
-      console.log('participants detail: ', res)
-
       const challengeDetail = { challengeId: id, ...res }
       participatingChallengeDetailList.value.set(id, challengeDetail)
     } catch (err) {
@@ -71,7 +68,6 @@ export const useChallengeStore = defineStore('challenge', () => {
   const fetchChallengeStatistics = async () => {
     try {
       const res = await request({ method: 'GET', url: '/challenge/stats' })
-      console.log(res)
       challengeStatistics.value = res
     } catch (err) {
       console.error('fetchChallengeStatistics error: ', err)

@@ -60,7 +60,6 @@ const checkCurrentToken = async () => {
 
     if (token) {
       testResult.value = `✅ 현재 FCM 토큰:\n${token}\n\n📏 토큰 길이: ${token.length}자`
-      console.log('📱 현재 FCM Token:', token)
     } else {
       testResult.value = '❌ 토큰을 가져올 수 없습니다.'
     }

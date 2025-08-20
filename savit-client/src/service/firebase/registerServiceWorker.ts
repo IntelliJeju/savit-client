@@ -43,7 +43,6 @@ export function registerServiceWorker(): void {
       .then((registration) => {
         // Service Worker 등록 성공
         // registration 객체에는 Service Worker의 상태 정보가 포함됨
-        console.log('Service Worker registered successfully:', registration)
 
         /**
          * registration 객체 주요 속성:
