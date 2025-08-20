@@ -63,3 +63,22 @@ export interface Statistics {
   my_fee: number
   prize: number
 }
+
+export interface ChallengeResult {
+  challengeId: number
+  title: string
+  startDate: string
+  endDate: string
+  type: 'COUNT' | 'AMOUNT'
+  goalCount: number | null
+  goalAmount: number | null
+  myStatus: 'SUCCESS' | 'FAIL'
+  myDeposit: number
+  actualCount: number | null
+  actualAmount: number | null
+  totalParticipants: number
+  survivorCount: number
+  totalDeposit: number
+  forfeitedDeposit: number
+  ended: boolean
+}
