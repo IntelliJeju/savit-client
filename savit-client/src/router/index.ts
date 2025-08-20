@@ -88,6 +88,19 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
 
+    {
+    path: '/auth/mypage',
+    name: 'Userpage',
+    component: UserPage,
+    meta: {
+      showNavigation: true,
+      requiresAuth: false,
+      showBackButton: true,
+      showHeader: true,
+      title: '',
+    },
+  },
+
   //card
   {
     path: '/card',

@@ -1,10 +1,9 @@
 <template>
   <Teleport to="#header-content">
     <div class="flex items-center gap-2">
-      <ProfileImage />
+      <UserProfileButton />
       <div>
-        <span class="text-app-green">{{ getUser?.nickname }}</span
-        >님 안녕하세요!
+        <span class="text-app-green">{{ getUser?.nickname }}</span>님 안녕하세요!
       </div>
     </div>
   </Teleport>
@@ -119,26 +118,47 @@
             </div>
           </div>
 
-          <!-- 분석 버튼 영역 -->
-          <div class="flex justify-center mx-4 mb-6 mt-8">
+          <!-- 통계 정보 영역 -->
+          <div class="mx-4 mb-6 mt-8 space-y-3">
             <template v-if="totalAmount > 0">
-              <div class="flex gap-8 w-full">
-                <ButtonItem class="flex-1 min-w-32 h-28 font-semibold" @click="BudgetCheck">
-                  <div class="text-center">이번 달 예산의 30%를</div>
-                  <div class="text-center">쇼핑 카테고리에</div>
-                  <div class="text-center">사용했어요!</div>
-                </ButtonItem>
-                <ButtonItem
-                  variant="purple"
-                  class="flex-1 min-w-32 h-28 font-semibold"
-                  @click="BudgetCheck"
-                >
-                  <div class="text-center">지난 달 보다</div>
-                  <div class="text-center">문화 카테고리에</div>
-                  <div class="text-center">10% 더</div>
-                  <div class="text-center">사용했어요!</div>
-                </ButtonItem>
-              </div>
+              <!-- 이번 달 최다 지출 카테고리 -->
+              <ButtonItem class="w-full h-20 px-6" @click="BudgetCheck">
+                <div class="flex items-center justify-between w-full">
+                  <div class="text-left">
+                    <div class="text-sm text-white/80">이번 달 최다 지출</div>
+                    <div class="text-lg font-bold text-white">
+                      {{ highestSpendingCategory.category }}
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-white">
+                      {{ highestSpendingCategory.ratio }}%
+                    </div>
+                    <div class="text-xs text-white/70">총 예산 중</div>
+                  </div>
+                </div>
+              </ButtonItem>
+
+              <!-- 전월 대비 변화 -->
+              <ButtonItem variant="purple" class="w-full h-20 px-6" @click="BudgetCheck">
+                <div class="flex items-center justify-between w-full">
+                  <div class="text-left">
+                    <div class="text-sm text-white/80">전월 대비</div>
+                    <div class="text-lg font-bold text-white">
+                      {{ categoryComparison.category }}
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-white">
+                      {{ categoryComparison.isIncrease ? '+' : '-'
+                      }}{{ categoryComparison.changeRatio }}%
+                    </div>
+                    <div class="text-xs text-white/70">
+                      {{ categoryComparison.isIncrease ? '증가' : '절약' }}
+                    </div>
+                  </div>
+                </div>
+              </ButtonItem>
             </template>
 
             <template v-else>
@@ -167,9 +187,10 @@ import router from '@/router'
 import { storeToRefs } from 'pinia'
 import { calculateProgress } from '@/utils/common.ts'
 import { useAuthStore } from '@/stores/auth.ts'
-import ProfileImage from '@/components/user/ProfileImage.vue'
+import UserProfileButton from '@/components/user/UserProfileButton.vue'
 import { transactionService } from '@/services/transactionService'
 import { getCurrentMonth } from '@/utils/dateUtils'
+import { useDashboardAnalytics } from '@/composables/dashboard/useDashboardAnalytics'
 
 const authStore = useAuthStore()
 const cardsStore = useCardsStore()
@@ -180,6 +201,11 @@ const { getUser } = storeToRefs(authStore)
 const { cardsList } = storeToRefs(cardsStore)
 const { getParticipatingChallengeList } = storeToRefs(challengeStore)
 const { currentBudgetSummary } = storeToRefs(budgetsStore)
+
+// Dashboard 분석 composable 사용
+const { highestSpendingCategory, categoryComparison } = useDashboardAnalytics()
+
+// 예산 데이터는 App.vue에서 이미 로드됨
 
 // 챌린지 슬라이드
 const currentChallengeIndex = ref(0)

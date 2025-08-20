@@ -53,20 +53,20 @@
 
       <CardComponent>
         <!-- 거래내역이 있을 때 -->
-        <div v-if="recentTransactions.length > 0">
+        <div v-if="recentTransactions.length > 0" class="my-[-0.5rem]">
           <div
             v-for="(transaction, index) in recentTransactions"
             :key="index"
-            class="p-4"
+            class="py-4 px-2"
             :class="{ 'border-b border-slate-200': index < recentTransactions.length - 1 }"
           >
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-3 flex-1 min-w-0">
                 <div
-                  class="w-10 h-10 rounded-3xl flex items-center justify-center bg-app-light-gray flex-shrink-0"
+                  class="w-10 h-10 bg-app-light-gray rounded-lg flex items-center justify-center flex-shrink-0"
                 >
                   <CategoryIcon
-                    :category="mapCategoryToMainCategory(transaction.resMemberStoreType)"
+                    :category="mapCategoryToMainCategory(transaction.categoryId)"
                     :color="'#028174'"
                     :size="20"
                   />
@@ -75,7 +75,7 @@
                   <div class="font-medium text-slate-800 truncate">
                     {{ transaction.resMemberStoreName }}
                   </div>
-                  <div class="text-sm text-slate-500 truncate">{{ transaction.resUsedDate }}</div>
+                  <div class="text-sm text-slate-500 truncate">{{ formatTransactionDate(transaction.resUsedDate) }}</div>
                 </div>
               </div>
               <div class="text-right flex-shrink-0">
@@ -117,7 +117,7 @@ import CategoryIcon from '@/components/icon/CategoryIcon.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import { mapCategoryToMainCategory } from '@/utils/category'
 import { storeToRefs } from 'pinia'
-import now from '@/utils/dateUtils'
+import now, { formatTransactionDate } from '@/utils/dateUtils'
 
 const cardsStore = useCardsStore()
 
@@ -160,22 +160,6 @@ const onSlideChange = (index: number) => {
   currentCardIndex.value = index
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-
-  if (date.toDateString() === today.toDateString()) {
-    return '오늘'
-  } else if (date.toDateString() === yesterday.toDateString()) {
-    return '어제'
-  } else {
-    const diffTime = Math.abs(today.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return `${diffDays}일 전`
-  }
-}
 
 const currentCard = computed(() => {
   return cardsList.value[currentCardIndex.value]

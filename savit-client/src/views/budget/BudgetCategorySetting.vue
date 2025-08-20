@@ -133,7 +133,7 @@ const applyRecommendation = async () => {
   try {
     // 각 카테고리별 또래 평균 금액 가져오기
     const peerAvgPromises = categories.value.map(async (category) => {
-      const categoryId = CATEGORY_ID_MAP[category.name]
+      const categoryId = CATEGORY_ID_MAP[category.name][0] // 첫 번째 ID 사용
       const peerAvg = await budgetsStore.getPeerAvgByCategoryId(categoryId)
       return { category: category.name, amount: peerAvg }
     })
