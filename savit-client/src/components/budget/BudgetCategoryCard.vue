@@ -112,33 +112,17 @@ const {
 
 // 월별 세그먼트 계산 함수 (통합)
 const getMonthSegments = (mainCategory: MainCategoryBudgetStatus, monthsBack: number) => {
-  const isExpanded = expandedCategories.value.has(mainCategory.mainCategory)
   const monthSpendingData = getMonthSpendingData(monthsBack)
   const monthBudgetData = getMonthBudgetData(monthsBack)
   const budgetAmount = getBudgetAmountForCategory(mainCategory, monthBudgetData)
 
-  if (isExpanded) {
-    return mainCategory.subCategories
-      .filter((sub) => monthSpendingData[sub.subCategory] > 0)
-      .map((sub) => ({
-        label: sub.subCategory,
-        value: Math.min((monthSpendingData[sub.subCategory] / budgetAmount) * 100, 100),
-        color: getSubCategoryColor(sub.subCategory),
-      }))
-  }
-
-  const monthTotal = mainCategory.subCategories.reduce(
-    (sum, sub) => sum + monthSpendingData[sub.subCategory],
-    0,
-  )
-
-  return [
-    {
-      label: `${getRelativeMonth(monthsBack).name} 지출`,
-      value: Math.min((monthTotal / budgetAmount) * 100, 100),
-      color: monthsBack === 1 ? '#6b7280' : '#9ca3af',
-    },
-  ]
+  // 모든 서브카테고리를 포함하여 표시
+  return mainCategory.subCategories
+    .map((sub) => ({
+      label: sub.subCategory,
+      value: (monthSpendingData[sub.subCategory] || 0) / budgetAmount * 100,
+      color: getSubCategoryColor(sub.subCategory),
+    }))
 }
 
 // 예산 금액 조회 유틸리티 (중복 제거)
@@ -164,6 +148,7 @@ const subCategoryColors: Record<string, string> = {
   배달: '#028174',
   대중교통: '#92DE8B',
   택시: '#0AB68B',
+  철도: '#028174',
   통신비: '#92DE8B',
   공과금: '#0AB68B',
   의료비: '#028174',
@@ -187,10 +172,9 @@ const getMainCategorySegments = (mainCategory: any) => {
 
   if (mainCategory.expanded) {
     return mainCategory.subCategories
-      .filter((sub: any) => sub.spentAmount > 0)
       .map((sub: any) => ({
         label: sub.subCategory,
-        value: Math.min((sub.spentAmount / mainCategory.budgetAmount) * 100, 100),
+        value: (sub.spentAmount / mainCategory.budgetAmount) * 100,
         color: getSubCategoryColor(sub.subCategory),
       }))
   }
@@ -198,8 +182,9 @@ const getMainCategorySegments = (mainCategory: any) => {
   return [
     {
       label: mainCategory.mainCategory,
-      value: Math.min(mainCategory.spendingRatio, 100),
-      color: mainCategory.isOverBudget ? '#ef4444' : '#0AB68B',
+      value: mainCategory.spendingRatio,
+      color: mainCategory.spendingRatio >= 80 ? '#ef4444' : 
+             mainCategory.spendingRatio >= 50 ? '#FFBC00' : '#0AB68B',
     },
   ]
 }

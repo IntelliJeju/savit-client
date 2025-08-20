@@ -13,7 +13,7 @@ export const CATEGORIES = {
     식비: ['식당', '카페', '배달'],
     교통: ['대중교통', '택시', '철도'],
     생활: ['통신비', '공과금', '편의점/마트', '의료비', '교육'],
-    문화: ['공연', '쇼핑', '유흥', '영화', '정기구독'],
+    문화: ['공연', '쇼핑', '유흥', '정기구독', '영화'],
     기타: ['기타']
   } as const
 } as const
@@ -22,19 +22,28 @@ export const CATEGORY_ORDER: MainCategory[] = [...CATEGORIES.MAIN]
 
 export const CATEGORY_ID_MAP: Record<MainCategory, number[]> = {
   식비: [1, 2, 3],
-  교통: [4, 5, 6, 17], 
-  생활: [7, 8, 12, 13],
-  문화: [9, 10, 11, 14, 15],
-  기타: [16]
+  교통: [4, 5, 6], 
+  생활: [7, 8, 9, 13, 14],
+  문화: [10, 11, 12, 15, 16],
+  기타: [17]
 } as const
 
 // 역방향 매핑: categoryId -> MainCategory
 export const ID_TO_CATEGORY_MAP: Record<number, MainCategory> = {
   1: '식비', 2: '식비', 3: '식비',
-  4: '교통', 5: '교통', 6: '교통', 17: '교통',
-  7: '생활', 8: '생활', 12: '생활', 13: '생활',
-  9: '문화', 10: '문화', 11: '문화', 14: '문화', 15: '문화',
-  16: '기타'
+  4: '교통', 5: '교통', 6: '교통',
+  7: '생활', 8: '생활', 9: '생활', 13: '생활', 14: '생활',
+  10: '문화', 11: '문화', 12: '문화', 15: '문화', 16: '문화',
+  17: '기타'
+} as const
+
+// 서브카테고리 ID 매핑: categoryId -> SubCategory
+export const ID_TO_SUBCATEGORY_MAP: Record<number, SubCategory> = {
+  1: '식당', 2: '카페', 3: '배달',
+  4: '대중교통', 5: '택시', 6: '철도',
+  7: '통신비', 8: '공과금', 9: '편의점/마트', 13: '의료비', 14: '교육',
+  10: '공연', 11: '쇼핑', 12: '유흥', 15: '정기구독', 16: '영화',
+  17: '기타'
 } as const
 
 export const DEFAULT_BUDGET_AMOUNTS: Record<MainCategory, number> = {
