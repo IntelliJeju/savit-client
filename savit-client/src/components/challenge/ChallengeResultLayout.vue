@@ -1,6 +1,6 @@
 <template>
   <div
-    class="result-page relative h-full ml-[-1rem] mr-[-1rem] px-6 text-white overflow-hidden pb-6"
+    class="result-page relative h-screen ml-[-1rem] mr-[-1rem] px-6 text-white overflow-hidden pb-6"
     :class="backgroundClass"
   >
     <div class="result-header relative flex py-4 items-center">

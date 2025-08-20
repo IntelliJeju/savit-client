@@ -7,6 +7,7 @@ import type {
   ParticipatingChallenge,
   ParticipatingChallengeDetail,
   Statistics,
+  ChallengeResult,
 } from '@/types/challenges'
 
 export const useChallengeStore = defineStore('challenge', () => {
@@ -18,6 +19,7 @@ export const useChallengeStore = defineStore('challenge', () => {
   const participatingChallengeList = ref<ParticipatingChallenge[]>([])
   const participatingChallengeDetailList = ref(new Map<number, ParticipatingChallengeDetail>())
   const challengeStatistics = ref<Statistics[]>([])
+  const challengeResultList = ref(new Map<number, ChallengeResult>())
 
   //fetch
   const fetchAvailChallengeList = async () => {
@@ -75,15 +77,12 @@ export const useChallengeStore = defineStore('challenge', () => {
     }
   }
 
-  const joinChallenge = async (id: number) => {
+  const fetchChallengeResult = async (id: number) => {
     try {
-      //   const res = await request({ method: 'POST', url: `/challenges/${id}/join` })
-      const res = true
-      if (res) {
-        return true
-      }
+      const res = await request({ method: 'GET', url: `/challenge/${id}/my-result` })
+      challengeResultList.value.set(id, res)
     } catch (err) {
-      console.error('joinChallenge error: ', err)
+      console.error('fetchChallengeResult error: ', err)
       throw err
     }
   }
@@ -112,6 +111,10 @@ export const useChallengeStore = defineStore('challenge', () => {
       challengeStatistics.value.filter((challenge) => challenge.challengeId === id)[0],
   )
 
+  const getChallengeResultById = computed(() => (id: number) => {
+    return challengeResultList.value.get(id)
+  })
+
   return {
     //fetch
     fetchAvailChallengeList,
@@ -119,7 +122,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     fetchParticipateChallenges,
     fetchParticipateChallengeDetail,
     fetchChallengeStatistics,
-    joinChallenge,
+    fetchChallengeResult,
 
     //computed
     getChallengeById,
@@ -128,6 +131,7 @@ export const useChallengeStore = defineStore('challenge', () => {
     getParticipatingChallengeDetailList,
     getChallengeStatistics,
     getChallengeStatisticsById,
+    getChallengeResultById,
 
     //ref
     participatingChallengeDetailList,
