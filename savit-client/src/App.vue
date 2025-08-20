@@ -37,10 +37,12 @@ const {
   fetchParticipateChallenges,
   fetchParticipateChallengeDetail,
   fetchChallengeStatistics,
+  fetchChallengeResult,
 } = challengeStore
 const {
   availChallengeList,
   getParticipatingChallengeList,
+  getChallengeStatistics,
   loading: challengeLoading,
 } = storeToRefs(challengeStore)
 
@@ -70,6 +72,9 @@ const loadAllData = async () => {
   await fetchParticipateChallenges()
   await fetchChallengeStatistics()
 
+  const statisticsResultPromise = getChallengeStatistics.value.map((stat) =>
+    fetchChallengeResult(stat.challengeId),
+  )
   const promissesAvail = availChallengeList.value.map((challenge) => {
     fetchAvailChallengeDetail(challenge.challengeId)
   })
@@ -77,6 +82,7 @@ const loadAllData = async () => {
     fetchParticipateChallengeDetail(challenge.challengeId)
   })
 
+  await Promise.allSettled(statisticsResultPromise)
   await Promise.allSettled(promissesAvail)
   await Promise.allSettled(promissesParticipant)
 
