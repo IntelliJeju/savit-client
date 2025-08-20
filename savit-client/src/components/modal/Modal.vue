@@ -5,12 +5,10 @@ const basicModal = useModal()
 
 닫기 후 함수
 const afterModalClose = () => {
-  console.log('modal close')
 }
 
 확인 후 함수
 const afterConfirmClose = () => {
-  console.log('modal confirm')
 }
 
 열기 전 함수

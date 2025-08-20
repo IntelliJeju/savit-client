@@ -27,7 +27,6 @@ export const useAuthStore = defineStore('auth', () => {
   const fetchUserInfo = async () => {
     try {
       const res = await request({ method: 'GET', url: '/profile' })
-      console.log(res)
       user.value = res
     } catch (err) {
       console.error('fetchUserInfo error: ', err)
@@ -45,7 +44,6 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('authUser')
 
-    console.log('로그아웃 되었습니다.')
   }
 
   function restoreAuthentication() {
@@ -57,7 +55,6 @@ export const useAuthStore = defineStore('auth', () => {
         accessToken.value = storedToken
         refreshToken.value = storedRefreshToken
         isAuthenticated.value = true
-        console.log('로그인 정보를 복원했습니다.')
       } catch (error) {
         console.error('사용자 정보 복원 실패:', error)
         logout()
