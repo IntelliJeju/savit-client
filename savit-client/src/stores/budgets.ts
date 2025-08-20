@@ -119,11 +119,11 @@ export const useBudgetsStore = defineStore('budgets', () => {
         url: '/budget/categories/list',
         method: 'POST',
         data: { categoryIds: [1, 2, 3, 4, 5] },
-      });
-      return res;
+      })
+      return res
     } catch (err) {
-      console.error('fetchMainCategoryBudget Error: ', err);
-      return null;
+      console.error('fetchMainCategoryBudget Error: ', err)
+      return null
     }
   }
 
@@ -143,9 +143,9 @@ export const useBudgetsStore = defineStore('budgets', () => {
       }
 
       // 2. API 응답을 올바른 주 카테고리 예산으로 변환
-      const monthKey = month.replace('-', '');
-      const categoryBudgetsFromApi = mainCategoryRes[monthKey] || [];
-      
+      const monthKey = month.replace('-', '')
+      const categoryBudgetsFromApi = mainCategoryRes[monthKey] || []
+
       // 이 API에서만 사용하는 ID <-> 주 카테고리 매핑
       const API_ID_TO_MAIN_CAT: Record<number, MainCategory> = {
         1: '식비',
@@ -153,39 +153,33 @@ export const useBudgetsStore = defineStore('budgets', () => {
         3: '생활',
         4: '문화',
         5: '기타',
-      };
+      }
       const MAIN_CAT_TO_API_ID = {
-        '식비': 1,
-        '교통': 2,
-        '생활': 3,
-        '문화': 4,
-        '기타': 5,
+        식비: 1,
+        교통: 2,
+        생활: 3,
+        문화: 4,
+        기타: 5,
       }
 
-      const mainCategoryBudgets: MainCategoryBudgetStatus[] = CATEGORIES.MAIN.map(
-        (mainCat) => {
-          const apiId = MAIN_CAT_TO_API_ID[mainCat];
-          const budgetFromApi = categoryBudgetsFromApi.find(
-            (item: any) => item.categoryId === apiId
-          );
+      const mainCategoryBudgets: MainCategoryBudgetStatus[] = CATEGORIES.MAIN.map((mainCat) => {
+        const apiId = MAIN_CAT_TO_API_ID[mainCat]
+        const budgetFromApi = categoryBudgetsFromApi.find((item: any) => item.categoryId === apiId)
 
-          const subCategories = (CATEGORIES.SUB[mainCat] || []).map(
-            (sub: SubCategory) => ({
-              subCategory: sub,
-              spentAmount: 0,
-            })
-          );
+        const subCategories = (CATEGORIES.SUB[mainCat] || []).map((sub: SubCategory) => ({
+          subCategory: sub,
+          spentAmount: 0,
+        }))
 
-          return {
-            mainCategory: mainCat,
-            budgetAmount: budgetFromApi
-              ? budgetFromApi.targetAmount
-              : DEFAULT_BUDGET_AMOUNTS[mainCat], // API 응답 없으면 기본값 사용
-            totalSpent: 0,
-            subCategories,
-          };
+        return {
+          mainCategory: mainCat,
+          budgetAmount: budgetFromApi
+            ? budgetFromApi.targetAmount
+            : DEFAULT_BUDGET_AMOUNTS[mainCat], // API 응답 없으면 기본값 사용
+          totalSpent: 0,
+          subCategories,
         }
-      );
+      })
 
       // 3. 최종 MonthlyBudget 객체 생성
       const completeBudget: MonthlyBudget = {
@@ -275,6 +269,19 @@ export const useBudgetsStore = defineStore('budgets', () => {
     return { month: monthStr, monthName, totalSpent, totalBudget }
   }
 
+  async function getPeerAvgByCategoryId(categoryId: number): Promise<number> {
+    try {
+      const res = await request({
+        url: `/budget/peer-avg/${categoryId}`,
+        method: 'GET',
+      })
+      return res.averageAmount || 0
+    } catch (error) {
+      console.error(`카테고리 ${categoryId}의 또래 평균 가져오기 실패:`, error)
+      return 0
+    }
+  }
+
   return {
     //fetch
     fetchBudgetsByMonth,
@@ -290,6 +297,7 @@ export const useBudgetsStore = defineStore('budgets', () => {
     setTotalBudget,
     setBudgetForMonth,
     getPreviousMonthsSummary,
+    getPeerAvgByCategoryId,
     getSpendingByMonth: getSpendingByMonthData,
     getBudgetByMonth,
     validateBudgetSettings,
