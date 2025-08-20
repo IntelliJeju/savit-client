@@ -15,7 +15,7 @@
         :style="{ 
           width: (segment.value / total) * 100 + '%',
           backgroundColor: segment.color,
-          marginLeft: index > 0 ? '-1px' : '0'
+          marginLeft: '0'
         }"
       />
     </div>

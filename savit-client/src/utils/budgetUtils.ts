@@ -137,5 +137,5 @@ export const calculateDefaultTotalBudget = (defaultAmounts: Record<MainCategory,
 
 // 지출 비율 계산 (중복 제거)
 export const calculateSpendingRatio = (spent: number, budget: number): string => {
-  return budget > 0 ? Math.min((spent / budget) * 100, 100).toFixed(1) : '0.0'
+  return budget > 0 ? ((spent / budget) * 100).toFixed(1) : '0.0'
 }

@@ -3,7 +3,7 @@
     <div
       class="progress-front h-2 rounded-full"
       :class="progress <= 50 ? 'bg-[#0AB68B]' : progress <= 80 ? 'bg-[#FFBC00]' : 'bg-[#FF4242]'"
-      :style="{ width: Math.min(100, progress) + '%' }"
+      :style="{ width: progress + '%' }"
     />
   </div>
 </template>

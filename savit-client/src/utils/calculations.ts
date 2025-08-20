@@ -178,7 +178,7 @@ export const calculateAmount = (percentage: number, totalBudget: number): number
 // 금액으로부터 퍼센테지 계산
 export const calculatePercentageFromAmount = (amount: number, budget: number): number => {
   const exactPercentage = (amount / budget) * 100
-  return Math.min(100, Math.max(0, exactPercentage))
+  return Math.max(0, exactPercentage)
 }
 
 // 입력값에서 숫자만 추출
@@ -260,7 +260,7 @@ export const adjustCategoriesForSlider = (
     if (operation === 'decrease') {
       cat.percentage = Math.max(0, cat.percentage - adjustment)
     } else {
-      cat.percentage = Math.min(100, cat.percentage + adjustment)
+      cat.percentage = cat.percentage + adjustment
     }
   })
 }
