@@ -5,7 +5,7 @@
     <!-- 로고 - 상단과 텍스트 사이 중앙 -->
     <div class="absolute top-0 left-0 right-0 h-2/3 flex items-center justify-center z-20">
       <img
-        src="@/assets/img/savit-logo.png"
+        src="@/assets/img/savit-logo.webp"
         alt="Savit Logo"
         class="w-72 h-72 object-contain drop-shadow-2xl"
       />
