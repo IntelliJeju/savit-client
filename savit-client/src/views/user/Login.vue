@@ -28,7 +28,7 @@
           <div class="relative group">
             <div>
               <img
-                src="@/assets/img/kakao_login_medium_wide.png"
+                src="@/assets/img/kakao_login_medium_wide.webp"
                 alt="Kakao Login"
                 class="w-full cursor-pointer rounded-xl drop-shadow-xl"
                 @click.prevent="handleKakaoLogin"
