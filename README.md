@@ -1,3 +1,6 @@
+<img width="1920" height="1080" alt="1" src="https://github.com/user-attachments/assets/2bd95d83-d139-4b41-8637-3c12df2c7263" />
+
+
 # 🏦 SAVIT Client
 
 SAVIT은 개인 자산 관리 및 소비 습관 개선을 위한 스마트 가계부 애플리케이션입니다. 카드 사용 내역 추적, 예산 관리, 절약 챌린지 등의 기능을 통해 사용자의 건전한 소비 습관 형성을 지원합니다.
